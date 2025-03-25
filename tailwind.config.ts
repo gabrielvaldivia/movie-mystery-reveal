@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -12,7 +13,7 @@ export default {
 	theme: {
 		container: {
 			center: true,
-			padding: '2rem',
+			padding: '1.5rem',
 			screens: {
 				'2xl': '1400px'
 			}
@@ -51,16 +52,6 @@ export default {
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
-				},
-				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
 				}
 			},
 			borderRadius: {
@@ -84,11 +75,66 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'pulse-subtle': {
+					'0%, 100%': { 
+						opacity: '1' 
+					},
+					'50%': { 
+						opacity: '0.85' 
+					}
+				},
+				'slide-up': {
+					'0%': { 
+						transform: 'translateY(20px)',
+						opacity: '0'
+					},
+					'100%': { 
+						transform: 'translateY(0)',
+						opacity: '1'
+					}
+				},
+				'slide-down': {
+					'0%': { 
+						transform: 'translateY(-20px)',
+						opacity: '0'
+					},
+					'100%': { 
+						transform: 'translateY(0)',
+						opacity: '1'
+					}
+				},
+				'fade-in': {
+					'0%': { 
+						opacity: '0' 
+					},
+					'100%': { 
+						opacity: '1' 
+					}
+				},
+				'fade-out': {
+					'0%': { 
+						opacity: '1' 
+					},
+					'100%': { 
+						opacity: '0' 
+					}
+				},
+				'shimmer': {
+					'100%': { 
+						transform: 'translateX(100%)' 
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'pulse-subtle': 'pulse-subtle 2s ease-in-out infinite',
+				'slide-up': 'slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+				'slide-down': 'slide-down 0.4s cubic-bezier(0.16, 1, 0.3, 1)',
+				'fade-in': 'fade-in 0.3s ease-in-out',
+				'fade-out': 'fade-out 0.3s ease-in-out',
+				'shimmer': 'shimmer 3s infinite'
 			}
 		}
 	},
