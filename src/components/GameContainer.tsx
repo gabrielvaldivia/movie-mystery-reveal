@@ -36,12 +36,14 @@ const GameContainer: React.FC = () => {
   }, []);
   
   const startNewRound = async () => {
+    console.log("Starting new round");
     setIsLoading(true);
     try {
       const nextMovie = currentMovie 
         ? await getNextMovie(currentMovie.id) 
         : await getRandomMovie();
       
+      console.log("Next movie selected:", nextMovie.title);
       setCurrentMovie(nextMovie);
       setIsGameActive(true);
       setIsRoundComplete(false);

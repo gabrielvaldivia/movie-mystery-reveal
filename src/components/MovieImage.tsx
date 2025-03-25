@@ -16,7 +16,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   isActive
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
+  const imageRef = useRef<HTMLImageElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [animation, setAnimation] = useState<{
     start: () => void;
@@ -26,12 +26,15 @@ const MovieImage: React.FC<MovieImageProps> = ({
 
   // Set up canvas and image when component mounts or image URL changes
   useEffect(() => {
+    setIsLoaded(false);
+    
     const image = new Image();
+    image.crossOrigin = "anonymous"; // Set this before setting src
     image.src = imageUrl;
-    image.crossOrigin = "anonymous";
     imageRef.current = image;
 
     image.onload = () => {
+      console.log("Image loaded successfully:", imageUrl);
       setIsLoaded(true);
       
       if (canvasRef.current) {
@@ -39,22 +42,26 @@ const MovieImage: React.FC<MovieImageProps> = ({
         const container = canvasRef.current.parentElement;
         if (container) {
           // For backdrops (screenshots), use the full container width
-          // Backdrops typically have a 16:9 aspect ratio which matches our container
           const containerWidth = container.clientWidth;
           canvasRef.current.width = containerWidth;
           canvasRef.current.height = (containerWidth * 9) / 16; // Force 16:9 aspect ratio
+          
+          // Create and store animation controller
+          const pixelAnimation = createPixelationAnimation(
+            image,
+            canvasRef.current,
+            duration,
+            onRevealComplete
+          );
+          
+          setAnimation(pixelAnimation);
         }
-        
-        // Create and store animation controller
-        const pixelAnimation = createPixelationAnimation(
-          image,
-          canvasRef.current,
-          duration,
-          onRevealComplete
-        );
-        
-        setAnimation(pixelAnimation);
       }
+    };
+
+    image.onerror = (e) => {
+      console.error("Error loading image:", imageUrl, e);
+      setIsLoaded(false);
     };
 
     return () => {
@@ -116,7 +123,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   }, [animation, duration, onRevealComplete, isActive]);
 
   return (
-    <div className="pixel-reveal-container glass-panel">
+    <div className="pixel-reveal-container glass-panel relative">
       {!isLoaded && (
         <div className="absolute inset-0 flex items-center justify-center bg-secondary animate-pulse-subtle">
           <span className="text-muted-foreground">Loading image...</span>
