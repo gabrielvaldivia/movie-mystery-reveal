@@ -38,9 +38,11 @@ const MovieImage: React.FC<MovieImageProps> = ({
         // Match canvas dimensions to container while maintaining aspect ratio
         const container = canvasRef.current.parentElement;
         if (container) {
+          // For backdrops (screenshots), use the full container width
+          // Backdrops typically have a 16:9 aspect ratio which matches our container
           const containerWidth = container.clientWidth;
           canvasRef.current.width = containerWidth;
-          canvasRef.current.height = (containerWidth / image.width) * image.height;
+          canvasRef.current.height = (containerWidth * 9) / 16; // Force 16:9 aspect ratio
         }
         
         // Create and store animation controller
@@ -85,7 +87,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
           if (Math.abs(oldWidth - containerWidth) > 10) {
             // Only resize if the width difference is significant
             canvasRef.current.width = containerWidth;
-            canvasRef.current.height = (containerWidth / imageRef.current.width) * imageRef.current.height;
+            canvasRef.current.height = (containerWidth * 9) / 16; // Maintain 16:9 aspect ratio
             
             // Reapply current pixelation level after resize
             if (animation) {
