@@ -1,4 +1,3 @@
-
 // Movie data with TMDB API integration
 
 export interface Movie {
@@ -58,7 +57,7 @@ export const moviesCollection: Movie[] = [
     hint: "An offer you can't refuse",
     tmdbId: 238
   },
-  // Adding more top movies to reach 100
+  // First 25 movies already in the list
   {
     id: "6",
     title: "The Dark Knight",
@@ -260,74 +259,385 @@ export const moviesCollection: Movie[] = [
     hint: "A poor family infiltrates a wealthy household",
     tmdbId: 496243
   },
-  // Continue with additional movies...
-  // Adding remaining movies to complete 100
-  // Each entry following the same pattern...
-];
-
-// Since the API key is invalid, we'll use the backup image URLs directly
-// This function no longer attempts to fetch from TMDB
-export const fetchMovieImages = async (movie: Movie): Promise<string> => {
-  try {
-    // Return the backup image URL that's already provided in the movie object
-    if (movie.imageUrl) {
-      return movie.imageUrl;
-    }
-    
-    // Fallback image if no backup image URL is available
-    return "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=1459&auto=format&fit=crop";
-  } catch (error) {
-    console.error("Error with movie image:", error);
-    return "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=1459&auto=format&fit=crop"; // Fallback image
-  }
-};
-
-// Prefetch and cache all movie images
-let moviesWithImages: Movie[] = [...moviesCollection];
-let imagesLoaded = false;
-
-export const loadAllMovieImages = async (): Promise<void> => {
-  if (imagesLoaded) return;
-  
-  // Since we're using backup URLs, this function is simpler now
-  // We just need to ensure all movies have an imageUrl
-  const updatedMovies = await Promise.all(
-    moviesCollection.map(async (movie) => {
-      // Only fetch if the movie doesn't already have an imageUrl
-      if (!movie.imageUrl) {
-        const imageUrl = await fetchMovieImages(movie);
-        return { ...movie, imageUrl };
-      }
-      return movie;
-    })
-  );
-  
-  moviesWithImages = updatedMovies;
-  imagesLoaded = true;
-};
-
-export const getRandomMovie = async (): Promise<Movie> => {
-  if (!imagesLoaded) {
-    await loadAllMovieImages();
-  }
-  
-  const randomIndex = Math.floor(Math.random() * moviesWithImages.length);
-  return moviesWithImages[randomIndex];
-};
-
-export const getNextMovie = async (currentId: string): Promise<Movie> => {
-  if (!imagesLoaded) {
-    await loadAllMovieImages();
-  }
-  
-  // Get a completely random movie that's different from the current one
-  let randomIndex;
-  let nextMovie;
-  
-  do {
-    randomIndex = Math.floor(Math.random() * moviesWithImages.length);
-    nextMovie = moviesWithImages[randomIndex];
-  } while (nextMovie.id === currentId && moviesWithImages.length > 1);
-  
-  return nextMovie;
-};
+  // Adding more movies to reach 100
+  {
+    id: "31",
+    title: "Apocalypse Now",
+    imageUrl: "https://image.tmdb.org/t/p/w780/gQB8Y5RCMkv2zwzFg7kz9JbVVId.jpg",
+    releaseYear: 1979,
+    hint: "The horror, the horror",
+    tmdbId: 28
+  },
+  {
+    id: "32",
+    title: "Alien",
+    imageUrl: "https://image.tmdb.org/t/p/w780/vfrQk5IPloGg1v9Rzbh2Eg3VGyM.jpg",
+    releaseYear: 1979,
+    hint: "In space, no one can hear you scream",
+    tmdbId: 348
+  },
+  {
+    id: "33",
+    title: "Amélie",
+    imageUrl: "https://image.tmdb.org/t/p/w780/f0uorE7K7ggHfr8r7lIZHHXs2ys.jpg",
+    releaseYear: 2001,
+    hint: "She changes others' lives but can she change her own?",
+    tmdbId: 194
+  },
+  {
+    id: "34",
+    title: "Blade Runner",
+    imageUrl: "https://image.tmdb.org/t/p/w780/63N9uy8nd9j7Eog2axPQ8lbr3Wj.jpg",
+    releaseYear: 1982,
+    hint: "Like tears in rain",
+    tmdbId: 78
+  },
+  {
+    id: "35",
+    title: "Jurassic Park",
+    imageUrl: "https://image.tmdb.org/t/p/w780/oU7Oq2kFAAlGqbU4VoAE36g4hoI.jpg",
+    releaseYear: 1993,
+    hint: "Life finds a way",
+    tmdbId: 329
+  },
+  {
+    id: "36",
+    title: "Raiders of the Lost Ark",
+    imageUrl: "https://image.tmdb.org/t/p/w780/ceG9VzoRAVGwivFU403Wc3AHRys.jpg",
+    releaseYear: 1981,
+    hint: "The original adventurer archaeologist",
+    tmdbId: 85
+  },
+  {
+    id: "37",
+    title: "The Truman Show",
+    imageUrl: "https://image.tmdb.org/t/p/w780/vuvo78QLHx7QVnVytQg7qJn1D2T.jpg",
+    releaseYear: 1998,
+    hint: "His whole life was a TV show",
+    tmdbId: 37165
+  },
+  {
+    id: "38",
+    title: "Titanic",
+    imageUrl: "https://image.tmdb.org/t/p/w780/9xjZS2rlVxm8SFx8kPC3aIGCOYQ.jpg",
+    releaseYear: 1997,
+    hint: "I'll never let go",
+    tmdbId: 597
+  },
+  {
+    id: "39",
+    title: "Eternal Sunshine of the Spotless Mind",
+    imageUrl: "https://image.tmdb.org/t/p/w780/5MwkWH9tYHv3mV9OdYTMR5qreIz.jpg",
+    releaseYear: 2004,
+    hint: "Erasing memories of lost love",
+    tmdbId: 38
+  },
+  {
+    id: "40",
+    title: "The Shining",
+    imageUrl: "https://image.tmdb.org/t/p/w780/b6ko0IKC8MdYBBPkkA1aBPLe2yz.jpg",
+    releaseYear: 1980,
+    hint: "Here's Johnny!",
+    tmdbId: 694
+  },
+  {
+    id: "41",
+    title: "Pan's Labyrinth",
+    imageUrl: "https://image.tmdb.org/t/p/w780/7PurMm0gUOJZ8Uk0XfYkO6fKjHp.jpg",
+    releaseYear: 2006,
+    hint: "A dark fairy tale during wartime",
+    tmdbId: 1417
+  },
+  {
+    id: "42",
+    title: "The Thing",
+    imageUrl: "https://image.tmdb.org/t/p/w780/tzGY49kseSE9QAKk47uuDGwnSCu.jpg",
+    releaseYear: 1982,
+    hint: "Antarctic isolation with a shapeshifting alien",
+    tmdbId: 1091
+  },
+  {
+    id: "43",
+    title: "Memento",
+    imageUrl: "https://image.tmdb.org/t/p/w780/yuNs09hvpHVU1cBTCAk9zxsL2oW.jpg",
+    releaseYear: 2000,
+    hint: "A story told backwards",
+    tmdbId: 77
+  },
+  {
+    id: "44",
+    title: "Die Hard",
+    imageUrl: "https://image.tmdb.org/t/p/w780/yFihWxQcmqcaBR31QM6Y8gT6aYV.jpg",
+    releaseYear: 1988,
+    hint: "Yippee-ki-yay",
+    tmdbId: 562
+  },
+  {
+    id: "45",
+    title: "Princess Mononoke",
+    imageUrl: "https://image.tmdb.org/t/p/w780/cMYCDADoLKLbB83g4WnJegaZimC.jpg",
+    releaseYear: 1997,
+    hint: "Humans vs. forest spirits",
+    tmdbId: 128
+  },
+  {
+    id: "46",
+    title: "Goodfellas",
+    imageUrl: "https://image.tmdb.org/t/p/w780/aKuFiU82s5ISJpGZp7YkIr3kCUd.jpg",
+    releaseYear: 1990,
+    hint: "As far back as I can remember...",
+    tmdbId: 769
+  },
+  {
+    id: "47",
+    title: "The Godfather: Part II",
+    imageUrl: "https://image.tmdb.org/t/p/w780/hek3koDUyRQk7FIhPXsa6mT2Zc3.jpg",
+    releaseYear: 1974,
+    hint: "The sequel that equals the original",
+    tmdbId: 240
+  },
+  {
+    id: "48",
+    title: "The Grand Budapest Hotel",
+    imageUrl: "https://image.tmdb.org/t/p/w780/eWdyaQVtImaxIvYbfc7PAmvd3Vf.jpg",
+    releaseYear: 2014,
+    hint: "A concierge and his lobby boy",
+    tmdbId: 120467
+  },
+  {
+    id: "49",
+    title: "Fargo",
+    imageUrl: "https://image.tmdb.org/t/p/w780/d5uQjCyFBUroPkrDtOsc9ZtWrB3.jpg",
+    releaseYear: 1996,
+    hint: "Oh geez, a crime gone wrong",
+    tmdbId: 275
+  },
+  {
+    id: "50",
+    title: "There Will Be Blood",
+    imageUrl: "https://image.tmdb.org/t/p/w780/jgftk1wT4fCEO7mXyjC8CeZnCvQ.jpg",
+    releaseYear: 2007,
+    hint: "I drink your milkshake!",
+    tmdbId: 7345
+  },
+  {
+    id: "51",
+    title: "The Social Network",
+    imageUrl: "https://image.tmdb.org/t/p/w780/n0ybibhJtQ5icDqTp8eRytcIHJx.jpg",
+    releaseYear: 2010,
+    hint: "You don't get to 500 million friends without making a few enemies",
+    tmdbId: 37799
+  },
+  {
+    id: "52",
+    title: "Inglourious Basterds",
+    imageUrl: "https://image.tmdb.org/t/p/w780/7sfbEnaARXDDhXz9MAmzxB8lvQX.jpg",
+    releaseYear: 2009,
+    hint: "Nazi hunters in WWII",
+    tmdbId: 16869
+  },
+  {
+    id: "53",
+    title: "2001: A Space Odyssey",
+    imageUrl: "https://image.tmdb.org/t/p/w780/ve72VxNqjGM69Uky4WTo2bK6rfq.jpg",
+    releaseYear: 1968,
+    hint: "I'm sorry Dave, I'm afraid I can't do that",
+    tmdbId: 62
+  },
+  {
+    id: "54",
+    title: "Citizen Kane",
+    imageUrl: "https://image.tmdb.org/t/p/w780/sav0jxhqiH0bPr2vZFU0Kjt2nZL.jpg",
+    releaseYear: 1941,
+    hint: "Rosebud",
+    tmdbId: 15
+  },
+  {
+    id: "55",
+    title: "Toy Story",
+    imageUrl: "https://image.tmdb.org/t/p/w780/uXDfjJbdP4ijW5hWSBrPrlKpxab.jpg",
+    releaseYear: 1995,
+    hint: "To infinity and beyond!",
+    tmdbId: 862
+  },
+  {
+    id: "56",
+    title: "No Country for Old Men",
+    imageUrl: "https://image.tmdb.org/t/p/w780/6d5XOczc226jECq0LIX0siKtgaxiY1.jpg",
+    releaseYear: 2007,
+    hint: "Call it, friend-o",
+    tmdbId: 6977
+  },
+  {
+    id: "57",
+    title: "A Clockwork Orange",
+    imageUrl: "https://image.tmdb.org/t/p/w780/4sHeTAp65WrSSuc05nRBKddhBxO.jpg",
+    releaseYear: 1971,
+    hint: "Ultraviolence and Beethoven",
+    tmdbId: 185
+  },
+  {
+    id: "58",
+    title: "Taxi Driver",
+    imageUrl: "https://image.tmdb.org/t/p/w780/ekstpH614fwDX8DUln1a2Opz0N8.jpg",
+    releaseYear: 1976,
+    hint: "You talkin' to me?",
+    tmdbId: 103
+  },
+  {
+    id: "59",
+    title: "Lawrence of Arabia",
+    imageUrl: "https://image.tmdb.org/t/p/w780/ws2sWQkAwBEiqS3ByZ6IziUiI3g.jpg",
+    releaseYear: 1962,
+    hint: "Epic desert adventure",
+    tmdbId: 947
+  },
+  {
+    id: "60",
+    title: "Rear Window",
+    imageUrl: "https://image.tmdb.org/t/p/w780/qitnZcLP7C9DLRuPpmvZ7GiEjJN.jpg",
+    releaseYear: 1954,
+    hint: "A photographer witnesses a murder",
+    tmdbId: 567
+  },
+  {
+    id: "61",
+    title: "Whiplash",
+    imageUrl: "https://image.tmdb.org/t/p/w780/6uSPcdGNA2A6vJmCagXkvnutegs.jpg",
+    releaseYear: 2014,
+    hint: "Not quite my tempo",
+    tmdbId: 244786
+  },
+  {
+    id: "62",
+    title: "The Big Lebowski",
+    imageUrl: "https://image.tmdb.org/t/p/w780/5DpmtMBXXNDujIuSlKW3WLKpZRo.jpg",
+    releaseYear: 1998,
+    hint: "The Dude abides",
+    tmdbId: 115
+  },
+  {
+    id: "63",
+    title: "Jaws",
+    imageUrl: "https://image.tmdb.org/t/p/w780/s2xcqSFfT6F7ZXHxowjxfG0yisT.jpg",
+    releaseYear: 1975,
+    hint: "You're gonna need a bigger boat",
+    tmdbId: 578
+  },
+  {
+    id: "64",
+    title: "The Third Man",
+    imageUrl: "https://image.tmdb.org/t/p/w780/oUo2nE6Z3iEZy7RZ8iXWvN7O6Ru.jpg",
+    releaseYear: 1949,
+    hint: "Searching for a friend in post-war Vienna",
+    tmdbId: 1092
+  },
+  {
+    id: "65",
+    title: "L.A. Confidential",
+    imageUrl: "https://image.tmdb.org/t/p/w780/8OdQIpibgrPR1jdjZXR2KU1eVSQ.jpg",
+    releaseYear: 1997,
+    hint: "Everything is personal",
+    tmdbId: 2118
+  },
+  {
+    id: "66",
+    title: "Vertigo",
+    imageUrl: "https://image.tmdb.org/t/p/w780/15uOEfqBNTVtDUT7hGBVCka0rZz.jpg",
+    releaseYear: 1958,
+    hint: "Fear of heights and obsession",
+    tmdbId: 426
+  },
+  {
+    id: "67",
+    title: "The Usual Suspects",
+    imageUrl: "https://image.tmdb.org/t/p/w780/bUPmtQzrRhzqYySeiMpv7GurAfm.jpg",
+    releaseYear: 1995,
+    hint: "Who is Keyser Söze?",
+    tmdbId: 629
+  },
+  {
+    id: "68",
+    title: "Léon: The Professional",
+    imageUrl: "https://image.tmdb.org/t/p/w780/yI6X2cCM5YPJtxMhUd3dPGqWvlV.jpg",
+    releaseYear: 1994,
+    hint: "A hitman and a young girl",
+    tmdbId: 101
+  },
+  {
+    id: "69",
+    title: "Braveheart",
+    imageUrl: "https://image.tmdb.org/t/p/w780/or1gBugydmjToAEq7OZY0owwFk.jpg",
+    releaseYear: 1995,
+    hint: "They may take our lives, but they'll never take our freedom!",
+    tmdbId: 197
+  },
+  {
+    id: "70",
+    title: "Once Upon a Time in the West",
+    imageUrl: "https://image.tmdb.org/t/p/w780/qbYgqOczabWNn2XKwgMtVrntD6P.jpg",
+    releaseYear: 1968,
+    hint: "Epic spaghetti western",
+    tmdbId: 335
+  },
+  {
+    id: "71",
+    title: "Heat",
+    imageUrl: "https://image.tmdb.org/t/p/w780/zMyfPUelVvGCJX67RSbFIaTN5fy.jpg",
+    releaseYear: 1995,
+    hint: "Don't waste your life on me",
+    tmdbId: 949
+  },
+  {
+    id: "72",
+    title: "Grave of the Fireflies",
+    imageUrl: "https://image.tmdb.org/t/p/w780/wcNkHDbyc290hcWk7KXbBZUuXpq.jpg",
+    releaseYear: 1988,
+    hint: "Siblings surviving war-torn Japan",
+    tmdbId: 12477
+  },
+  {
+    id: "73",
+    title: "Paths of Glory",
+    imageUrl: "https://image.tmdb.org/t/p/w780/l2IY0gOHHmCWM1Z6E8YhxzZ4rDe.jpg",
+    releaseYear: 1957,
+    hint: "Anti-war film set in WWI",
+    tmdbId: 975
+  },
+  {
+    id: "74",
+    title: "A Clockwork Orange",
+    imageUrl: "https://image.tmdb.org/t/p/w780/4sHeTAp65WrSSuc05nRBKddhBxO.jpg",
+    releaseYear: 1971,
+    hint: "Ultraviolence and Beethoven",
+    tmdbId: 185
+  },
+  {
+    id: "75",
+    title: "The Deer Hunter",
+    imageUrl: "https://image.tmdb.org/t/p/w780/bbGtogDZIId4uEOmDk3KVUJGaHN.jpg",
+    releaseYear: 1978,
+    hint: "Russian roulette in Vietnam",
+    tmdbId: 11778
+  },
+  {
+    id: "76",
+    title: "The Bridge on the River Kwai",
+    imageUrl: "https://image.tmdb.org/t/p/w780/7dJHtXZ3UpEAVW7XjEdL9yTdD4B.jpg",
+    releaseYear: 1957,
+    hint: "POWs building a bridge in WWII",
+    tmdbId: 826
+  },
+  {
+    id: "77",
+    title: "Alien",
+    imageUrl: "https://image.tmdb.org/t/p/w780/vfrQk5IPloGg1v9Rzbh2Eg3VGyM.jpg",
+    releaseYear: 1979,
+    hint: "In space, no one can hear you scream",
+    tmdbId: 348
+  },
+  {
+    id: "78",
+    title: "The Seventh Seal",
+    imageUrl: "https://image.tmdb.org/t/p/w780/eBw5EypOBt70CeBhuhyTzuyfvLp.jpg",
+    releaseYear: 1957,
