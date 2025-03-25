@@ -9,12 +9,16 @@ export const applyPixelation = (
   canvas: HTMLCanvasElement,
   pixelationLevel: number // 0 to 1, where 1 is most pixelated
 ): void => {
-  if (!imageElement.complete) {
+  if (!imageElement.complete || !imageElement.naturalWidth) {
+    console.log("Image not ready for pixelation");
     return;
   }
 
   const ctx = canvas.getContext("2d");
-  if (!ctx) return;
+  if (!ctx) {
+    console.error("Could not get canvas context");
+    return;
+  }
 
   // Clear the canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -34,29 +38,49 @@ export const applyPixelation = (
     return;
   }
 
-  // Calculate the size of the pixelated image
-  const w = Math.ceil(canvas.width / pixelSize);
-  const h = Math.ceil(canvas.height / pixelSize);
-
-  // Step 1: Draw the image at a smaller size
-  ctx.drawImage(imageElement, 0, 0, w, h);
-
-  // Step 2: Save the small image data
-  const smallImageData = ctx.getImageData(0, 0, w, h);
-  
-  // Step 3: Clear the canvas
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  // Step 4: Turn off image smoothing for a blocky look
-  ctx.imageSmoothingEnabled = false;
-  
-  // Step 5: Draw the small image back to the canvas at full size
-  ctx.putImageData(smallImageData, 0, 0);
-  ctx.drawImage(
-    canvas, 
-    0, 0, w, h,
-    0, 0, canvas.width, canvas.height
-  );
+  try {
+    // Draw directly to the main canvas at intended size first (for fallback if other method fails)
+    ctx.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
+    
+    // Calculate the size of the pixelated image
+    const w = Math.max(1, Math.ceil(canvas.width / pixelSize));
+    const h = Math.max(1, Math.ceil(canvas.height / pixelSize));
+    
+    // Create a temporary canvas for the pixelation effect
+    const offscreenCanvas = document.createElement('canvas');
+    offscreenCanvas.width = w;
+    offscreenCanvas.height = h;
+    const offscreenCtx = offscreenCanvas.getContext('2d');
+    
+    if (!offscreenCtx) {
+      console.error("Could not get offscreen canvas context");
+      return;
+    }
+    
+    // Step 1: Draw the image at a smaller size
+    offscreenCtx.drawImage(imageElement, 0, 0, w, h);
+    
+    // Step 2: Clear the main canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Step 3: Turn off image smoothing for a blocky look
+    ctx.imageSmoothingEnabled = false;
+    
+    // Step 4: Draw the small image back to the canvas at full size
+    ctx.drawImage(
+      offscreenCanvas, 
+      0, 0, w, h,
+      0, 0, canvas.width, canvas.height
+    );
+  } catch (error) {
+    console.error("Error applying pixelation:", error);
+    // Fallback to direct drawing if pixelation fails
+    try {
+      ctx.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
+    } catch (fallbackError) {
+      console.error("Even fallback drawing failed:", fallbackError);
+    }
+  }
 };
 
 // Utility function to create timed pixelation animation
