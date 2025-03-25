@@ -11,16 +11,16 @@ export interface Movie {
 }
 
 // TMDB API configuration
-const TMDB_API_KEY = "3e1dd17d199afbfd733a53927dfafc93"; // This is a public API key
-const TMDB_BASE_URL = "https://api.themoviedb.org/3";
+// Note: Even though this is marked as a public API key, it seems to be invalid or revoked
+// Using a different approach with predefined image URLs for reliability
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w780"; // Medium size images
 
-// Sample movies with TMDB IDs
+// Sample movies with backup image URLs
 export const sampleMovies: Movie[] = [
   {
     id: "1",
     title: "Inception",
-    imageUrl: "", // Will be populated from TMDB
+    imageUrl: "https://image.tmdb.org/t/p/w780/8IB2e4r4oVhHnANbnm7O3Tj6tF8.jpg", // Backup image URL
     releaseYear: 2010,
     hint: "Dreams within dreams",
     tmdbId: 27205
@@ -28,7 +28,7 @@ export const sampleMovies: Movie[] = [
   {
     id: "2",
     title: "The Shawshank Redemption",
-    imageUrl: "", // Will be populated from TMDB
+    imageUrl: "https://image.tmdb.org/t/p/w780/9O7gLzmreU0nGkIB6K3BsJbzvNv.jpg", // Backup image URL
     releaseYear: 1994,
     hint: "Prison escape drama",
     tmdbId: 278
@@ -36,7 +36,7 @@ export const sampleMovies: Movie[] = [
   {
     id: "3",
     title: "Pulp Fiction",
-    imageUrl: "", // Will be populated from TMDB
+    imageUrl: "https://image.tmdb.org/t/p/w780/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg", // Backup image URL
     releaseYear: 1994,
     hint: "Non-linear storytelling",
     tmdbId: 680
@@ -44,7 +44,7 @@ export const sampleMovies: Movie[] = [
   {
     id: "4",
     title: "The Matrix",
-    imageUrl: "", // Will be populated from TMDB
+    imageUrl: "https://image.tmdb.org/t/p/w780/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg", // Backup image URL
     releaseYear: 1999,
     hint: "Reality is not what it seems",
     tmdbId: 603
@@ -52,46 +52,26 @@ export const sampleMovies: Movie[] = [
   {
     id: "5",
     title: "Forrest Gump",
-    imageUrl: "", // Will be populated from TMDB
+    imageUrl: "https://image.tmdb.org/t/p/w780/arw2vcBveWOVZr6pxd9XTd1TdQa.jpg", // Backup image URL
     releaseYear: 1994,
     hint: "Life is like a box of chocolates",
     tmdbId: 13
   }
 ];
 
-// Function to fetch movie images from TMDB
+// Since the API key is invalid, we'll use the backup image URLs directly
+// This function no longer attempts to fetch from TMDB
 export const fetchMovieImages = async (movie: Movie): Promise<string> => {
   try {
-    if (!movie.tmdbId) {
-      console.error("No TMDB ID provided for movie:", movie.title);
-      return "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=1459&auto=format&fit=crop"; // Fallback image
-    }
-
-    // First try to get backdrops (usually more recognizable for the game)
-    const response = await fetch(
-      `${TMDB_BASE_URL}/movie/${movie.tmdbId}/images?api_key=${TMDB_API_KEY}`
-    );
-    
-    if (!response.ok) {
-      throw new Error(`TMDB API error: ${response.status}`);
+    // Return the backup image URL that's already provided in the movie object
+    if (movie.imageUrl) {
+      return movie.imageUrl;
     }
     
-    const data = await response.json();
-    
-    // Prefer backdrops, but fall back to posters if no backdrops available
-    if (data.backdrops && data.backdrops.length > 0) {
-      // Get a random backdrop from available ones
-      const randomIndex = Math.floor(Math.random() * Math.min(data.backdrops.length, 5));
-      return `${TMDB_IMAGE_BASE_URL}${data.backdrops[randomIndex].file_path}`;
-    } else if (data.posters && data.posters.length > 0) {
-      // Fall back to poster if no backdrops
-      return `${TMDB_IMAGE_BASE_URL}${data.posters[0].file_path}`;
-    }
-    
-    // If no images found, use fallback
+    // Fallback image if no backup image URL is available
     return "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=1459&auto=format&fit=crop";
   } catch (error) {
-    console.error("Error fetching movie images:", error);
+    console.error("Error with movie image:", error);
     return "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=1459&auto=format&fit=crop"; // Fallback image
   }
 };
@@ -103,10 +83,16 @@ let imagesLoaded = false;
 export const loadAllMovieImages = async (): Promise<void> => {
   if (imagesLoaded) return;
   
+  // Since we're using backup URLs, this function is simpler now
+  // We just need to ensure all movies have an imageUrl
   const updatedMovies = await Promise.all(
     sampleMovies.map(async (movie) => {
-      const imageUrl = await fetchMovieImages(movie);
-      return { ...movie, imageUrl };
+      // Only fetch if the movie doesn't already have an imageUrl
+      if (!movie.imageUrl) {
+        const imageUrl = await fetchMovieImages(movie);
+        return { ...movie, imageUrl };
+      }
+      return movie;
     })
   );
   
