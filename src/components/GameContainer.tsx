@@ -92,6 +92,15 @@ const GameContainer: React.FC = () => {
     }
   };
   
+  const handleSkip = () => {
+    if (!isRoundComplete && isGameActive) {
+      setIsGameActive(false);
+      setIsRoundComplete(true);
+      setIsCorrectGuess(false);
+      toast.info("Skipped! Moving to next movie...");
+    }
+  };
+  
   const handleNextRound = async () => {
     if (round >= TOTAL_ROUNDS) {
       // Game complete
@@ -149,6 +158,7 @@ const GameContainer: React.FC = () => {
             correctAnswer={isRoundComplete ? currentMovie?.title : undefined}
             isCorrect={isCorrectGuess}
             onNextRound={handleNextRound}
+            onSkip={handleSkip}
           />
         </div>
         
