@@ -9,7 +9,8 @@ export const applyPixelation = (
   canvas: HTMLCanvasElement,
   pixelationLevel: number // 0 to 1, where 1 is most pixelated
 ): void => {
-  if (!imageElement.complete) {
+  if (!imageElement.complete || !imageElement.naturalWidth) {
+    console.log("Image not ready for pixelation");
     return;
   }
 
@@ -30,33 +31,47 @@ export const applyPixelation = (
 
   // If pixelation level is very low, just draw the image normally
   if (pixelSize <= 1) {
-    ctx.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
+    try {
+      ctx.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
+    } catch (err) {
+      console.error("Error drawing image at low pixelation:", err);
+    }
     return;
   }
 
-  // Calculate the size of the pixelated image
-  const w = Math.ceil(canvas.width / pixelSize);
-  const h = Math.ceil(canvas.height / pixelSize);
+  try {
+    // Calculate the size of the pixelated image
+    const w = Math.ceil(canvas.width / pixelSize);
+    const h = Math.ceil(canvas.height / pixelSize);
 
-  // Step 1: Draw the image at a smaller size
-  ctx.drawImage(imageElement, 0, 0, w, h);
+    // Step 1: Draw the image at a smaller size
+    ctx.drawImage(imageElement, 0, 0, w, h);
 
-  // Step 2: Save the small image data
-  const smallImageData = ctx.getImageData(0, 0, w, h);
-  
-  // Step 3: Clear the canvas
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  // Step 4: Turn off image smoothing for a blocky look
-  ctx.imageSmoothingEnabled = false;
-  
-  // Step 5: Draw the small image back to the canvas at full size
-  ctx.putImageData(smallImageData, 0, 0);
-  ctx.drawImage(
-    canvas, 
-    0, 0, w, h,
-    0, 0, canvas.width, canvas.height
-  );
+    // Step 2: Save the small image data
+    const smallImageData = ctx.getImageData(0, 0, w, h);
+    
+    // Step 3: Clear the canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Step 4: Turn off image smoothing for a blocky look
+    ctx.imageSmoothingEnabled = false;
+    
+    // Step 5: Draw the small image back to the canvas at full size
+    ctx.putImageData(smallImageData, 0, 0);
+    ctx.drawImage(
+      canvas, 
+      0, 0, w, h,
+      0, 0, canvas.width, canvas.height
+    );
+  } catch (err) {
+    console.error("Error applying pixelation effect:", err);
+    // Fallback: try to draw the image directly if pixelation fails
+    try {
+      ctx.drawImage(imageElement, 0, 0, canvas.width, canvas.height);
+    } catch (fallbackErr) {
+      console.error("Fallback image drawing also failed:", fallbackErr);
+    }
+  }
 };
 
 // Utility function to create timed pixelation animation
