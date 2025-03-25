@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import MovieImage from './MovieImage';
@@ -20,12 +19,10 @@ const GameContainer: React.FC = () => {
   const [isCorrectGuess, setIsCorrectGuess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Initialize game
   useEffect(() => {
     const initGame = async () => {
       setIsLoading(true);
       try {
-        // Preload all movie images
         await loadAllMovieImages();
         await startNewRound();
       } catch (error) {
@@ -75,7 +72,6 @@ const GameContainer: React.FC = () => {
   const handleGuess = (guess: string) => {
     if (!currentMovie || !isGameActive) return;
     
-    // Very simple matching algorithm - make it case insensitive
     const normalizedGuess = guess.toLowerCase().trim();
     const normalizedTitle = currentMovie.title.toLowerCase().trim();
     
@@ -92,26 +88,34 @@ const GameContainer: React.FC = () => {
     }
   };
   
-  const handleSkip = () => {
+  const handleSkip = async () => {
     if (!isRoundComplete && isGameActive) {
       setIsGameActive(false);
       setIsRoundComplete(true);
       setIsCorrectGuess(false);
       toast.info("Skipped! Moving to next movie...");
+      
+      setTimeout(async () => {
+        if (round >= TOTAL_ROUNDS) {
+          toast.success(`Game complete! Final score: ${score}`);
+          setRound(1);
+          setScore(0);
+          await startNewRound();
+        } else {
+          setRound(prev => prev + 1);
+          await startNewRound();
+        }
+      }, 1000);
     }
   };
   
   const handleNextRound = async () => {
     if (round >= TOTAL_ROUNDS) {
-      // Game complete
       toast.success(`Game complete! Final score: ${score}`);
-      
-      // Reset the game
       setRound(1);
       setScore(0);
       await startNewRound();
     } else {
-      // Next round
       setRound(prev => prev + 1);
       await startNewRound();
     }
