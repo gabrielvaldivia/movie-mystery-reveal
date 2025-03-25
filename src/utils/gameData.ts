@@ -1,3 +1,4 @@
+
 // Movie data with TMDB API integration
 
 export interface Movie {
@@ -641,3 +642,236 @@ export const moviesCollection: Movie[] = [
     title: "The Seventh Seal",
     imageUrl: "https://image.tmdb.org/t/p/w780/eBw5EypOBt70CeBhuhyTzuyfvLp.jpg",
     releaseYear: 1957,
+    hint: "Playing chess with Death",
+    tmdbId: 490
+  },
+  {
+    id: "79",
+    title: "Gone with the Wind",
+    imageUrl: "https://image.tmdb.org/t/p/w780/lNz2Ow0wGCAvzw2tnuXWyxvJK5T.jpg",
+    releaseYear: 1939,
+    hint: "Frankly, my dear, I don't give a damn",
+    tmdbId: 770
+  },
+  {
+    id: "80",
+    title: "It's a Wonderful Life",
+    imageUrl: "https://image.tmdb.org/t/p/w780/2McRYgxmZJuyHnzSPOHT9C1nMhY.jpg",
+    releaseYear: 1946,
+    hint: "Every time a bell rings...",
+    tmdbId: 1585
+  },
+  {
+    id: "81",
+    title: "The Great Dictator",
+    imageUrl: "https://image.tmdb.org/t/p/w780/kyoBZ6YXw5cQYA5DL7PGbJg9TxA.jpg",
+    releaseYear: 1940,
+    hint: "Chaplin's satire of Hitler",
+    tmdbId: 914
+  },
+  {
+    id: "82",
+    title: "Singin' in the Rain",
+    imageUrl: "https://image.tmdb.org/t/p/w780/w01Z2RzEj0BVySh4K1liS9v9r9Z.jpg",
+    releaseYear: 1952,
+    hint: "Dancing with an umbrella",
+    tmdbId: 872
+  },
+  {
+    id: "83",
+    title: "Some Like It Hot",
+    imageUrl: "https://image.tmdb.org/t/p/w780/pxc9EJoIiRDLpSaQYFaT9iyBPbF.jpg",
+    releaseYear: 1959,
+    hint: "Nobody's perfect",
+    tmdbId: 239
+  },
+  {
+    id: "84",
+    title: "Bicycle Thieves",
+    imageUrl: "https://image.tmdb.org/t/p/w780/9wfM8l3JsvRsfgQbKnXiIJQfJNa.jpg",
+    releaseYear: 1948,
+    hint: "A father and son search for a stolen bicycle",
+    tmdbId: 5156
+  },
+  {
+    id: "85",
+    title: "Cinema Paradiso",
+    imageUrl: "https://image.tmdb.org/t/p/w780/8SRUfRUi6x4O68n0VCbDNRa6iGL.jpg",
+    releaseYear: 1988,
+    hint: "A love letter to cinema",
+    tmdbId: 11216
+  },
+  {
+    id: "86",
+    title: "Sunset Boulevard",
+    imageUrl: "https://image.tmdb.org/t/p/w780/zt8aQ6ksqK6qc0huC9AgGepFkw9.jpg",
+    releaseYear: 1950,
+    hint: "I'm ready for my close-up",
+    tmdbId: 599
+  },
+  {
+    id: "87",
+    title: "M",
+    imageUrl: "https://image.tmdb.org/t/p/w780/q5fXkYEmvigHwzCfYFJhp2dyPQP.jpg",
+    releaseYear: 1931,
+    hint: "A child murderer hunted by the criminal underworld",
+    tmdbId: 386
+  },
+  {
+    id: "88",
+    title: "City Lights",
+    imageUrl: "https://image.tmdb.org/t/p/w780/bXNvzjULc9jrOVhGfjcc64uKZmZ.jpg",
+    releaseYear: 1931,
+    hint: "Chaplin's tramp falls for a blind flower girl",
+    tmdbId: 901
+  },
+  {
+    id: "89",
+    title: "12 Angry Men",
+    imageUrl: "https://image.tmdb.org/t/p/w780/ow3wq89wM8qd5X7hWKxiRfsFf9C.jpg",
+    releaseYear: 1957,
+    hint: "Jury deliberations in a murder trial",
+    tmdbId: 389
+  },
+  {
+    id: "90",
+    title: "Modern Times",
+    imageUrl: "https://image.tmdb.org/t/p/w780/94J25SpcuCt8Lt2cRsMoEyE9x99.jpg",
+    releaseYear: 1936,
+    hint: "Chaplin vs. the machine age",
+    tmdbId: 3082
+  },
+  {
+    id: "91",
+    title: "Room",
+    imageUrl: "https://image.tmdb.org/t/p/w780/eqFckcHuFCT1FrzLOAvXBb4jHwq.jpg",
+    releaseYear: 2015,
+    hint: "A mother and son held captive",
+    tmdbId: 264644
+  },
+  {
+    id: "92",
+    title: "La La Land",
+    imageUrl: "https://image.tmdb.org/t/p/w780/uDO8zWDhfWwoFdKS4fzkUJt0Rf0.jpg",
+    releaseYear: 2016,
+    hint: "City of stars",
+    tmdbId: 313369
+  },
+  {
+    id: "93",
+    title: "Call Me by Your Name",
+    imageUrl: "https://image.tmdb.org/t/p/w780/nPTjj6ZfBXXBwOhd7iiVKPjEmgN.jpg",
+    releaseYear: 2017,
+    hint: "Summer romance in Italy",
+    tmdbId: 398818
+  },
+  {
+    id: "94",
+    title: "Portrait of a Lady on Fire",
+    imageUrl: "https://image.tmdb.org/t/p/w780/2LquGwEhbg3soxSCs9VNyh5VJd9.jpg",
+    releaseYear: 2019,
+    hint: "Forbidden love and art in 18th century France",
+    tmdbId: 531428
+  },
+  {
+    id: "95",
+    title: "Get Out",
+    imageUrl: "https://image.tmdb.org/t/p/w780/tFXcEccSQMf3zyxpHFusHvPyBPq.jpg",
+    releaseYear: 2017,
+    hint: "The sunken place",
+    tmdbId: 419430
+  },
+  {
+    id: "96",
+    title: "Before Sunrise",
+    imageUrl: "https://image.tmdb.org/t/p/w780/kcBlY5FasH93tzPSbG2MJDQYvWA.jpg",
+    releaseYear: 1995,
+    hint: "One night in Vienna",
+    tmdbId: 76
+  },
+  {
+    id: "97",
+    title: "Come and See",
+    imageUrl: "https://image.tmdb.org/t/p/w780/qrZdHBnJVvff1xKX1B09AErhy3i.jpg",
+    releaseYear: 1985,
+    hint: "A boy witnesses Nazi atrocities in Belarus",
+    tmdbId: 25237
+  },
+  {
+    id: "98",
+    title: "Mad Max: Fury Road",
+    imageUrl: "https://image.tmdb.org/t/p/w780/hA2ple9q4qnwxp3hKVNhroW8zQn.jpg",
+    releaseYear: 2015,
+    hint: "What a lovely day",
+    tmdbId: 76341
+  },
+  {
+    id: "99",
+    title: "Mulholland Drive",
+    imageUrl: "https://image.tmdb.org/t/p/w780/tVxGt7uffLVhIIcwuldXOMpFBPX.jpg",
+    releaseYear: 2001,
+    hint: "Surreal Hollywood nightmare",
+    tmdbId: 1018
+  },
+  {
+    id: "100",
+    title: "The Handmaiden",
+    imageUrl: "https://image.tmdb.org/t/p/w780/wvzfK5QR6dGLwND8MCzWjsQWG7D.jpg",
+    releaseYear: 2016,
+    hint: "A complex con in Japanese-occupied Korea",
+    tmdbId: 290098
+  }
+];
+
+// Helper function to preload all movie images
+export const loadAllMovieImages = async (): Promise<void> => {
+  const preloadImage = (url: string): Promise<void> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => resolve();
+      img.onerror = () => {
+        console.error(`Failed to load image: ${url}`);
+        resolve(); // We still resolve to prevent hanging the promise chain
+      };
+      img.src = url;
+    });
+  };
+
+  // Load the first 5 images first (for immediate display)
+  const initialImages = moviesCollection.slice(0, 5).map(movie => preloadImage(movie.imageUrl));
+  await Promise.all(initialImages);
+
+  // Then load the rest in the background
+  const remainingImages = moviesCollection.slice(5).map(movie => preloadImage(movie.imageUrl));
+  Promise.all(remainingImages).catch(err => {
+    console.error("Error preloading remaining images:", err);
+  });
+};
+
+// Get a random movie from the collection
+export const getRandomMovie = async (): Promise<Movie> => {
+  // Ensure we have movies to select from
+  if (moviesCollection.length === 0) {
+    throw new Error("No movies available");
+  }
+
+  // Get a random movie
+  const randomIndex = Math.floor(Math.random() * moviesCollection.length);
+  const movie = moviesCollection[randomIndex];
+
+  return movie;
+};
+
+// Get next movie, ensuring it's different from the current one
+export const getNextMovie = async (currentMovieId: string): Promise<Movie> => {
+  // Filter out the current movie
+  const availableMovies = moviesCollection.filter(movie => movie.id !== currentMovieId);
+
+  if (availableMovies.length === 0) {
+    throw new Error("No more movies available");
+  }
+
+  // Get a random movie from the filtered list
+  const randomIndex = Math.floor(Math.random() * availableMovies.length);
+  return availableMovies[randomIndex];
+};
