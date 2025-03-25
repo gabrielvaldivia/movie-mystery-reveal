@@ -1,5 +1,5 @@
+
 import React, { useState, useEffect } from 'react';
-import { toast } from 'sonner';
 import MovieImage from './MovieImage';
 import GuessInput from './GuessInput';
 import Timer from './Timer';
@@ -27,7 +27,6 @@ const GameContainer: React.FC = () => {
         await startNewRound();
       } catch (error) {
         console.error("Error initializing game:", error);
-        toast.error("Error loading game data. Please try again.");
       } finally {
         setIsLoading(false);
       }
@@ -49,7 +48,6 @@ const GameContainer: React.FC = () => {
       setIsCorrectGuess(false);
     } catch (error) {
       console.error("Error starting new round:", error);
-      toast.error("Error loading movie data. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -59,7 +57,6 @@ const GameContainer: React.FC = () => {
     if (!isRoundComplete) {
       setIsGameActive(false);
       setIsRoundComplete(true);
-      toast.error("Time's up!");
     }
   };
   
@@ -82,9 +79,6 @@ const GameContainer: React.FC = () => {
       setIsRoundComplete(true);
       setIsCorrectGuess(true);
       setScore(prev => prev + 100);
-      toast.success("Correct answer!");
-    } else {
-      toast.error("Try again!");
     }
   };
   
@@ -93,11 +87,9 @@ const GameContainer: React.FC = () => {
       setIsGameActive(false);
       setIsRoundComplete(true);
       setIsCorrectGuess(false);
-      toast.info("Skipped! Moving to next movie...");
       
       setTimeout(async () => {
         if (round >= TOTAL_ROUNDS) {
-          toast.success(`Game complete! Final score: ${score}`);
           setRound(1);
           setScore(0);
           await startNewRound();
@@ -111,7 +103,6 @@ const GameContainer: React.FC = () => {
   
   const handleNextRound = async () => {
     if (round >= TOTAL_ROUNDS) {
-      toast.success(`Game complete! Final score: ${score}`);
       setRound(1);
       setScore(0);
       await startNewRound();
