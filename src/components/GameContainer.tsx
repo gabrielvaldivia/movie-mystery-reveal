@@ -40,8 +40,6 @@ const GameContainer: React.FC = () => {
       setIsGameActive(false);
       setIsRoundComplete(true);
       toast.error("Time's up!");
-      
-      // Play sound effect or animation here
     }
   };
   
@@ -55,24 +53,19 @@ const GameContainer: React.FC = () => {
     if (!currentMovie || !isGameActive) return;
     
     // Very simple matching algorithm - make it case insensitive
-    // In a real app, consider more sophisticated matching (e.g., Levenshtein distance)
     const normalizedGuess = guess.toLowerCase().trim();
     const normalizedTitle = currentMovie.title.toLowerCase().trim();
     
     const isCorrect = normalizedGuess === normalizedTitle;
     
     if (isCorrect) {
-      // Calculate score based on how quickly they guessed
       setIsGameActive(false);
       setIsRoundComplete(true);
       setIsCorrectGuess(true);
       setScore(prev => prev + 100);
-      
       toast.success("Correct answer!");
-      // Add sound effects or animations here
     } else {
       toast.error("Try again!");
-      // Maybe deduct points or add other effects for wrong guesses
     }
   };
   
