@@ -25,6 +25,22 @@ const MovieImage: React.FC<MovieImageProps> = ({
     getCurrentLevel: () => number;
   } | null>(null);
 
+  // Helper function to create a proxied URL to avoid CORS issues
+  const getProxiedImageUrl = (url: string): string => {
+    // Some movies might have relative URLs
+    if (url.startsWith('/')) {
+      return `https://image.tmdb.org/t/p/w780${url}`;
+    }
+    
+    // Use a CORS proxy service if not already using one
+    if (url.includes('image.tmdb.org') && !url.includes('cors-anywhere')) {
+      // Using cors-anywhere proxy (note: this is for development purposes only)
+      return `https://cors-anywhere.herokuapp.com/${url}`;
+    }
+    
+    return url;
+  };
+
   // Set up canvas and image when component mounts or image URL changes
   useEffect(() => {
     setIsLoaded(false);
@@ -70,13 +86,55 @@ const MovieImage: React.FC<MovieImageProps> = ({
       console.error(`Failed to load image: ${imageUrl}`, e);
       setHasError(true);
       setIsLoaded(false);
+      
+      // Try loading a local fallback image if available
+      if (!imageUrl.includes('placeholder.svg')) {
+        const fallbackImage = new Image();
+        fallbackImage.crossOrigin = "anonymous";
+        fallbackImage.onload = () => {
+          console.log("Using fallback image instead");
+          setIsLoaded(true);
+          setHasError(false);
+          imageRef.current = fallbackImage;
+          
+          if (canvasRef.current) {
+            // Set up canvas and animation with fallback image
+            const container = canvasRef.current.parentElement;
+            if (container) {
+              const containerWidth = container.clientWidth;
+              canvasRef.current.width = containerWidth;
+              canvasRef.current.height = (containerWidth * 9) / 16;
+            }
+            
+            const pixelAnimation = createPixelationAnimation(
+              fallbackImage,
+              canvasRef.current,
+              duration,
+              onRevealComplete
+            );
+            
+            setAnimation(pixelAnimation);
+          }
+        };
+        
+        fallbackImage.src = '/placeholder.svg';
+      }
     };
     
-    // Set the source after setting up event handlers
+    // Try with a direct URL first (no proxy)
     image.src = imageUrl;
+    
+    // If it doesn't load within 3 seconds, try with a proxy
+    const timeoutId = setTimeout(() => {
+      if (!isLoaded && !hasError) {
+        console.log("Attempting to load image via proxy...");
+        image.src = getProxiedImageUrl(imageUrl);
+      }
+    }, 3000);
     
     // Cleanup on component unmount or URL change
     return () => {
+      clearTimeout(timeoutId);
       if (animation) {
         animation.stop();
       }

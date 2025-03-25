@@ -40,29 +40,27 @@ export const applyPixelation = (
   }
 
   try {
-    // Calculate the size of the pixelated image
-    const w = Math.ceil(canvas.width / pixelSize);
-    const h = Math.ceil(canvas.height / pixelSize);
-
-    // Step 1: Draw the image at a smaller size
-    ctx.drawImage(imageElement, 0, 0, w, h);
-
-    // Step 2: Save the small image data
-    const smallImageData = ctx.getImageData(0, 0, w, h);
-    
-    // Step 3: Clear the canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    // Step 4: Turn off image smoothing for a blocky look
+    // Draw directly at the target size with pixelation
+    // Turn off image smoothing for a pixelated effect
     ctx.imageSmoothingEnabled = false;
     
-    // Step 5: Draw the small image back to the canvas at full size
-    ctx.putImageData(smallImageData, 0, 0);
-    ctx.drawImage(
-      canvas, 
-      0, 0, w, h,
-      0, 0, canvas.width, canvas.height
-    );
+    // Calculate a smaller size for the pixelated effect
+    const w = Math.ceil(canvas.width / pixelSize);
+    const h = Math.ceil(canvas.height / pixelSize);
+    
+    // Create a temporary canvas for the pixelated effect
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    if (!tempCtx) return;
+    
+    tempCanvas.width = w;
+    tempCanvas.height = h;
+    
+    // Draw the image at a smaller size
+    tempCtx.drawImage(imageElement, 0, 0, w, h);
+    
+    // Draw the small image back to the main canvas at full size
+    ctx.drawImage(tempCanvas, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
   } catch (err) {
     console.error("Error applying pixelation effect:", err);
     // Fallback: try to draw the image directly if pixelation fails
