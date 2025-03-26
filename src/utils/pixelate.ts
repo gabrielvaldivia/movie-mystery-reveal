@@ -124,6 +124,7 @@ export const createPixelationAnimation = (
   let isPaused = false;
 
   const animate = (timestamp: number) => {
+    // If paused, just return without scheduling next frame
     if (isPaused) return;
     
     if (startTime === null) {
@@ -164,7 +165,7 @@ export const createPixelationAnimation = (
   };
 
   const pause = () => {
-    if (!isPaused && startTime !== null) {
+    if (!isPaused) {
       isPaused = true;
       pauseTime = performance.now();
       if (startTime !== null) {
@@ -174,6 +175,7 @@ export const createPixelationAnimation = (
         cancelAnimationFrame(animationFrameId);
         animationFrameId = null;
       }
+      console.log("Animation paused at level:", currentLevel);
     }
   };
 
@@ -182,6 +184,7 @@ export const createPixelationAnimation = (
       isPaused = false;
       startTime = performance.now();
       animationFrameId = requestAnimationFrame(animate);
+      console.log("Animation resumed from level:", currentLevel);
     }
   };
 
@@ -217,6 +220,7 @@ export const createPixelationAnimation = (
       
       isPaused = false;
       animationFrameId = requestAnimationFrame(animate);
+      console.log("Animation started");
     },
     stop: () => {
       if (animationFrameId !== null) {

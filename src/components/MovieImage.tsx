@@ -48,6 +48,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   const [loadingProgress, setLoadingProgress] = useState(0);
 
   const handleCanvasClick = () => {
+    console.log("Canvas clicked, toggling pause. Current isPaused:", isPaused);
     if (onTogglePause && isLoaded && !isLoading) {
       onTogglePause();
     }
@@ -172,20 +173,25 @@ const MovieImage: React.FC<MovieImageProps> = ({
   }, [imageUrl, duration, onImageLoaded, onRevealComplete, onImageError]);
   
   useEffect(() => {
-    // Don't restart the animation when only the pause state changes
+    // Handle animation state changes based on active and paused states
     if (!animationRef.current || !isLoaded) return;
     
+    console.log("Animation state changed. isActive:", isActive, "isPaused:", isPaused);
+    
     if (isActive && !isPaused) {
-      // Only need to resume if it was previously paused
+      // Resume animation if it was paused
+      console.log("Resuming animation");
       animationRef.current.resume();
     } else if (isActive && isPaused) {
+      // Pause animation
+      console.log("Pausing animation");
       animationRef.current.pause();
     } else {
+      // Not active - force complete
+      console.log("Forcing animation complete");
       animationRef.current.forceComplete();
     }
   }, [isActive, isLoaded, isPaused]);
-  
-  // The useEffect below is no longer needed as we handle pause/resume in the effect above
   
   useEffect(() => {
     const handleResize = () => {
@@ -239,7 +245,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
 
   return (
     <div 
-      className="pixel-reveal-container glass-panel no-rounded relative"
+      className="pixel-reveal-container glass-panel no-rounded relative cursor-pointer"
       onClick={handleCanvasClick}
     >
       <PixelRevealCanvas ref={canvasRef} />
