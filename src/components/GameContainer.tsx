@@ -64,7 +64,6 @@ const GameContainer: React.FC = () => {
                     isCorrect={isCorrectGuess}
                     hasIncorrectGuess={hasIncorrectGuess}
                     onNextRound={handleNextRound}
-                    hint={currentMovie?.hint}
                   />
                 </MovieImage>
               </div>
