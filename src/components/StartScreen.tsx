@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Button } from './ui/button';
-import { GalleryHorizontalEnd } from 'lucide-react';
+import { FilmIcon } from 'lucide-react';
 
 interface StartScreenProps {
   onStartGame: () => void;
@@ -11,7 +11,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStartGame }) => {
   return (
     <div className="flex flex-col items-center justify-center w-full h-full p-6 text-center bg-gradient-to-b from-background to-secondary/50 rounded-lg">
       <div className="mb-8 text-primary">
-        <GalleryHorizontalEnd size={64} />
+        <FilmIcon size={64} />
       </div>
       <h1 className="text-4xl font-bold mb-4">Movie Mystery</h1>
       <p className="text-muted-foreground mb-8 max-w-md">
