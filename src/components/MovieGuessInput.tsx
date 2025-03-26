@@ -59,14 +59,10 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
 
   const handleSuggestionSelect = (movie: Movie) => {
     console.log("Selected movie:", movie.title);
-    // Update the state
     setGuess(movie.title);
-    // Close suggestions
     setIsSuggestionsOpen(false);
     
-    // Give React a chance to update the DOM
     setTimeout(() => {
-      // Focus the input after selection
       if (inputRef.current) {
         inputRef.current.focus();
       }
@@ -118,7 +114,6 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
     }
   }, [disabled]);
   
-  // This effect runs when guess changes from external updates (like suggestion selection)
   useEffect(() => {
     if (inputRef.current && inputRef.current.value !== guess) {
       inputRef.current.value = guess;
@@ -129,6 +124,17 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
     <form onSubmit={handleSubmit} className="w-full">
       <div className="relative flex items-center gap-2">
         <div className="relative flex-grow">
+          {isSuggestionsOpen && (
+            <div className="absolute bottom-full left-0 right-0 mb-1 z-50">
+              <MovieSuggestions 
+                suggestions={suggestions}
+                isOpen={isSuggestionsOpen}
+                onSelect={handleSuggestionSelect}
+                highlightedIndex={highlightedIndex}
+              />
+            </div>
+          )}
+          
           <Input
             ref={inputRef}
             type="text"
@@ -150,15 +156,6 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
           >
             <Send className="h-3 w-3" />
           </button>
-          
-          {isSuggestionsOpen && (
-            <MovieSuggestions 
-              suggestions={suggestions}
-              isOpen={isSuggestionsOpen}
-              onSelect={handleSuggestionSelect}
-              highlightedIndex={highlightedIndex}
-            />
-          )}
         </div>
       </div>
     </form>

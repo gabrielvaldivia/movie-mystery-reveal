@@ -25,7 +25,7 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
   const safeSuggestions = Array.isArray(suggestions) ? suggestions : [];
 
   return (
-    <div className="absolute top-full left-0 right-0 z-50 mt-1 overflow-hidden bg-white dark:bg-gray-800 rounded-md border shadow-lg">
+    <div className="w-full overflow-hidden bg-white dark:bg-gray-800 rounded-md border shadow-lg">
       <Command className="w-full">
         <CommandList>
           <CommandEmpty>No movies found</CommandEmpty>
@@ -51,6 +51,6 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
       </Command>
     </div>
   );
-};
+}
 
 export default MovieSuggestions;
