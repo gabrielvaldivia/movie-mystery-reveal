@@ -1,10 +1,6 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 import { createPixelationAnimation } from '../utils/pixelate';
-import { AspectRatio } from './ui/aspect-ratio';
-import { Skeleton } from './ui/skeleton';
-import { AlertCircle, RefreshCw } from 'lucide-react';
-import { Button } from './ui/button';
+import ImageLoadingIndicator from './ImageLoadingIndicator';
 
 interface MovieImageProps {
   imageUrl: string;
@@ -28,6 +24,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   const [isLoaded, setIsLoaded] = useState(false);
   const [loadProgress, setLoadProgress] = useState(0);
   const [loadError, setLoadError] = useState(false);
+  const [loadTimeout, setLoadTimeout] = useState(false);
   const timeoutRef = useRef<number | null>(null);
   const progressIntervalRef = useRef<number | null>(null);
   const [animation, setAnimation] = useState<{
@@ -64,23 +61,21 @@ const MovieImage: React.FC<MovieImageProps> = ({
     setIsLoaded(false);
     setLoadProgress(0);
     setLoadError(false);
+    setLoadTimeout(false);
     
     // Clean up first
     cleanup();
     
     // Create a new image object
     const image = new Image();
-    
-    // Force bypass cache with timestamp
-    image.src = `${imageUrl}?cache=${Date.now()}`;
+    image.src = `${imageUrl}?t=${Date.now()}`; // Add timestamp to prevent caching
     image.crossOrigin = "anonymous";
     imageRef.current = image;
 
     // Set a timeout for image loading (10 seconds)
     timeoutRef.current = window.setTimeout(() => {
+      setLoadTimeout(true);
       console.log("Image loading timed out:", imageUrl);
-      setLoadError(true);
-      cleanup();
     }, 10000);
 
     // Simulate progress
@@ -93,7 +88,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
 
     // Handle successful image load
     image.onload = () => {
-      // Clear timers
       cleanup();
       
       console.log("Image loaded successfully:", imageUrl);
@@ -130,9 +124,9 @@ const MovieImage: React.FC<MovieImageProps> = ({
 
     // Handle image load error
     image.onerror = () => {
-      console.error("Error loading image:", imageUrl);
       cleanup();
       setLoadError(true);
+      console.error("Error loading image:", imageUrl);
     };
   };
 
@@ -203,61 +197,21 @@ const MovieImage: React.FC<MovieImageProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, [animation, duration, onRevealComplete, isActive, isLoaded]);
 
-  const handleRetry = () => {
-    loadImage();
-  };
-
-  // Create a fallback image when loading fails
-  const renderFallbackImage = () => {
-    return (
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary">
-        <AlertCircle className="w-12 h-12 text-destructive mb-4" />
-        <p className="text-center text-destructive-foreground mb-4">Failed to load image</p>
-        <Button onClick={handleRetry} variant="outline" className="flex items-center gap-2">
-          <RefreshCw className="w-4 h-4" />
-          Retry
-        </Button>
-      </div>
-    );
-  };
-
-  // Create a loading indicator
-  const renderLoading = () => {
-    return (
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary">
-        <div className="w-16 h-16 relative mb-4">
-          <div className="w-16 h-16 rounded-full border-4 border-primary border-opacity-20 absolute"></div>
-          <div 
-            className="w-16 h-16 rounded-full border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent absolute animate-spin"
-            style={{ animationDuration: '1.5s' }}
-          ></div>
-        </div>
-        <div className="w-full max-w-xs px-4">
-          <div className="h-2 bg-secondary-foreground/10 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-primary transition-all duration-300 ease-out"
-              style={{ width: `${loadProgress}%` }}
-            ></div>
-          </div>
-          <p className="text-center text-sm text-muted-foreground mt-2">
-            Loading image...
-          </p>
-        </div>
-      </div>
-    );
-  };
-
   return (
     <div className="pixel-reveal-container glass-panel no-rounded relative">
-      {/* Show loading state or error state */}
-      {!isLoaded && !loadError && renderLoading()}
-      {loadError && renderFallbackImage()}
-      
       {/* Canvas for the pixelation effect */}
       <canvas 
         ref={canvasRef}
-        className="w-full h-full object-cover transition-opacity duration-300"
-        style={{ display: isLoaded && !loadError ? 'block' : 'none' }}
+        className="w-full h-full object-cover"
+      />
+      
+      {/* Simplified loading indicator component */}
+      <ImageLoadingIndicator 
+        isLoading={!isLoaded}
+        progress={loadProgress}
+        error={loadError}
+        timeout={loadTimeout}
+        onRetry={loadImage}
       />
       
       {/* Children (like buttons or UI controls) */}
