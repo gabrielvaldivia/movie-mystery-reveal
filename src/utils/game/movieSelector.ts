@@ -15,14 +15,6 @@ export const getRandomMovie = async (): Promise<Movie> => {
   const randomIndex = Math.floor(Math.random() * filteredMovies.length);
   const movie = filteredMovies[randomIndex];
   
-  // If the movie has a TMDB image URL, replace it with a static placeholder
-  if (movie.imageUrl.includes('image.tmdb.org')) {
-    return {
-      ...movie,
-      imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5"
-    };
-  }
-
   return movie;
 };
 
@@ -40,23 +32,11 @@ export const getNextMovie = async (currentMovieId: string): Promise<Movie> => {
   const randomIndex = Math.floor(Math.random() * availableMovies.length);
   const movie = availableMovies[randomIndex];
   
-  // If the movie has a TMDB image URL, replace it with a static placeholder
-  if (movie.imageUrl.includes('image.tmdb.org')) {
-    return {
-      ...movie,
-      imageUrl: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5"
-    };
-  }
-  
   return movie;
 };
 
 // Load all movie images
 export const preloadAllMovieImages = async (): Promise<void> => {
-  const imageUrls = allMovies.map(movie => 
-    movie.imageUrl.includes('image.tmdb.org') 
-      ? "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5" 
-      : movie.imageUrl
-  );
+  const imageUrls = allMovies.map(movie => movie.imageUrl);
   await loadAllMovieImages(imageUrls);
 };

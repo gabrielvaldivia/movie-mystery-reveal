@@ -32,18 +32,12 @@ const MovieImage: React.FC<MovieImageProps> = ({
     setHasError(false);
     
     const image = new Image();
-    
-    // Use a more reliable image source - placeholder or direct Unsplash API
-    // Avoid TMDB images completely since they're consistently failing
-    const effectiveUrl = imageUrl.includes('image.tmdb.org') 
-      ? `https://source.unsplash.com/featured/800x450/?movie,cinema,${Date.now()}`
-      : imageUrl;
-    
-    image.crossOrigin = "anonymous";
     imageRef.current = image;
     
+    image.crossOrigin = "anonymous";
+    
     const handleLoad = () => {
-      console.log("Image loaded successfully:", effectiveUrl);
+      console.log("Image loaded successfully:", imageUrl);
       setIsLoaded(true);
       setHasError(false);
       
@@ -69,21 +63,16 @@ const MovieImage: React.FC<MovieImageProps> = ({
     };
     
     const handleError = () => {
-      console.error("Failed to load image:", effectiveUrl);
+      console.error("Failed to load image:", imageUrl);
       setHasError(true);
       setIsLoaded(false);
-      
-      // Use a direct static placeholder instead of another API call that might fail
-      const fallbackUrl = "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5";
-      console.log("Using static placeholder image");
-      image.src = fallbackUrl;
     };
     
     image.onload = handleLoad;
     image.onerror = handleError;
     
     // Set image source after setting up event handlers
-    image.src = effectiveUrl;
+    image.src = imageUrl;
 
     return () => {
       if (animation) {
@@ -153,7 +142,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
       
       {hasError && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary/50 text-center p-4">
-          <span className="text-muted-foreground">Using placeholder movie image</span>
+          <span className="text-muted-foreground">Image failed to load</span>
         </div>
       )}
       
