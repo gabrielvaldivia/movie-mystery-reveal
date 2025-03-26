@@ -1,6 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Progress } from './ui/progress';
+import { cn } from "@/lib/utils";
 
 interface TimerProps {
   duration: number;
@@ -46,7 +47,6 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
     <Progress 
       value={progress} 
       className="h-1 w-full rounded-none bg-transparent" 
-      indicatorClassName="bg-primary transition-all duration-100" 
     />
   );
 };
