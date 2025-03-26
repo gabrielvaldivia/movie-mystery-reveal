@@ -1,3 +1,4 @@
+
 /**
  * Utility to create a pixelation effect on an image
  * The pixelation level goes from 0 (no pixelation) to 1 (maximum pixelation)
@@ -13,7 +14,8 @@ export const applyPixelation = (
     return;
   }
 
-  const ctx = canvas.getContext("2d");
+  // Get context with willReadFrequently set to true for better performance
+  const ctx = canvas.getContext("2d", { willReadFrequently: true });
   if (!ctx) {
     console.error("Could not get 2D context from canvas");
     return;
@@ -45,7 +47,8 @@ export const applyPixelation = (
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = canvas.width;
     tempCanvas.height = canvas.height;
-    const tempCtx = tempCanvas.getContext('2d');
+    // Also set willReadFrequently on temporary canvas context
+    const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
     if (!tempCtx) return;
     
     // Draw the original image properly scaled
