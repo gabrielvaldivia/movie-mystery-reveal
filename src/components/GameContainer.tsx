@@ -6,22 +6,17 @@ import Timer from './Timer';
 import { getRandomMovie, Movie, getNextMovie, loadAllMovieImages } from '../utils/gameData';
 import { Button } from './ui/button';
 import { SkipForward } from 'lucide-react';
-import { useToast } from "@/hooks/use-toast";
 
 const GAME_DURATION = 30000; // 30 seconds
-const MAX_SCORE = 1000; // Maximum possible score for fastest guess
 
 const GameContainer: React.FC = () => {
   const [currentMovie, setCurrentMovie] = useState<Movie | null>(null);
   const [isGameActive, setIsGameActive] = useState(false);
   const [isRoundComplete, setIsRoundComplete] = useState(false);
   const [score, setScore] = useState(0);
-  const [roundScore, setRoundScore] = useState(0);
   const [isCorrectGuess, setIsCorrectGuess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasIncorrectGuess, setHasIncorrectGuess] = useState(false);
-  const [elapsedTime, setElapsedTime] = useState(0);
-  const { toast } = useToast();
   
   useEffect(() => {
     const initGame = async () => {
@@ -51,8 +46,6 @@ const GameContainer: React.FC = () => {
       setIsRoundComplete(false);
       setIsCorrectGuess(false);
       setHasIncorrectGuess(false);
-      setElapsedTime(0);
-      setRoundScore(0);
     } catch (error) {
       console.error("Error starting new round:", error);
     } finally {
@@ -73,17 +66,6 @@ const GameContainer: React.FC = () => {
     }
   };
   
-  const handleTimeUpdate = (currentElapsedTime: number) => {
-    setElapsedTime(currentElapsedTime);
-  };
-  
-  const calculateScore = (timeElapsed: number) => {
-    // Calculate score based on how quickly they guessed
-    // Earlier guesses = higher scores
-    const percentageRemaining = 1 - (timeElapsed / GAME_DURATION);
-    return Math.round(percentageRemaining * MAX_SCORE);
-  };
-  
   const handleGuess = (guess: string) => {
     if (!currentMovie || !isGameActive) return;
     
@@ -93,18 +75,10 @@ const GameContainer: React.FC = () => {
     const isCorrect = normalizedGuess === normalizedTitle;
     
     if (isCorrect) {
-      const calculatedScore = calculateScore(elapsedTime);
-      setRoundScore(calculatedScore);
-      setScore(prev => prev + calculatedScore);
       setIsGameActive(false);
       setIsRoundComplete(true);
       setIsCorrectGuess(true);
-      
-      toast({
-        title: "Correct!",
-        description: `You earned ${calculatedScore} points!`,
-        duration: 3000,
-      });
+      setScore(prev => prev + 100);
     } else {
       setHasIncorrectGuess(true);
       setTimeout(() => {
@@ -114,6 +88,7 @@ const GameContainer: React.FC = () => {
   };
   
   const handleNextRound = async () => {
+    setScore(0);
     await startNewRound();
   };
   
@@ -135,16 +110,11 @@ const GameContainer: React.FC = () => {
         ) : currentMovie ? (
           <div className="relative w-full h-full">
             <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/40 to-transparent h-12 flex justify-between items-center px-4 py-2">
-              <div className="flex flex-col w-full mr-2">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-white text-xs">Score: {score}</span>
-                  {isCorrectGuess && <span className="text-white text-xs">+{roundScore}</span>}
-                </div>
+              <div className="w-full mr-2">
                 <Timer 
                   duration={GAME_DURATION} 
                   onTimeUp={handleTimeUp} 
-                  isRunning={isGameActive}
-                  onTimeUpdate={handleTimeUpdate}
+                  isRunning={isGameActive} 
                 />
               </div>
               <Button 
