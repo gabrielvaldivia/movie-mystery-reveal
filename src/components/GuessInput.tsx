@@ -1,7 +1,9 @@
+
 import React, { useEffect } from 'react';
 import MovieGuessInput from './MovieGuessInput';
 import NextRoundButton from './NextRoundButton';
 import HintPopover from './HintPopover';
+
 interface GuessInputProps {
   onGuess: (guess: string) => void;
   disabled: boolean;
@@ -11,6 +13,7 @@ interface GuessInputProps {
   onNextRound?: () => void;
   hint?: string;
 }
+
 const GuessInput: React.FC<GuessInputProps> = ({
   onGuess,
   disabled,
@@ -32,8 +35,9 @@ const GuessInput: React.FC<GuessInputProps> = ({
       return () => clearTimeout(timeout);
     }
   }, [correctAnswer, onNextRound]);
+
   return <div className="w-full space-y-4">
-      {correctAnswer ? onNextRound && <NextRoundButton onNextRound={onNextRound} /> : <div className="relative flex items-center gap-2 backdrop-blur-sm bg-background/80 p-2 rounded-xl">
+      {correctAnswer ? onNextRound && <NextRoundButton onNextRound={onNextRound} /> : <div className="relative flex items-center gap-2">
           {hint && <HintPopover hint={hint} />}
           
           <div className="flex-grow">
@@ -42,4 +46,5 @@ const GuessInput: React.FC<GuessInputProps> = ({
         </div>}
     </div>;
 };
+
 export default GuessInput;
