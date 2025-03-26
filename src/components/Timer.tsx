@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Progress } from './ui/progress';
 import { cn } from "@/lib/utils";
 
@@ -17,6 +17,12 @@ const Timer: React.FC<TimerProps> = ({
   onTimeUpdate 
 }) => {
   const [timeRemaining, setTimeRemaining] = useState(duration);
+  const updateTimeRef = useRef<((elapsed: number) => void) | undefined>(onTimeUpdate);
+  
+  // Update the ref when the callback changes
+  useEffect(() => {
+    updateTimeRef.current = onTimeUpdate;
+  }, [onTimeUpdate]);
   
   useEffect(() => {
     // Reset timer when isRunning changes to true
@@ -24,13 +30,6 @@ const Timer: React.FC<TimerProps> = ({
       setTimeRemaining(duration);
     }
   }, [isRunning, duration]);
-  
-  // Use useCallback to avoid recreating function on each render
-  const updateTime = useCallback((elapsed: number) => {
-    if (onTimeUpdate) {
-      onTimeUpdate(elapsed);
-    }
-  }, [onTimeUpdate]);
   
   useEffect(() => {
     let timerId: number | null = null;
@@ -41,8 +40,10 @@ const Timer: React.FC<TimerProps> = ({
           const newRemaining = Math.max(0, prev - 100);
           const elapsed = duration - newRemaining;
           
-          // Call update outside of state update to avoid warning
-          updateTime(elapsed);
+          // Call update using the ref to avoid issues with stale callbacks
+          if (updateTimeRef.current) {
+            updateTimeRef.current(elapsed);
+          }
           
           if (newRemaining <= 0) {
             if (timerId) clearInterval(timerId);
@@ -58,7 +59,7 @@ const Timer: React.FC<TimerProps> = ({
     return () => {
       if (timerId) clearInterval(timerId);
     };
-  }, [isRunning, timeRemaining, onTimeUp, duration, updateTime]);
+  }, [isRunning, timeRemaining, onTimeUp, duration]);
   
   const progress = Math.max(0, (timeRemaining / duration) * 100);
   

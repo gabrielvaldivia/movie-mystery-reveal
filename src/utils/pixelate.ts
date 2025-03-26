@@ -120,21 +120,17 @@ export const createPixelationAnimation = (
 } => {
   let animationFrameId: number | null = null;
   let startTime: number | null = null;
+  let pauseTime: number | null = null;
+  let pausedDuration = 0;
   let currentLevel = 1; // Start with maximum pixelation
-  let isPaused = false;
-  let elapsedAtPause = 0;
 
   const animate = (timestamp: number) => {
-    if (isPaused) {
-      startTime = timestamp - elapsedAtPause;
-    }
-    
     if (startTime === null) {
       startTime = timestamp;
     }
 
-    const elapsed = timestamp - startTime;
-    elapsedAtPause = elapsed;
+    // Calculate elapsed time, accounting for pauses
+    const elapsed = timestamp - startTime - pausedDuration;
     
     // Calculate current pixelation level (1 to 0 over duration)
     currentLevel = Math.max(0, 1 - elapsed / duration);
@@ -153,35 +149,39 @@ export const createPixelationAnimation = (
     }
   };
 
-  const forceComplete = () => {
-    // Force pixelation level to 0 (fully unpixelated)
-    currentLevel = 0;
-    applyPixelation(imageElement, canvas, currentLevel);
-  };
-
   return {
     start: () => {
-      // Stop any existing animation
-      if (animationFrameId !== null) {
-        cancelAnimationFrame(animationFrameId);
-      }
-      isPaused = false;
-      // Only reset if we're starting fresh, not resuming
-      if (startTime === null || currentLevel >= 0.99) {
+      // If we're resuming from pause
+      if (pauseTime !== null && startTime !== null) {
+        pausedDuration += (performance.now() - pauseTime);
+        pauseTime = null;
+      } else if (animationFrameId === null) {
+        // Only reset if we're starting fresh, not resuming
         startTime = null;
+        pausedDuration = 0;
         currentLevel = 1;
-        elapsedAtPause = 0;
       }
+      
       animationFrameId = requestAnimationFrame(animate);
     },
     stop: () => {
       if (animationFrameId !== null) {
-        isPaused = true;
         cancelAnimationFrame(animationFrameId);
         animationFrameId = null;
+        // Record time when paused for later resume
+        pauseTime = performance.now();
       }
     },
     getCurrentLevel: () => currentLevel,
-    forceComplete
+    forceComplete: () => {
+      // Force pixelation level to 0 (fully unpixelated)
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+      currentLevel = 0;
+      applyPixelation(imageElement, canvas, currentLevel);
+      if (onComplete) onComplete();
+    }
   };
 };
