@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import MovieImage from './MovieImage';
 import GuessInput from './GuessInput';
@@ -93,10 +92,6 @@ const GameContainer: React.FC = () => {
   return (
     <div className="w-full max-w-md mx-auto px-4 py-8">
       <div className="flex flex-col items-center">
-        <div className="w-full flex items-center justify-between mb-4">
-          {/* Hint moved to GuessInput component */}
-        </div>
-        
         {isLoading ? (
           <div className="w-full aspect-video glass-panel flex items-center justify-center">
             <div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></div>
@@ -115,7 +110,17 @@ const GameContainer: React.FC = () => {
               duration={GAME_DURATION}
               onRevealComplete={handleRevealComplete}
               isActive={isGameActive}
-            />
+            >
+              <GuessInput 
+                onGuess={handleGuess}
+                disabled={!isGameActive || isLoading}
+                correctAnswer={isRoundComplete ? currentMovie?.title : undefined}
+                isCorrect={isCorrectGuess}
+                hasIncorrectGuess={hasIncorrectGuess}
+                onNextRound={handleNextRound}
+                hint={currentMovie?.hint}
+              />
+            </MovieImage>
             {isCorrectGuess && (
               <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in rounded-lg">
                 <div className="bg-white px-6 py-4 rounded-lg shadow-lg text-center">
@@ -126,18 +131,6 @@ const GameContainer: React.FC = () => {
             )}
           </div>
         ) : null}
-        
-        <div className="w-full mt-6">
-          <GuessInput 
-            onGuess={handleGuess}
-            disabled={!isGameActive || isLoading}
-            correctAnswer={isRoundComplete ? currentMovie?.title : undefined}
-            isCorrect={isCorrectGuess}
-            hasIncorrectGuess={hasIncorrectGuess}
-            onNextRound={handleNextRound}
-            hint={currentMovie?.hint}
-          />
-        </div>
       </div>
     </div>
   );

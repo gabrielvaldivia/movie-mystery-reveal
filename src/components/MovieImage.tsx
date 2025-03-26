@@ -7,13 +7,15 @@ interface MovieImageProps {
   duration: number; // in milliseconds
   onRevealComplete?: () => void;
   isActive: boolean;
+  children?: React.ReactNode; // Add children prop
 }
 
 const MovieImage: React.FC<MovieImageProps> = ({ 
   imageUrl, 
   duration, 
   onRevealComplete,
-  isActive
+  isActive,
+  children // Add children to component props
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -135,7 +137,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   }, [animation, duration, onRevealComplete, isActive]);
 
   return (
-    <div className="pixel-reveal-container glass-panel">
+    <div className="pixel-reveal-container glass-panel relative">
       {!isLoaded && (
         <div className="absolute inset-0 flex items-center justify-center bg-secondary animate-pulse-subtle">
           <span className="text-muted-foreground">Loading image...</span>
@@ -146,6 +148,13 @@ const MovieImage: React.FC<MovieImageProps> = ({
         className="w-full h-full object-cover transition-opacity duration-300"
         style={{ objectFit: 'cover' }}
       />
+      
+      {/* Display children (input field and hint button) at the bottom of the container */}
+      {children && (
+        <div className="absolute bottom-4 left-0 right-0 px-4 z-10">
+          {children}
+        </div>
+      )}
     </div>
   );
 };

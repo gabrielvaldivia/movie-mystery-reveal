@@ -69,7 +69,7 @@ const GuessInput: React.FC<GuessInputProps> = ({
             <button
               id="next-round-button" 
               onClick={handleNextRound}
-              className="w-full mt-4 bg-primary text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all hover:bg-primary/90 active:scale-[0.98]"
+              className="w-full bg-primary text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all hover:bg-primary/90 active:scale-[0.98]"
             >
               <RefreshCw className="h-5 w-5" />
               <span>Next Round</span>
@@ -77,8 +77,8 @@ const GuessInput: React.FC<GuessInputProps> = ({
           )}
         </div>
       ) : (
-        <form onSubmit={handleSubmit} className="w-full flex flex-col gap-2">
-          <div className="relative flex items-center gap-2">
+        <form onSubmit={handleSubmit} className="w-full">
+          <div className="relative flex items-center gap-2 backdrop-blur-sm bg-background/80 rounded-lg p-2">
             {hint && (
               <Popover>
                 <PopoverTrigger asChild>
@@ -86,7 +86,7 @@ const GuessInput: React.FC<GuessInputProps> = ({
                     type="button" 
                     variant="outline" 
                     size="icon" 
-                    className="flex-shrink-0"
+                    className="flex-shrink-0 bg-white/90 hover:bg-white"
                     aria-label="Show hint"
                   >
                     <HelpCircle className="h-4 w-4" />
@@ -106,7 +106,7 @@ const GuessInput: React.FC<GuessInputProps> = ({
                 onChange={(e) => setGuess(e.target.value)}
                 placeholder="Guess the movie..."
                 disabled={disabled}
-                className={`w-full py-3 px-4 pr-12 bg-white rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed transition-all ${
+                className={`w-full py-2 px-3 pr-10 bg-white/90 rounded-md border focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed transition-all ${
                   hasIncorrectGuess 
                     ? 'border-destructive ring-2 ring-destructive/50 shake-animation' 
                     : 'border-input'
@@ -115,9 +115,9 @@ const GuessInput: React.FC<GuessInputProps> = ({
               <button
                 type="submit"
                 disabled={disabled || !guess.trim()}
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-primary text-white opacity-90 hover:opacity-100 disabled:opacity-30 transition-opacity"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-full bg-primary text-white opacity-90 hover:opacity-100 disabled:opacity-30 transition-opacity"
               >
-                <Send className="h-4 w-4" />
+                <Send className="h-3 w-3" />
               </button>
             </div>
           </div>
