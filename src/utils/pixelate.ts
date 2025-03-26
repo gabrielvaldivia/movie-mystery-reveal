@@ -1,3 +1,4 @@
+
 /**
  * Utility to create a pixelation effect on an image
  * The pixelation level goes from 0 (no pixelation) to 1 (maximum pixelation)
@@ -38,40 +39,37 @@ export const applyPixelation = (
       return;
     }
 
-    // Calculate the size of the pixelated image
-    const w = Math.ceil(canvas.width / pixelSize);
-    const h = Math.ceil(canvas.height / pixelSize);
-
     // Create a temporary canvas for the initial image
     const tempCanvas = document.createElement('canvas');
     tempCanvas.width = canvas.width;
     tempCanvas.height = canvas.height;
-    // Also set willReadFrequently on temporary canvas context
     const tempCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
     if (!tempCtx) return;
     
     // Draw the original image properly scaled
     drawImageWithCover(imageElement, tempCanvas, tempCtx);
     
-    // Step 1: Draw the scaled image at a smaller size
-    ctx.drawImage(tempCanvas, 0, 0, w, h);
+    // Calculate the size of the pixelated version
+    const w = Math.ceil(canvas.width / pixelSize);
+    const h = Math.ceil(canvas.height / pixelSize);
 
-    // Step 2: Save the small image data
-    const smallImageData = ctx.getImageData(0, 0, w, h);
+    // Create a small canvas for pixelation
+    const smallCanvas = document.createElement('canvas');
+    smallCanvas.width = w;
+    smallCanvas.height = h;
+    const smallCtx = smallCanvas.getContext('2d', { willReadFrequently: true });
+    if (!smallCtx) return;
     
-    // Step 3: Clear the canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Step 1: Draw the original image at a smaller size (pixelation)
+    smallCtx.drawImage(tempCanvas, 0, 0, w, h);
     
-    // Step 4: Turn off image smoothing for a blocky look
+    // Step 2: Turn off image smoothing for all contexts
     ctx.imageSmoothingEnabled = false;
+    smallCtx.imageSmoothingEnabled = false;
+    tempCtx.imageSmoothingEnabled = false;
     
-    // Step 5: Draw the small image back to the canvas at full size
-    ctx.putImageData(smallImageData, 0, 0);
-    ctx.drawImage(
-      canvas, 
-      0, 0, w, h,
-      0, 0, canvas.width, canvas.height
-    );
+    // Step 3: Draw the small image back to the main canvas at full size
+    ctx.drawImage(smallCanvas, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
   } catch (error) {
     console.error("Error applying pixelation effect:", error);
   }
@@ -147,7 +145,7 @@ export const createPixelationAnimation = (
     if (elapsed < duration) {
       animationFrameId = requestAnimationFrame(animate);
     } else {
-      // Animation complete
+      // Animation complete - ensure we render the final state
       currentLevel = 0;
       try {
         applyPixelation(imageElement, canvas, currentLevel);
@@ -160,12 +158,17 @@ export const createPixelationAnimation = (
 
   const forceComplete = () => {
     // Force pixelation level to 0 (fully unpixelated)
+    if (animationFrameId !== null) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
     currentLevel = 0;
     try {
       applyPixelation(imageElement, canvas, currentLevel);
     } catch (error) {
       console.error("Error in force complete:", error);
     }
+    if (onComplete) onComplete();
   };
 
   return {
