@@ -1,4 +1,3 @@
-
 import React, { useRef, useEffect, useState } from 'react';
 import { createPixelationAnimation } from '../utils/pixelate';
 import { AspectRatio } from './ui/aspect-ratio';
@@ -28,7 +27,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
     forceComplete: () => void;
   } | null>(null);
 
-  // Set up canvas and image when component mounts or image URL changes
   useEffect(() => {
     const image = new Image();
     image.src = imageUrl;
@@ -39,7 +37,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
       setIsLoaded(true);
       
       if (canvasRef.current) {
-        // Match canvas dimensions to container while maintaining aspect ratio
         const container = canvasRef.current.parentElement;
         if (container) {
           const containerWidth = container.clientWidth;
@@ -48,7 +45,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
           canvasRef.current.height = containerHeight;
         }
         
-        // Create and store animation controller
         const pixelAnimation = createPixelationAnimation(
           image,
           canvasRef.current,
@@ -67,23 +63,19 @@ const MovieImage: React.FC<MovieImageProps> = ({
     };
   }, [imageUrl, duration, onRevealComplete]);
 
-  // Start or stop animation based on isActive prop
   useEffect(() => {
     if (animation && isLoaded) {
       if (isActive) {
         animation.start();
       } else {
         animation.stop();
-        // When round is over (isActive is false), force the image to be fully unpixelated
         if (!isActive) {
-          // Only call forceComplete if it exists
           animation.forceComplete();
         }
       }
     }
   }, [isActive, animation, isLoaded]);
 
-  // Handle window resize
   useEffect(() => {
     const handleResize = () => {
       if (canvasRef.current && imageRef.current) {
@@ -92,19 +84,16 @@ const MovieImage: React.FC<MovieImageProps> = ({
           const containerWidth = container.clientWidth;
           const containerHeight = container.clientHeight;
           
-          // Only resize if the dimensions change significantly
           if (Math.abs(canvasRef.current.width - containerWidth) > 10 || 
               Math.abs(canvasRef.current.height - containerHeight) > 10) {
             
             canvasRef.current.width = containerWidth;
             canvasRef.current.height = containerHeight;
             
-            // Reapply current pixelation level after resize
             if (animation) {
               animation.stop();
               
               if (isActive) {
-                // Restart animation with new dimensions
                 const newAnimation = createPixelationAnimation(
                   imageRef.current,
                   canvasRef.current,
@@ -114,7 +103,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
                 setAnimation(newAnimation);
                 newAnimation.start();
               } else {
-                // If not active, show the unpixelated image
                 const newAnimation = createPixelationAnimation(
                   imageRef.current,
                   canvasRef.current,
@@ -122,7 +110,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
                   onRevealComplete
                 );
                 setAnimation(newAnimation);
-                // Only call forceComplete if it exists
                 if (newAnimation) {
                   newAnimation.forceComplete();
                 }
@@ -138,7 +125,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   }, [animation, duration, onRevealComplete, isActive]);
 
   return (
-    <div className="pixel-reveal-container glass-panel relative h-[85vh]">
+    <div className="pixel-reveal-container glass-panel relative">
       {!isLoaded && (
         <div className="absolute inset-0 flex items-center justify-center bg-secondary animate-pulse-subtle">
           <span className="text-muted-foreground">Loading image...</span>
@@ -150,7 +137,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
         style={{ objectFit: 'cover' }}
       />
       
-      {/* Display children (input field and hint button) at the bottom of the container */}
       {children && (
         <div className="absolute bottom-4 left-0 right-0 px-4 z-10">
           {children}
