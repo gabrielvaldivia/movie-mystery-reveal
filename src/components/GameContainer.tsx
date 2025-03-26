@@ -1,5 +1,5 @@
+
 import React, { useState, useEffect } from 'react';
-import { toast } from 'sonner';
 import MovieImage from './MovieImage';
 import GuessInput from './GuessInput';
 import Timer from './Timer';
@@ -18,6 +18,7 @@ const GameContainer: React.FC = () => {
   const [round, setRound] = useState(1);
   const [isCorrectGuess, setIsCorrectGuess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasIncorrectGuess, setHasIncorrectGuess] = useState(false);
   
   useEffect(() => {
     const initGame = async () => {
@@ -27,7 +28,6 @@ const GameContainer: React.FC = () => {
         await startNewRound();
       } catch (error) {
         console.error("Error initializing game:", error);
-        toast.error("Error loading game data. Please try again.");
       } finally {
         setIsLoading(false);
       }
@@ -47,9 +47,9 @@ const GameContainer: React.FC = () => {
       setIsGameActive(true);
       setIsRoundComplete(false);
       setIsCorrectGuess(false);
+      setHasIncorrectGuess(false);
     } catch (error) {
       console.error("Error starting new round:", error);
-      toast.error("Error loading movie data. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -59,7 +59,6 @@ const GameContainer: React.FC = () => {
     if (!isRoundComplete) {
       setIsGameActive(false);
       setIsRoundComplete(true);
-      toast.error("Time's up!");
     }
   };
   
@@ -83,18 +82,22 @@ const GameContainer: React.FC = () => {
       setIsCorrectGuess(true);
       setScore(prev => prev + 100);
     } else {
-      toast.error("Try again!");
+      setHasIncorrectGuess(true);
+      // Reset the incorrect state after 1 second to remove the red outline effect
+      setTimeout(() => {
+        setHasIncorrectGuess(false);
+      }, 1000);
     }
   };
   
   const handleNextRound = async () => {
     if (round >= TOTAL_ROUNDS) {
-      toast.success(`Game complete! Final score: ${score}`);
-      
+      // Game complete - reset the game
       setRound(1);
       setScore(0);
       await startNewRound();
     } else {
+      // Next round
       setRound(prev => prev + 1);
       await startNewRound();
     }
@@ -124,12 +127,22 @@ const GameContainer: React.FC = () => {
             <div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></div>
           </div>
         ) : currentMovie ? (
-          <MovieImage 
-            imageUrl={currentMovie.imageUrl}
-            duration={GAME_DURATION}
-            onRevealComplete={handleRevealComplete}
-            isActive={isGameActive}
-          />
+          <div className="relative">
+            <MovieImage 
+              imageUrl={currentMovie.imageUrl}
+              duration={GAME_DURATION}
+              onRevealComplete={handleRevealComplete}
+              isActive={isGameActive}
+            />
+            {isCorrectGuess && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm animate-fade-in rounded-lg">
+                <div className="bg-white px-6 py-4 rounded-lg shadow-lg text-center">
+                  <h3 className="font-bold text-xl mb-2 text-primary">Correct!</h3>
+                  <p className="text-gray-700">{currentMovie.title}</p>
+                </div>
+              </div>
+            )}
+          </div>
         ) : null}
         
         <div className="w-full mt-6">
@@ -138,6 +151,7 @@ const GameContainer: React.FC = () => {
             disabled={!isGameActive || isLoading}
             correctAnswer={isRoundComplete ? currentMovie?.title : undefined}
             isCorrect={isCorrectGuess}
+            hasIncorrectGuess={hasIncorrectGuess}
             onNextRound={handleNextRound}
           />
         </div>

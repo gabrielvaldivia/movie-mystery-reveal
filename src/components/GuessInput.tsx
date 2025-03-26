@@ -7,6 +7,7 @@ interface GuessInputProps {
   disabled: boolean;
   isCorrect?: boolean;
   correctAnswer?: string;
+  hasIncorrectGuess?: boolean;
   onNextRound?: () => void;
 }
 
@@ -15,6 +16,7 @@ const GuessInput: React.FC<GuessInputProps> = ({
   disabled, 
   isCorrect, 
   correctAnswer,
+  hasIncorrectGuess,
   onNextRound
 }) => {
   const [guess, setGuess] = useState("");
@@ -72,7 +74,11 @@ const GuessInput: React.FC<GuessInputProps> = ({
               onChange={(e) => setGuess(e.target.value)}
               placeholder="Guess the movie..."
               disabled={disabled}
-              className="w-full py-3 px-4 pr-12 bg-white rounded-lg border border-input focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed"
+              className={`w-full py-3 px-4 pr-12 bg-white rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed transition-all ${
+                hasIncorrectGuess 
+                  ? 'border-destructive ring-2 ring-destructive/50 shake-animation' 
+                  : 'border-input'
+              }`}
             />
             <button
               type="submit"
