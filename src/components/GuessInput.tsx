@@ -51,14 +51,6 @@ const GuessInput: React.FC<GuessInputProps> = ({
     <div className="w-full space-y-4">
       {correctAnswer ? (
         <div className="animate-slide-up">
-          <div className={`text-center p-3 rounded-lg ${isCorrect ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'}`}>
-            <p className="font-medium">
-              {isCorrect ? 'Correct!' : 'Time\'s up!'}
-            </p>
-            <p className="text-sm mt-1">
-              The movie was <span className="font-semibold">{correctAnswer}</span>
-            </p>
-          </div>
           {onNextRound && (
             <button
               id="next-round-button" 

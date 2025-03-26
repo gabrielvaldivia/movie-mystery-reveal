@@ -115,7 +115,8 @@ export const createPixelationAnimation = (
 ): { 
   start: () => void, 
   stop: () => void, 
-  getCurrentLevel: () => number 
+  getCurrentLevel: () => number,
+  forceComplete: () => void
 } => {
   let animationFrameId: number | null = null;
   let startTime: number | null = null;
@@ -145,6 +146,12 @@ export const createPixelationAnimation = (
     }
   };
 
+  const forceComplete = () => {
+    // Force pixelation level to 0 (fully unpixelated)
+    currentLevel = 0;
+    applyPixelation(imageElement, canvas, currentLevel);
+  };
+
   return {
     start: () => {
       // Stop any existing animation
@@ -161,6 +168,7 @@ export const createPixelationAnimation = (
         animationFrameId = null;
       }
     },
-    getCurrentLevel: () => currentLevel
+    getCurrentLevel: () => currentLevel,
+    forceComplete: forceComplete
   };
 };

@@ -22,6 +22,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
     start: () => void;
     stop: () => void;
     getCurrentLevel: () => number;
+    forceComplete: () => void;
   } | null>(null);
 
   // Set up canvas and image when component mounts or image URL changes
@@ -70,6 +71,10 @@ const MovieImage: React.FC<MovieImageProps> = ({
         animation.start();
       } else {
         animation.stop();
+        // When round is over (isActive is false), force the image to be fully unpixelated
+        if (!isActive) {
+          animation.forceComplete();
+        }
       }
     }
   }, [isActive, animation, isLoaded]);
@@ -104,6 +109,16 @@ const MovieImage: React.FC<MovieImageProps> = ({
                 );
                 setAnimation(newAnimation);
                 newAnimation.start();
+              } else {
+                // If not active, show the unpixelated image
+                const newAnimation = createPixelationAnimation(
+                  imageRef.current,
+                  canvasRef.current,
+                  duration,
+                  onRevealComplete
+                );
+                setAnimation(newAnimation);
+                newAnimation.forceComplete();
               }
             }
           }
