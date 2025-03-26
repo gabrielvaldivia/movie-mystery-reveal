@@ -20,7 +20,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
   onPause
 }) => {
   return (
-    <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/40 to-transparent h-12 flex justify-between items-center px-4 py-2">
+    <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/40 to-transparent h-12 flex justify-between items-center px-4 py-4">
       <Button 
         variant="ghost" 
         size="icon" 
