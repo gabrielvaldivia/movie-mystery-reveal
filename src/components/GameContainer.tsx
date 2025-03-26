@@ -1,8 +1,8 @@
+
 import React, { useState, useEffect } from 'react';
 import MovieImage from './MovieImage';
 import GuessInput from './GuessInput';
 import Timer from './Timer';
-import GameHeader from './GameHeader';
 import { getRandomMovie, Movie, getNextMovie, loadAllMovieImages } from '../utils/gameData';
 
 const GAME_DURATION = 30000; // 30 seconds
@@ -101,8 +101,6 @@ const GameContainer: React.FC = () => {
   return (
     <div className="w-full max-w-md mx-auto px-4 py-8">
       <div className="flex flex-col items-center">
-        <GameHeader score={score} round={round} totalRounds={TOTAL_ROUNDS} />
-        
         <div className="w-full flex items-center justify-between mb-4">
           <Timer 
             duration={GAME_DURATION} 
