@@ -2,19 +2,21 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
-import { SkipForward } from 'lucide-react';
+import { SkipForward, AlarmClock } from 'lucide-react';
 import { Movie } from '../utils/types/movieTypes';
 
 interface SuccessDialogProps {
   isOpen: boolean;
   movie: Movie | null;
   onNextRound: () => void;
+  timeExpired?: boolean;
 }
 
 const SuccessDialog: React.FC<SuccessDialogProps> = ({ 
   isOpen, 
   movie, 
-  onNextRound 
+  onNextRound,
+  timeExpired = false
 }) => {
   if (!movie) return null;
   
@@ -23,7 +25,7 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold text-center">
-            Correct! 🎉
+            {timeExpired ? "Time's Up!" : "Correct! 🎉"}
           </DialogTitle>
         </DialogHeader>
         <div className="flex flex-col items-center space-y-4">

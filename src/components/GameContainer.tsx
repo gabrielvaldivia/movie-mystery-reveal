@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import MovieImage from './MovieImage';
 import GuessInput from './GuessInput';
@@ -22,6 +21,7 @@ const GameContainer: React.FC = () => {
   const [imageKey, setImageKey] = useState(Date.now()); // Add a key to force re-mounting
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const [timeExpired, setTimeExpired] = useState(false);
   
   useEffect(() => {
     const initGame = async () => {
@@ -54,6 +54,7 @@ const GameContainer: React.FC = () => {
     setIsLoading(true);
     setIsImageLoaded(false);
     setShowSuccessDialog(false);
+    setTimeExpired(false);
     
     try {
       // Generate a new image key to force re-mounting of MovieImage
@@ -85,6 +86,8 @@ const GameContainer: React.FC = () => {
     if (!isRoundComplete) {
       setIsGameActive(false);
       setIsRoundComplete(true);
+      setTimeExpired(true);
+      setShowSuccessDialog(true);
     }
   };
   
@@ -175,7 +178,7 @@ const GameContainer: React.FC = () => {
                 </Button>
               </div>
               <MovieImage 
-                key={imageKey} // Force re-mount on new round
+                key={imageKey}
                 imageUrl={currentMovie.imageUrl}
                 duration={GAME_DURATION}
                 onRevealComplete={handleRevealComplete}
@@ -200,6 +203,7 @@ const GameContainer: React.FC = () => {
               isOpen={showSuccessDialog}
               movie={currentMovie}
               onNextRound={handleNextRound}
+              timeExpired={timeExpired}
             />
           </>
         ) : null}
