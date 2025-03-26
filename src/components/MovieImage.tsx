@@ -1,24 +1,30 @@
 
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { createPixelationAnimation } from '../utils/pixelate';
 import ImageLoadingIndicator from './ImageLoadingIndicator';
+import { retryMovieImage } from '../utils/services/movieImageService';
+import { Movie } from '../utils/types/movieTypes';
 
 interface MovieImageProps {
   imageUrl: string;
+  movie?: Movie; // Add the movie object for better retry handling
   duration: number; // in milliseconds
   onRevealComplete?: () => void;
   isActive: boolean;
   children?: React.ReactNode;
   onImageLoaded?: () => void;
+  onImageUrlChanged?: (newUrl: string) => void;
 }
 
 const MovieImage: React.FC<MovieImageProps> = ({ 
   imageUrl, 
+  movie,
   duration, 
   onRevealComplete,
   isActive,
   children,
-  onImageLoaded
+  onImageLoaded,
+  onImageUrlChanged
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
@@ -26,6 +32,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   const [loadProgress, setLoadProgress] = useState(0);
   const [loadError, setLoadError] = useState(false);
   const [loadTimeout, setLoadTimeout] = useState(false);
+  const [currentImageUrl, setCurrentImageUrl] = useState(imageUrl);
   const timeoutRef = useRef<number | null>(null);
   const progressIntervalRef = useRef<number | null>(null);
   const [animation, setAnimation] = useState<{
@@ -57,7 +64,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
     }
   };
 
-  const loadImage = () => {
+  const loadImage = useCallback((url: string = currentImageUrl) => {
     // Reset states
     setIsLoaded(false);
     setLoadProgress(0);
@@ -68,16 +75,19 @@ const MovieImage: React.FC<MovieImageProps> = ({
     // Clean up first
     cleanup();
     
+    console.log("Attempting to load image:", url);
+    
     // Create a new image object
     const image = new Image();
-    image.src = `${imageUrl}?t=${Date.now()}`; // Add timestamp to prevent caching
+    // Add cache-busting parameter
+    image.src = `${url}?t=${Date.now()}`;
     image.crossOrigin = "anonymous";
     imageRef.current = image;
 
     // Set a timeout for image loading (10 seconds)
     timeoutRef.current = window.setTimeout(() => {
       setLoadTimeout(true);
-      console.log("Image loading timed out:", imageUrl);
+      console.log("Image loading timed out:", url);
     }, 10000);
 
     // Simulate progress
@@ -92,7 +102,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
     image.onload = () => {
       cleanup();
       
-      console.log("Image loaded successfully:", imageUrl);
+      console.log("Image loaded successfully:", url);
       setLoadProgress(100);
       setIsLoaded(true);
       
@@ -128,17 +138,49 @@ const MovieImage: React.FC<MovieImageProps> = ({
     image.onerror = (error) => {
       cleanup();
       setLoadError(true);
-      console.error("Error loading image:", imageUrl, error);
+      console.error("Error loading image:", url, error);
     };
-  };
+  }, [currentImageUrl, duration, onRevealComplete, onImageLoaded]);
+
+  // Handle retry with potentially new image URL
+  const handleRetry = useCallback(async () => {
+    if (movie) {
+      try {
+        console.log("Retrying with movie object:", movie.title);
+        const newUrl = await retryMovieImage(movie);
+        console.log("Got new URL:", newUrl);
+        
+        // Only update if URL changed
+        if (newUrl !== currentImageUrl) {
+          setCurrentImageUrl(newUrl);
+          if (onImageUrlChanged) {
+            onImageUrlChanged(newUrl);
+          }
+        }
+        
+        // Always attempt to load the image again
+        loadImage(newUrl);
+      } catch (error) {
+        console.error("Error during retry:", error);
+        // Still try to reload with current URL as fallback
+        loadImage();
+      }
+    } else {
+      // If no movie object, just retry with current URL
+      loadImage();
+    }
+  }, [movie, currentImageUrl, loadImage, onImageUrlChanged]);
 
   // Load image when URL changes
   useEffect(() => {
-    loadImage();
+    if (imageUrl !== currentImageUrl) {
+      setCurrentImageUrl(imageUrl);
+    }
+    loadImage(imageUrl);
     
     // Clean up on unmount or URL change
     return cleanup;
-  }, [imageUrl]);
+  }, [imageUrl, loadImage]);
 
   // Handle animation state based on isActive
   useEffect(() => {
@@ -213,7 +255,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
         progress={loadProgress}
         error={loadError}
         timeout={loadTimeout}
-        onRetry={loadImage}
+        onRetry={handleRetry}
       />
       
       {/* Children (like buttons or UI controls) */}

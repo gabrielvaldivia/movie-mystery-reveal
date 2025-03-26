@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import MovieImage from './MovieImage';
 import GuessInput from './GuessInput';
 import Timer from './Timer';
@@ -7,6 +7,7 @@ import SuccessDialog from './SuccessDialog';
 import { getRandomMovie, Movie, getNextMovie, loadAllMovieImages } from '../utils/gameData';
 import { Button } from './ui/button';
 import { SkipForward } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const GAME_DURATION = 30000; // 30 seconds
 
@@ -22,6 +23,7 @@ const GameContainer: React.FC = () => {
   const [imageKey, setImageKey] = useState(Date.now()); // Add a key to force re-mounting
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const { toast } = useToast();
   
   useEffect(() => {
     const initGame = async () => {
@@ -42,6 +44,11 @@ const GameContainer: React.FC = () => {
         setLoadingProgress(100);
       } catch (error) {
         console.error("Error initializing game:", error);
+        toast({
+          title: "Error",
+          description: "Failed to initialize game. Please refresh the page.",
+          variant: "destructive"
+        });
       } finally {
         setIsLoading(false);
       }
@@ -70,31 +77,46 @@ const GameContainer: React.FC = () => {
       // We'll set isGameActive to true after the image is loaded
     } catch (error) {
       console.error("Error starting new round:", error);
+      toast({
+        title: "Error",
+        description: "Failed to load next movie. Please try again.",
+        variant: "destructive"
+      });
     } finally {
       setIsLoading(false);
     }
   };
   
-  const handleImageLoaded = () => {
+  const handleImageLoaded = useCallback(() => {
     setIsImageLoaded(true);
     // Now that the image is loaded, we can start the game
     setIsGameActive(true);
-  };
+  }, []);
   
-  const handleTimeUp = () => {
+  const handleTimeUp = useCallback(() => {
     if (!isRoundComplete) {
       setIsGameActive(false);
       setIsRoundComplete(true);
     }
-  };
+  }, [isRoundComplete]);
   
-  const handleRevealComplete = () => {
+  const handleRevealComplete = useCallback(() => {
     if (!isRoundComplete) {
       handleTimeUp();
     }
-  };
+  }, [isRoundComplete, handleTimeUp]);
   
-  const handleGuess = (guess: string) => {
+  const handleImageUrlChanged = useCallback((newUrl: string) => {
+    if (currentMovie) {
+      // Update the movie with the new URL
+      setCurrentMovie({
+        ...currentMovie,
+        imageUrl: newUrl
+      });
+    }
+  }, [currentMovie]);
+  
+  const handleGuess = useCallback((guess: string) => {
     if (!currentMovie || !isGameActive) return;
     
     const normalizedGuess = guess.toLowerCase().trim();
@@ -114,20 +136,20 @@ const GameContainer: React.FC = () => {
         setHasIncorrectGuess(false);
       }, 1000);
     }
-  };
+  }, [currentMovie, isGameActive]);
   
-  const handleNextRound = async () => {
+  const handleNextRound = useCallback(async () => {
     setScore(0);
     await startNewRound();
-  };
+  }, []);
   
-  const handleSkip = async () => {
+  const handleSkip = useCallback(async () => {
     if (isGameActive) {
       setIsGameActive(false);
       setIsRoundComplete(true);
       await startNewRound();
     }
-  };
+  }, [isGameActive, startNewRound]);
   
   return (
     <div className="w-full h-full flex items-center justify-center">
@@ -177,10 +199,12 @@ const GameContainer: React.FC = () => {
               <MovieImage 
                 key={imageKey} // Force re-mount on new round
                 imageUrl={currentMovie.imageUrl}
+                movie={currentMovie} // Pass the movie object for better retry handling
                 duration={GAME_DURATION}
                 onRevealComplete={handleRevealComplete}
                 isActive={isGameActive && !showSuccessDialog}
                 onImageLoaded={handleImageLoaded}
+                onImageUrlChanged={handleImageUrlChanged}
               >
                 {!showSuccessDialog && (
                   <GuessInput 

@@ -21,7 +21,7 @@ const ImageLoadingIndicator: React.FC<ImageLoadingIndicatorProps> = ({
 }) => {
   if (error || timeout) {
     return (
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm z-10">
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/80 backdrop-blur-sm z-20">
         <AlertCircle className="w-10 h-10 text-red-500 mb-2" />
         <p className="text-center text-white font-medium mb-4">
           {timeout ? "Image load timed out" : "Failed to load image"}
@@ -30,11 +30,12 @@ const ImageLoadingIndicator: React.FC<ImageLoadingIndicatorProps> = ({
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
+            console.log("Retry button clicked");
             onRetry();
           }} 
           variant="outline" 
           size="sm" 
-          className="flex items-center gap-2 bg-white hover:bg-gray-100"
+          className="flex items-center gap-2 bg-white/90 hover:bg-white text-black font-medium"
         >
           <RefreshCw className="w-4 h-4" />
           Retry
@@ -45,7 +46,7 @@ const ImageLoadingIndicator: React.FC<ImageLoadingIndicatorProps> = ({
 
   if (isLoading) {
     return (
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary/80 backdrop-blur-sm">
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary/80 backdrop-blur-sm z-10">
         <div className="w-2/3 max-w-xs space-y-2">
           <Progress value={progress} className="h-1.5" />
           <p className="text-center text-xs text-muted-foreground">
