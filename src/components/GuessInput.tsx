@@ -2,7 +2,6 @@
 import React, { useEffect } from 'react';
 import MovieGuessInput from './MovieGuessInput';
 import NextRoundButton from './NextRoundButton';
-import HintPopover from './HintPopover';
 
 interface GuessInputProps {
   onGuess: (guess: string) => void;
@@ -11,7 +10,6 @@ interface GuessInputProps {
   correctAnswer?: string;
   hasIncorrectGuess?: boolean;
   onNextRound?: () => void;
-  hint?: string;
 }
 
 const GuessInput: React.FC<GuessInputProps> = ({
@@ -21,7 +19,6 @@ const GuessInput: React.FC<GuessInputProps> = ({
   correctAnswer,
   hasIncorrectGuess,
   onNextRound,
-  hint
 }) => {
   // Focus the next round button when correct answer is shown
   useEffect(() => {
@@ -48,8 +45,6 @@ const GuessInput: React.FC<GuessInputProps> = ({
         onNextRound && <NextRoundButton onNextRound={onNextRound} />
       ) : (
         <div className="relative flex items-center gap-2">
-          {hint && <HintPopover hint={hint} />}
-          
           <div className="flex-grow">
             <MovieGuessInput 
               onGuess={handleGuess} 
