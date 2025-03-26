@@ -1,9 +1,7 @@
-
 import React, { useEffect } from 'react';
 import MovieGuessInput from './MovieGuessInput';
 import NextRoundButton from './NextRoundButton';
 import HintPopover from './HintPopover';
-
 interface GuessInputProps {
   onGuess: (guess: string) => void;
   disabled: boolean;
@@ -13,11 +11,10 @@ interface GuessInputProps {
   onNextRound?: () => void;
   hint?: string;
 }
-
-const GuessInput: React.FC<GuessInputProps> = ({ 
-  onGuess, 
-  disabled, 
-  isCorrect, 
+const GuessInput: React.FC<GuessInputProps> = ({
+  onGuess,
+  disabled,
+  isCorrect,
   correctAnswer,
   hasIncorrectGuess,
   onNextRound,
@@ -35,26 +32,14 @@ const GuessInput: React.FC<GuessInputProps> = ({
       return () => clearTimeout(timeout);
     }
   }, [correctAnswer, onNextRound]);
-
-  return (
-    <div className="w-full space-y-4">
-      {correctAnswer ? (
-        onNextRound && <NextRoundButton onNextRound={onNextRound} />
-      ) : (
-        <div className="relative flex items-center gap-2 backdrop-blur-sm bg-background/80 rounded-lg p-2">
+  return <div className="w-full space-y-4">
+      {correctAnswer ? onNextRound && <NextRoundButton onNextRound={onNextRound} /> : <div className="relative flex items-center gap-2 backdrop-blur-sm bg-background/80 p-2 rounded-xl">
           {hint && <HintPopover hint={hint} />}
           
           <div className="flex-grow">
-            <MovieGuessInput 
-              onGuess={onGuess} 
-              disabled={disabled}
-              hasIncorrectGuess={hasIncorrectGuess}
-            />
+            <MovieGuessInput onGuess={onGuess} disabled={disabled} hasIncorrectGuess={hasIncorrectGuess} />
           </div>
-        </div>
-      )}
-    </div>
-  );
+        </div>}
+    </div>;
 };
-
 export default GuessInput;
