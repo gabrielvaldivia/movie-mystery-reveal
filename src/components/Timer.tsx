@@ -11,10 +11,12 @@ interface TimerProps {
 const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
   const [timeRemaining, setTimeRemaining] = useState(duration);
   const timerRef = useRef<number | null>(null);
+  const pausedTimeRef = useRef<number>(timeRemaining);
   
   // Reset timer when duration changes
   useEffect(() => {
     setTimeRemaining(duration);
+    pausedTimeRef.current = duration;
   }, [duration]);
   
   // Clear interval on unmount
@@ -32,6 +34,11 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
     if (timerRef.current) {
       clearInterval(timerRef.current);
       timerRef.current = null;
+    }
+    
+    // When pausing, store the current time remaining
+    if (!isRunning) {
+      pausedTimeRef.current = timeRemaining;
     }
     
     // Start timer if running and we have time left

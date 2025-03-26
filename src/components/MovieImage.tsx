@@ -32,10 +32,16 @@ const MovieImage: React.FC<MovieImageProps> = ({
   const [loadError, setLoadError] = useState(false);
   const [timeoutError, setTimeoutError] = useState(false);
   const imageRef = useRef<HTMLImageElement | null>(null);
-  const animationRef = useRef<{ start: () => void; stop: () => void; forceComplete: () => void } | null>(null);
+  const animationRef = useRef<{ 
+    start: () => void; 
+    stop: () => void; 
+    resume: (pausedTime?: number) => void;
+    forceComplete: () => void 
+  } | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const loadingProgressRef = useRef<number>(0);
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const previousActiveRef = useRef<boolean>(isActive);
 
   const loadImage = () => {
     // Clear previous state
@@ -168,14 +174,24 @@ const MovieImage: React.FC<MovieImageProps> = ({
     };
   }, [imageUrl, duration, onImageLoaded, onRevealComplete, onImageError]);
   
-  // Handle isActive changes
+  // Handle isActive changes for pausing/resuming
   useEffect(() => {
     if (!animationRef.current || !isLoaded) return;
     
-    if (isActive) {
+    const wasActive = previousActiveRef.current;
+    previousActiveRef.current = isActive;
+    
+    if (isActive && !wasActive) {
+      // Resuming from paused state
+      animationRef.current.resume();
+    } else if (!isActive && wasActive) {
+      // Pausing
+      animationRef.current.stop();
+    } else if (isActive) {
+      // Initial start
       animationRef.current.start();
     } else {
-      animationRef.current.stop();
+      // Force complete when not active
       animationRef.current.forceComplete();
     }
   }, [isActive, isLoaded]);
