@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, RefreshCw, HelpCircle } from 'lucide-react';
 import { Button } from './ui/button';
@@ -32,8 +31,10 @@ const GuessInput: React.FC<GuessInputProps> = ({
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = (e?: React.FormEvent) => {
+    if (e) {
+      e.preventDefault();
+    }
     if (guess.trim() && !disabled) {
       onGuess(guess.trim());
       setSuggestions([]);
@@ -202,6 +203,7 @@ const GuessInput: React.FC<GuessInputProps> = ({
                 isOpen={isSuggestionsOpen}
                 onSelect={handleSuggestionSelect}
                 highlightedIndex={highlightedIndex}
+                onSubmit={handleSubmit}
               />
             </div>
           </div>

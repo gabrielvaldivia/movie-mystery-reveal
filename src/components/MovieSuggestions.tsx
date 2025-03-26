@@ -8,6 +8,7 @@ interface MovieSuggestionsProps {
   isOpen: boolean;
   onSelect: (title: string) => void;
   highlightedIndex: number;
+  onSubmit: () => void; // Add a new prop for submitting the form
 }
 
 const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
@@ -15,6 +16,7 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
   isOpen,
   onSelect,
   highlightedIndex,
+  onSubmit, // Receive the onSubmit prop
 }) => {
   // Don't render anything if not open
   if (!isOpen) {
@@ -23,6 +25,13 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
 
   // Ensure suggestions is always an array
   const safeSuggestions = Array.isArray(suggestions) ? suggestions : [];
+
+  // Handle the selection and submission
+  const handleSelection = (title: string) => {
+    onSelect(title);
+    // Submit the form after setting the title
+    setTimeout(() => onSubmit(), 10);
+  };
 
   return (
     <div className="relative w-full">
@@ -35,7 +44,7 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
                 {safeSuggestions.map((movie, index) => (
                   <CommandItem
                     key={movie.id}
-                    onSelect={() => onSelect(movie.title)}
+                    onSelect={() => handleSelection(movie.title)}
                     className={`flex items-center py-2 px-3 cursor-pointer ${
                       index === highlightedIndex ? 'bg-accent' : ''
                     }`}
