@@ -1,5 +1,6 @@
 import { Movie } from '../types/movieTypes';
-import { moviesCollection } from '../data/movieCollection';
+import { getMoviesCollection } from '../data/movieCollection';
+import { TMDB_IMAGE_BASE_URL } from '../services/tmdbService';
 
 // TMDB image sizes - try different sizes in case one works
 const IMAGE_SIZES = ['w780', 'w500', 'w342', 'original'];
@@ -18,7 +19,7 @@ const isImageUrlValid = async (url: string): Promise<boolean> => {
 // Try different image sizes until one works
 const tryDifferentImageSizes = async (posterPath: string): Promise<string | null> => {
   for (const size of IMAGE_SIZES) {
-    const imageUrl = `https://image.tmdb.org/t/p/${size}${posterPath}`;
+    const imageUrl = `${TMDB_IMAGE_BASE_URL.replace('w780', size)}${posterPath}`;
     if (await isImageUrlValid(imageUrl)) {
       return imageUrl;
     }
@@ -59,30 +60,37 @@ export const getMovieWithImage = async (): Promise<Movie> => {
     return validMovies[Math.floor(Math.random() * validMovies.length)];
   }
   
-  // Otherwise, we need to find movies with valid images
-  // Shuffle the entire movie collection to ensure true randomness
-  const shuffledMovies = [...moviesCollection].sort(() => Math.random() - 0.5);
-  
-  // Try to find a movie with a valid image
-  for (const movie of shuffledMovies) {
-    try {
-      const imageUrl = await fetchMovieImages(movie);
-      const movieWithImage = { ...movie, imageUrl };
-      
-      // Add to our valid movies cache if not already there
-      if (!validMovies.some(m => m.id === movie.id)) {
-        validMovies.push(movieWithImage);
+  // Otherwise, we need to fetch movies from TMDB and find ones with valid images
+  try {
+    const moviesCollection = await getMoviesCollection();
+    
+    // Shuffle the entire movie collection to ensure true randomness
+    const shuffledMovies = [...moviesCollection].sort(() => Math.random() - 0.5);
+    
+    // Try to find a movie with a valid image
+    for (const movie of shuffledMovies) {
+      try {
+        const imageUrl = await fetchMovieImages(movie);
+        const movieWithImage = { ...movie, imageUrl };
+        
+        // Add to our valid movies cache if not already there
+        if (!validMovies.some(m => m.id === movie.id)) {
+          validMovies.push(movieWithImage);
+        }
+        
+        return movieWithImage;
+      } catch (error) {
+        // Just skip this movie and try another
+        console.log(`Skipping movie without valid image: ${movie.title}`);
+        continue;
       }
-      
-      return movieWithImage;
-    } catch (error) {
-      // Just skip this movie and try another
-      console.log(`Skipping movie without valid image: ${movie.title}`);
-      continue;
     }
+    
+    throw new Error("Could not find any movies with valid images");
+  } catch (error) {
+    console.error("Error getting movie with image:", error);
+    throw error;
   }
-  
-  throw new Error("Could not find any movies with valid images");
 };
 
 // Get the list of movies we've validated have images
