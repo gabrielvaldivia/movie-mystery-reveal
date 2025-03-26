@@ -9,7 +9,20 @@ export const applyPixelation = (
   canvas: HTMLCanvasElement,
   pixelationLevel: number // 0 to 1, where 1 is most pixelated
 ): void => {
-  if (!imageElement.complete) {
+  if (!imageElement.complete || imageElement.naturalWidth === 0) {
+    // Image not loaded or failed to load
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    
+    // Fill with a dark gray background
+    ctx.fillStyle = "#3a3a3a";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    // Add text indicating image failed to load
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "16px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillText("Image not available", canvas.width / 2, canvas.height / 2);
     return;
   }
 

@@ -18,6 +18,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const [animation, setAnimation] = useState<{
     start: () => void;
     stop: () => void;
@@ -33,13 +34,13 @@ const MovieImage: React.FC<MovieImageProps> = ({
 
     image.onload = () => {
       setIsLoaded(true);
+      setHasError(false);
       
       if (canvasRef.current) {
         // Match canvas dimensions to container while maintaining aspect ratio
         const container = canvasRef.current.parentElement;
         if (container) {
           // For backdrops (screenshots), use the full container width
-          // Backdrops typically have a 16:9 aspect ratio which matches our container
           const containerWidth = container.clientWidth;
           canvasRef.current.width = containerWidth;
           canvasRef.current.height = (containerWidth * 9) / 16; // Force 16:9 aspect ratio
@@ -57,6 +58,31 @@ const MovieImage: React.FC<MovieImageProps> = ({
       }
     };
 
+    image.onerror = () => {
+      console.error(`Failed to load image: ${imageUrl}`);
+      setIsLoaded(true); // Still mark as loaded so we can show fallback
+      setHasError(true);
+      
+      if (canvasRef.current) {
+        const container = canvasRef.current.parentElement;
+        if (container) {
+          canvasRef.current.width = container.clientWidth;
+          canvasRef.current.height = (container.clientWidth * 9) / 16;
+        }
+        
+        const ctx = canvasRef.current.getContext("2d");
+        if (ctx) {
+          // Draw fallback image
+          ctx.fillStyle = "#3a3a3a";
+          ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+          ctx.fillStyle = "#ffffff";
+          ctx.font = "16px sans-serif";
+          ctx.textAlign = "center";
+          ctx.fillText("Image not available", canvasRef.current.width / 2, canvasRef.current.height / 2);
+        }
+      }
+    };
+
     return () => {
       if (animation) {
         animation.stop();
@@ -66,14 +92,14 @@ const MovieImage: React.FC<MovieImageProps> = ({
 
   // Start or stop animation based on isActive prop
   useEffect(() => {
-    if (animation && isLoaded) {
+    if (animation && isLoaded && !hasError) {
       if (isActive) {
         animation.start();
       } else {
         animation.stop();
       }
     }
-  }, [isActive, animation, isLoaded]);
+  }, [isActive, animation, isLoaded, hasError]);
 
   // Handle window resize
   useEffect(() => {
@@ -88,6 +114,20 @@ const MovieImage: React.FC<MovieImageProps> = ({
             // Only resize if the width difference is significant
             canvasRef.current.width = containerWidth;
             canvasRef.current.height = (containerWidth * 9) / 16; // Maintain 16:9 aspect ratio
+            
+            if (hasError) {
+              // Redraw error message
+              const ctx = canvasRef.current.getContext("2d");
+              if (ctx) {
+                ctx.fillStyle = "#3a3a3a";
+                ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+                ctx.fillStyle = "#ffffff";
+                ctx.font = "16px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("Image not available", canvasRef.current.width / 2, canvasRef.current.height / 2);
+              }
+              return;
+            }
             
             // Reapply current pixelation level after resize
             if (animation) {
@@ -113,7 +153,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [animation, duration, onRevealComplete, isActive]);
+  }, [animation, duration, onRevealComplete, isActive, hasError]);
 
   return (
     <div className="pixel-reveal-container glass-panel">
