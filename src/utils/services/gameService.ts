@@ -42,11 +42,16 @@ export const getMovieSuggestions = (query: string): Movie[] => {
     return [];
   }
   
-  // Filter movies that match the query
-  const matchingMovies = moviesWithImages.filter(movie => 
-    movie.title.toLowerCase().includes(lowercaseQuery)
-  );
-  
-  // Limit the number of suggestions to avoid overwhelming the UI
-  return matchingMovies.slice(0, 5);
+  try {
+    // Filter movies that match the query
+    const matchingMovies = moviesWithImages.filter(movie => 
+      movie && movie.title && movie.title.toLowerCase().includes(lowercaseQuery)
+    );
+    
+    // Limit the number of suggestions to avoid overwhelming the UI
+    return matchingMovies.slice(0, 5);
+  } catch (error) {
+    console.error('Error filtering movie suggestions:', error);
+    return [];
+  }
 };

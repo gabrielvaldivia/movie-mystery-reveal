@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, RefreshCw, HelpCircle } from 'lucide-react';
 import { Button } from './ui/button';
@@ -41,7 +40,6 @@ const GuessInput: React.FC<GuessInputProps> = ({
     }
   };
 
-  // Clear input when Next Round is clicked
   const handleNextRound = () => {
     setGuess("");
     setSuggestions([]);
@@ -51,16 +49,14 @@ const GuessInput: React.FC<GuessInputProps> = ({
     }
   };
 
-  // Handle input change and fetch suggestions
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setGuess(value);
     
     if (value.trim().length >= 2) {
-      // Fetch suggestions when user types at least 2 characters
       const movieSuggestions = getMovieSuggestions(value);
-      setSuggestions(movieSuggestions);
-      setIsSuggestionsOpen(movieSuggestions.length > 0);
+      setSuggestions(movieSuggestions || []);
+      setIsSuggestionsOpen(movieSuggestions && movieSuggestions.length > 0);
     } else {
       setSuggestions([]);
       setIsSuggestionsOpen(false);
@@ -68,7 +64,6 @@ const GuessInput: React.FC<GuessInputProps> = ({
     setHighlightedIndex(-1);
   };
 
-  // Handle suggestion selection
   const handleSuggestionSelect = (title: string) => {
     setGuess(title);
     setSuggestions([]);
@@ -78,36 +73,30 @@ const GuessInput: React.FC<GuessInputProps> = ({
     }
   };
 
-  // Handle keyboard navigation in suggestions
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isSuggestionsOpen) return;
     
-    // Arrow down
     if (e.key === 'ArrowDown') {
       e.preventDefault();
       setHighlightedIndex(prev => 
         prev < suggestions.length - 1 ? prev + 1 : prev
       );
     }
-    // Arrow up
     else if (e.key === 'ArrowUp') {
       e.preventDefault();
       setHighlightedIndex(prev => 
         prev > 0 ? prev - 1 : 0
       );
     }
-    // Enter key
     else if (e.key === 'Enter' && highlightedIndex >= 0) {
       e.preventDefault();
       handleSuggestionSelect(suggestions[highlightedIndex].title);
     }
-    // Escape key
     else if (e.key === 'Escape') {
       setIsSuggestionsOpen(false);
     }
   };
 
-  // Close suggestions when clicking outside
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (inputRef.current && !inputRef.current.contains(e.target as Node)) {
@@ -121,14 +110,12 @@ const GuessInput: React.FC<GuessInputProps> = ({
     };
   }, []);
 
-  // Focus input on mount and when disabled state changes
   useEffect(() => {
     if (!disabled && inputRef.current) {
       inputRef.current.focus();
     }
   }, [disabled]);
 
-  // If correctAnswer is shown, focus the next button
   useEffect(() => {
     if (correctAnswer && onNextRound) {
       const timeout = setTimeout(() => {
@@ -202,7 +189,7 @@ const GuessInput: React.FC<GuessInputProps> = ({
               </button>
               
               <MovieSuggestions 
-                suggestions={suggestions}
+                suggestions={suggestions || []}
                 isOpen={isSuggestionsOpen}
                 onSelect={handleSuggestionSelect}
                 highlightedIndex={highlightedIndex}

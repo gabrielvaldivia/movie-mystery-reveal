@@ -16,17 +16,21 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
   onSelect,
   highlightedIndex,
 }) => {
+  // Don't render anything if not open
   if (!isOpen) {
     return null;
   }
+
+  // Ensure suggestions is always an array
+  const safeSuggestions = Array.isArray(suggestions) ? suggestions : [];
 
   return (
     <div className="relative w-full">
       <div className="absolute top-1 left-0 right-0 z-50 overflow-hidden bg-white dark:bg-gray-800 rounded-md border shadow-lg">
         <Command className="w-full">
           <CommandGroup>
-            {suggestions && suggestions.length > 0 ? (
-              suggestions.map((movie, index) => (
+            {safeSuggestions.length > 0 ? (
+              safeSuggestions.map((movie, index) => (
                 <CommandItem
                   key={movie.id}
                   onSelect={() => onSelect(movie.title)}
