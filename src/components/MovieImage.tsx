@@ -3,6 +3,7 @@ import ImageLoadingIndicator from './ImageLoadingIndicator';
 import PixelRevealCanvas from './PixelRevealCanvas';
 import MovieContentWrapper from './MovieContentWrapper';
 import { createPixelationAnimation } from '../utils/pixelate';
+import { Play } from 'lucide-react';
 
 interface MovieImageProps {
   imageUrl: string;
@@ -256,22 +257,9 @@ const MovieImage: React.FC<MovieImageProps> = ({
       {children && <MovieContentWrapper>{children}</MovieContentWrapper>}
       
       {isLoaded && isPaused && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/20 z-10">
-          <div className="bg-black/60 p-3 rounded-full">
-            <svg 
-              xmlns="http://www.w3.org/2000/svg" 
-              width="36" 
-              height="36" 
-              viewBox="0 0 24 24" 
-              fill="none" 
-              stroke="currentColor" 
-              strokeWidth="2" 
-              strokeLinecap="round" 
-              strokeLinejoin="round" 
-              className="text-white"
-            >
-              <polygon points="5 3 19 12 5 21 5 3"></polygon>
-            </svg>
+        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+          <div className="rounded-full bg-black/40 p-3 backdrop-blur-sm">
+            <Play className="h-8 w-8 text-white" />
           </div>
         </div>
       )}

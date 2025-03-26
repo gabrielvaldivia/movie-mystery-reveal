@@ -122,6 +122,7 @@ export const createPixelationAnimation = (
   let elapsedBeforePause: number = 0;
   let currentLevel = 1; // Start with maximum pixelation
   let isPaused = false;
+  let pausedPixelationLevel = 1;
 
   const animate = (timestamp: number) => {
     // If paused, just return without scheduling next frame
@@ -168,6 +169,7 @@ export const createPixelationAnimation = (
     if (!isPaused) {
       isPaused = true;
       pauseTime = performance.now();
+      pausedPixelationLevel = currentLevel;
       if (startTime !== null) {
         elapsedBeforePause += pauseTime - startTime;
       }
