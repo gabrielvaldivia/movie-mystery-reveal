@@ -36,6 +36,12 @@ export const getMovieSuggestions = (query: string): Movie[] => {
   const lowercaseQuery = query.toLowerCase().trim();
   const moviesWithImages = getLoadedMovies();
   
+  // Make sure moviesWithImages exists and is an array
+  if (!moviesWithImages || !Array.isArray(moviesWithImages)) {
+    console.warn('No movies with images available for suggestions');
+    return [];
+  }
+  
   // Filter movies that match the query
   const matchingMovies = moviesWithImages.filter(movie => 
     movie.title.toLowerCase().includes(lowercaseQuery)

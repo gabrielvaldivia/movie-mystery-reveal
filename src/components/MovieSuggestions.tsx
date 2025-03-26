@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Movie } from '@/utils/types/movieTypes';
-import { Command, CommandGroup, CommandItem } from './ui/command';
+import { Command, CommandEmpty, CommandGroup, CommandItem } from './ui/command';
 
 interface MovieSuggestionsProps {
   suggestions: Movie[];
@@ -16,7 +16,7 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
   onSelect,
   highlightedIndex,
 }) => {
-  if (!isOpen || suggestions.length === 0) {
+  if (!isOpen) {
     return null;
   }
 
@@ -25,17 +25,21 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
       <div className="absolute top-1 left-0 right-0 z-50 overflow-hidden bg-white dark:bg-gray-800 rounded-md border shadow-lg">
         <Command className="w-full">
           <CommandGroup>
-            {suggestions.map((movie, index) => (
-              <CommandItem
-                key={movie.id}
-                onSelect={() => onSelect(movie.title)}
-                className={`flex items-center py-2 px-3 cursor-pointer ${
-                  index === highlightedIndex ? 'bg-accent' : ''
-                }`}
-              >
-                <span className="truncate">{movie.title}</span>
-              </CommandItem>
-            ))}
+            {suggestions && suggestions.length > 0 ? (
+              suggestions.map((movie, index) => (
+                <CommandItem
+                  key={movie.id}
+                  onSelect={() => onSelect(movie.title)}
+                  className={`flex items-center py-2 px-3 cursor-pointer ${
+                    index === highlightedIndex ? 'bg-accent' : ''
+                  }`}
+                >
+                  <span className="truncate">{movie.title}</span>
+                </CommandItem>
+              ))
+            ) : (
+              <CommandEmpty>No movies found</CommandEmpty>
+            )}
           </CommandGroup>
         </Command>
       </div>
