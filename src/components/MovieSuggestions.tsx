@@ -38,7 +38,7 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
 
   return (
     <div className="relative w-full">
-      <div className="absolute bottom-full left-0 right-0 z-50 mb-2 overflow-hidden bg-white dark:bg-gray-800 rounded-md border shadow-lg">
+      <div className="absolute bottom-full left-0 right-0 z-50 mb-10 overflow-hidden bg-white dark:bg-gray-800 rounded-md border shadow-lg">
         <Command className="w-full">
           <CommandList>
             <CommandEmpty>No movies found</CommandEmpty>
