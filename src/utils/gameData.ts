@@ -1,5 +1,4 @@
-
-// Movie data with simpler, more reliable image URLs
+// Movie data using TMDB API
 
 export interface Movie {
   id: string;
@@ -9,111 +8,114 @@ export interface Movie {
   hint?: string;
 }
 
-// Simple movie collection with movie posters from Wikimedia or other reliable sources
+// API configuration for TMDB
+const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w780";
+
+// Movie collection using TMDB image paths
 export const moviesCollection: Movie[] = [
   {
     id: "1",
     title: "Inception",
-    imageUrl: "https://upload.wikimedia.org/wikipedia/en/2/2e/Inception_%282010%29_theatrical_poster.jpg",
+    imageUrl: `${TMDB_IMAGE_BASE_URL}/9gk7adHYeDvHkCSEqAvQNLV5Uge.jpg`,
     releaseYear: 2010,
     hint: "Dreams within dreams"
   },
   {
     id: "2",
     title: "The Shawshank Redemption",
-    imageUrl: "https://upload.wikimedia.org/wikipedia/en/8/81/ShawshankRedemptionMoviePoster.jpg",
+    imageUrl: `${TMDB_IMAGE_BASE_URL}/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg`,
     releaseYear: 1994,
     hint: "Prison escape drama"
   },
   {
     id: "3",
     title: "Pulp Fiction",
-    imageUrl: "https://upload.wikimedia.org/wikipedia/en/3/3b/Pulp_Fiction_%281994%29_poster.jpg",
+    imageUrl: `${TMDB_IMAGE_BASE_URL}/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg`,
     releaseYear: 1994,
     hint: "Non-linear storytelling"
   },
   {
     id: "4",
     title: "The Matrix",
-    imageUrl: "https://upload.wikimedia.org/wikipedia/en/c/c1/The_Matrix_Poster.jpg",
+    imageUrl: `${TMDB_IMAGE_BASE_URL}/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg`,
     releaseYear: 1999,
     hint: "Reality is not what it seems"
   },
   {
     id: "5",
     title: "The Godfather",
-    imageUrl: "https://upload.wikimedia.org/wikipedia/en/1/1c/Godfather_ver1.jpg",
+    imageUrl: `${TMDB_IMAGE_BASE_URL}/3bhkrj58Vtu7enYsRolD1fZdja1.jpg`,
     releaseYear: 1972,
     hint: "An offer you can't refuse"
   },
   {
     id: "6",
     title: "The Dark Knight",
-    imageUrl: "https://upload.wikimedia.org/wikipedia/en/1/1c/The_Dark_Knight_%282008_film%29.jpg",
+    imageUrl: `${TMDB_IMAGE_BASE_URL}/qJ2tW6WMUDux911r6m7haRef0WH.jpg`,
     releaseYear: 2008,
     hint: "Why so serious?"
   },
   {
     id: "7",
     title: "Schindler's List",
-    imageUrl: "https://upload.wikimedia.org/wikipedia/en/3/38/Schindler%27s_List_movie.jpg",
+    imageUrl: `${TMDB_IMAGE_BASE_URL}/sF1U4EUQS8YHUYjNl3pMGNIQyr0.jpg`,
     releaseYear: 1993,
     hint: "The man who saved lives during the Holocaust"
   },
   {
     id: "8",
     title: "The Lord of the Rings: The Return of the King",
-    imageUrl: "https://upload.wikimedia.org/wikipedia/en/b/be/The_Lord_of_the_Rings_-_The_Return_of_the_King_%282003%29.jpg",
+    imageUrl: `${TMDB_IMAGE_BASE_URL}/rCzpDGLbOoPwLjy3OAm5NUPOTrC.jpg`,
     releaseYear: 2003,
     hint: "The final chapter of a fantasy trilogy"
   },
   {
     id: "9",
     title: "Fight Club",
-    imageUrl: "https://upload.wikimedia.org/wikipedia/en/f/fc/Fight_Club_poster.jpg",
+    imageUrl: `${TMDB_IMAGE_BASE_URL}/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg`,
     releaseYear: 1999,
     hint: "First rule: don't talk about it"
   },
   {
     id: "10",
     title: "Forrest Gump",
-    imageUrl: "https://upload.wikimedia.org/wikipedia/en/6/67/Forrest_Gump_poster.jpg",
+    imageUrl: `${TMDB_IMAGE_BASE_URL}/arw2vcBveWOVZr6pxd9XTd1TdQa.jpg`,
     releaseYear: 1994,
     hint: "Life is like a box of chocolates"
   },
   {
     id: "11",
     title: "Star Wars: Episode V - The Empire Strikes Back",
-    imageUrl: "https://upload.wikimedia.org/wikipedia/en/3/3c/SW_-_Empire_Strikes_Back.jpg",
+    imageUrl: `${TMDB_IMAGE_BASE_URL}/2l05cFWJacyIsTpsqSgH0wQXe4V.jpg`,
     releaseYear: 1980,
     hint: "I am your father"
   },
   {
     id: "12",
     title: "The Shining",
-    imageUrl: "https://upload.wikimedia.org/wikipedia/en/e/ea/The_Shining_%281980%29_U.K._release_poster_-_The_tide_of_terror_that_swept_America_IS_HERE.jpg",
+    imageUrl: `${TMDB_IMAGE_BASE_URL}/b6ko0IKC8MdYBBPkkA1aBPLe2yz.jpg`,
     releaseYear: 1980,
     hint: "Here's Johnny!"
   },
   {
     id: "13",
     title: "Jurassic Park",
-    imageUrl: "https://upload.wikimedia.org/wikipedia/en/e/e7/Jurassic_Park_poster.jpg",
+    imageUrl: `${TMDB_IMAGE_BASE_URL}/oU7Oq2kFAAlGqbU4VoAE36g4hoI.jpg`,
     releaseYear: 1993,
     hint: "Life finds a way"
   },
   {
     id: "14",
     title: "Titanic",
-    imageUrl: "https://upload.wikimedia.org/wikipedia/en/1/18/Titanic_%281997_film%29_poster.png",
+    imageUrl: `${TMDB_IMAGE_BASE_URL}/9xjZS2rlVxm8SFx8kPC3aIGCOYQ.jpg`,
     releaseYear: 1997,
     hint: "I'll never let go"
   },
   {
     id: "15",
     title: "Toy Story",
-    imageUrl: "https://upload.wikimedia.org/wikipedia/en/1/13/Toy_Story.jpg",
-    releaseYear: S1995,
+    imageUrl: `${TMDB_IMAGE_BASE_URL}/uXDfjJbdP4ijW5hWSBrPrlKpxab.jpg`,
+    releaseYear: 1995,
     hint: "To infinity and beyond!"
   }
 ];
