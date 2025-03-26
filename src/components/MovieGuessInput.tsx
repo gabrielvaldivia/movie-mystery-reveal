@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Send } from 'lucide-react';
 import MovieSuggestions from './MovieSuggestions';
@@ -58,12 +57,14 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
   };
 
   const handleSuggestionSelect = (title: string) => {
-    console.log("Prefilling input with:", title);
+    console.log("Selecting suggestion:", title);
     setGuess(title);
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
     setIsSuggestionsOpen(false);
+    setTimeout(() => {
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, 0);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -84,8 +85,7 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
     else if (e.key === 'Enter' && highlightedIndex >= 0) {
       e.preventDefault();
       if (suggestions[highlightedIndex] && suggestions[highlightedIndex].title) {
-        setGuess(suggestions[highlightedIndex].title);
-        setIsSuggestionsOpen(false);
+        handleSuggestionSelect(suggestions[highlightedIndex].title);
       }
     }
     else if (e.key === 'Escape') {
@@ -111,10 +111,6 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
       inputRef.current.focus();
     }
   }, [disabled]);
-
-  const closeSuggestions = () => {
-    setIsSuggestionsOpen(false);
-  };
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
@@ -147,7 +143,7 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
             isOpen={isSuggestionsOpen}
             onSelect={handleSuggestionSelect}
             highlightedIndex={highlightedIndex}
-            onSubmit={closeSuggestions}
+            onSubmit={() => setIsSuggestionsOpen(false)}
           />
         </div>
       </div>
