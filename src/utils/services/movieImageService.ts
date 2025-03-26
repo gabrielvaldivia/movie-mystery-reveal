@@ -10,16 +10,20 @@ export const fetchMovieImages = async (movie: Movie): Promise<string> => {
   try {
     // If movie already has an imageUrl that isn't from Unsplash, use it
     if (movie.imageUrl && !movie.imageUrl.includes('unsplash.com')) {
+      console.log(`Using existing image URL: ${movie.imageUrl}`);
       return movie.imageUrl;
     }
     
     // Use movie poster_path if available (from the movie API)
     if (movie.poster_path) {
       const baseUrl = 'https://image.tmdb.org/t/p/w500';
-      return `${baseUrl}${movie.poster_path}`;
+      const imageUrl = `${baseUrl}${movie.poster_path}`;
+      console.log(`Using TMDB image: ${imageUrl}`);
+      return imageUrl;
     }
     
     // Use the local fallback image as last resort
+    console.log(`Using fallback image for movie: ${movie.title}`);
     return FALLBACK_IMAGE;
   } catch (error) {
     console.error("Error with movie image:", error);

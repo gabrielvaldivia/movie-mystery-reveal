@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { createPixelationAnimation } from '../utils/pixelate';
 import ImageLoadingIndicator from './ImageLoadingIndicator';
@@ -62,6 +63,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
     setLoadProgress(0);
     setLoadError(false);
     setLoadTimeout(false);
+    setAnimation(null);
     
     // Clean up first
     cleanup();
@@ -123,10 +125,10 @@ const MovieImage: React.FC<MovieImageProps> = ({
     };
 
     // Handle image load error
-    image.onerror = () => {
+    image.onerror = (error) => {
       cleanup();
       setLoadError(true);
-      console.error("Error loading image:", imageUrl);
+      console.error("Error loading image:", imageUrl, error);
     };
   };
 
