@@ -9,6 +9,8 @@ interface MovieImageProps {
   isActive: boolean;
 }
 
+const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5"; // Matrix-like fallback image
+
 const MovieImage: React.FC<MovieImageProps> = ({ 
   imageUrl, 
   duration, 
@@ -18,6 +20,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [hasError, setHasError] = useState(false);
   const [animation, setAnimation] = useState<{
     start: () => void;
     stop: () => void;
@@ -27,22 +30,38 @@ const MovieImage: React.FC<MovieImageProps> = ({
   // Set up canvas and image when component mounts or image URL changes
   useEffect(() => {
     const image = new Image();
+    
+    // Reset states
+    setIsLoaded(false);
+    setHasError(false);
+    
+    // Set up image loading
     image.src = imageUrl;
     image.crossOrigin = "anonymous";
     imageRef.current = image;
+
+    const handleImageError = () => {
+      console.error("Failed to load image:", imageUrl);
+      setHasError(true);
+      
+      // Use fallback image
+      console.info("Using fallback image instead");
+      image.src = FALLBACK_IMAGE;
+    };
 
     image.onload = () => {
       setIsLoaded(true);
       
       if (canvasRef.current) {
-        // Match canvas dimensions to container while maintaining aspect ratio
+        // Match canvas dimensions to container while maintaining poster aspect ratio
         const container = canvasRef.current.parentElement;
         if (container) {
-          // For backdrops (screenshots), use the full container width
-          // Backdrops typically have a 16:9 aspect ratio which matches our container
+          // For posters, we should use a different aspect ratio (2:3 is standard for movie posters)
           const containerWidth = container.clientWidth;
+          const posterHeight = containerWidth * 1.5; // 2:3 aspect ratio
+          
           canvasRef.current.width = containerWidth;
-          canvasRef.current.height = (containerWidth * 9) / 16; // Force 16:9 aspect ratio
+          canvasRef.current.height = posterHeight;
         }
         
         // Create and store animation controller
@@ -56,6 +75,8 @@ const MovieImage: React.FC<MovieImageProps> = ({
         setAnimation(pixelAnimation);
       }
     };
+
+    image.onerror = handleImageError;
 
     return () => {
       if (animation) {
@@ -87,7 +108,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
           if (Math.abs(oldWidth - containerWidth) > 10) {
             // Only resize if the width difference is significant
             canvasRef.current.width = containerWidth;
-            canvasRef.current.height = (containerWidth * 9) / 16; // Maintain 16:9 aspect ratio
+            canvasRef.current.height = containerWidth * 1.5; // 2:3 poster aspect ratio
             
             // Reapply current pixelation level after resize
             if (animation) {
@@ -124,7 +145,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
       )}
       <canvas 
         ref={canvasRef}
-        className={`w-full h-full object-cover transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+        className={`w-full h-full object-contain transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
       />
       <div className="shine-effect"></div>
     </div>
