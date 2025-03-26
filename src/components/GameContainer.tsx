@@ -35,8 +35,8 @@ const GameContainer: React.FC = () => {
   } = useGameState();
   
   return (
-    <div className={`w-full ${isMobile ? 'h-full fixed inset-0' : 'h-full'} flex items-center justify-center`}>
-      <div className={`flex flex-col items-center w-full max-w-2xl ${isMobile ? 'h-full' : 'aspect-[3/5] h-full max-h-screen'}`}>
+    <div className={`w-full ${isMobile ? 'h-full absolute inset-0' : 'h-full'} flex items-center justify-center`}>
+      <div className={`flex flex-col items-center w-full max-w-2xl ${isMobile ? 'h-full max-h-none' : 'aspect-[3/5] h-full max-h-screen'}`}>
         {isLoading ? (
           <GameLoading loadingProgress={loadingProgress} />
         ) : currentMovie ? (

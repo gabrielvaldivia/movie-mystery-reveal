@@ -7,7 +7,7 @@ const Index = () => {
   const isMobile = useIsMobile();
 
   return (
-    <div className={`min-h-screen ${isMobile ? 'h-screen w-screen overflow-hidden fixed inset-0' : 'h-screen'} bg-gradient-to-b from-background to-secondary/50 flex flex-col items-center justify-center overflow-hidden p-0`}>
+    <div className={`${isMobile ? 'fixed inset-0 w-full h-full overflow-hidden' : 'min-h-screen h-screen'} bg-gradient-to-b from-background to-secondary/50 flex flex-col items-center justify-center p-0`}>
       <GameContainer />
     </div>
   );

@@ -53,7 +53,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   };
 
   return (
-    <div className={`pixel-reveal-container glass-panel no-rounded relative ${isMobile ? 'h-full' : ''}`}>
+    <div className={`pixel-reveal-container glass-panel no-rounded relative ${isMobile ? 'h-full w-full' : ''}`}>
       <PixelRevealCanvas ref={canvasRef} />
       
       <ImageLoadingIndicator 
