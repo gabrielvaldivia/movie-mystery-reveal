@@ -20,18 +20,32 @@ export function useLoadingProgress({
       loadingProgressRef.current = 0;
       setLoadingProgress(0);
       
-      // Set up progress simulation
+      // Start immediate visual feedback with a small progress increment
+      setTimeout(() => {
+        loadingProgressRef.current = 10;
+        setLoadingProgress(10);
+      }, 100);
+      
+      // Set up progress simulation with smaller, more frequent updates
       progressIntervalRef.current = setInterval(() => {
-        if (loadingProgressRef.current < 90) {
-          loadingProgressRef.current += 5;
+        if (loadingProgressRef.current < 85) {
+          // Add a random increment between 3-8% to make it feel more dynamic
+          const increment = Math.random() * 5 + 3;
+          loadingProgressRef.current += increment;
           setLoadingProgress(loadingProgressRef.current);
         } else {
-          if (progressIntervalRef.current) {
-            clearInterval(progressIntervalRef.current);
-            progressIntervalRef.current = null;
+          // Slow down at the end to simulate waiting for final resources
+          if (loadingProgressRef.current < 95) {
+            loadingProgressRef.current += 0.5;
+            setLoadingProgress(loadingProgressRef.current);
+          } else {
+            if (progressIntervalRef.current) {
+              clearInterval(progressIntervalRef.current);
+              progressIntervalRef.current = null;
+            }
           }
         }
-      }, duration / 20); // Divide duration to get appropriate interval steps
+      }, duration / 40); // More frequent updates for smoother animation
     } else {
       // Clean up interval if loading stops
       if (progressIntervalRef.current) {

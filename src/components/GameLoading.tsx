@@ -11,12 +11,14 @@ interface GameLoadingProps {
 const GameLoading: React.FC<GameLoadingProps> = ({ loadingProgress }) => {
   // Change the message based on the loading stage
   const getMessage = () => {
-    if (loadingProgress < 50) {
+    if (loadingProgress < 30) {
+      return "Initializing game...";
+    } else if (loadingProgress < 60) {
       return "Loading game assets...";
-    } else if (loadingProgress < 95) {
-      return "Preparing game content...";
+    } else if (loadingProgress < 85) {
+      return "Preparing movie data...";
     } else {
-      return "Loading movie image...";
+      return "Almost ready...";
     }
   };
 
@@ -27,16 +29,20 @@ const GameLoading: React.FC<GameLoadingProps> = ({ loadingProgress }) => {
       </div>
       
       <div className="w-3/4 max-w-xs space-y-4">
-        <Progress value={loadingProgress} className="h-2" />
-        <p className="text-center text-sm text-muted-foreground">
+        <Progress 
+          value={loadingProgress} 
+          className="h-2"
+          indicatorClassName="bg-primary/90 transition-all duration-500" 
+        />
+        <p className="text-center text-sm text-muted-foreground animate-pulse">
           {getMessage()} {Math.round(loadingProgress)}%
         </p>
       </div>
       
       <div className="w-full max-w-sm space-y-3 mt-8">
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-3/4" />
-        <Skeleton className="h-4 w-1/2" />
+        <Skeleton className="h-4 w-full animate-pulse" />
+        <Skeleton className="h-4 w-3/4 animate-pulse" />
+        <Skeleton className="h-4 w-1/2 animate-pulse" />
       </div>
     </div>
   );
