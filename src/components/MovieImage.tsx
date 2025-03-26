@@ -28,16 +28,24 @@ const MovieImage: React.FC<MovieImageProps> = ({
   } | null>(null);
 
   useEffect(() => {
-    // Clear any previous image reference
-    if (imageRef.current) {
-      imageRef.current = null;
-    }
+    // Clean up any previous image elements
+    const cleanup = () => {
+      if (imageRef.current) {
+        if (imageRef.current.parentNode) {
+          imageRef.current.parentNode.removeChild(imageRef.current);
+        }
+        imageRef.current = null;
+      }
+    };
     
-    // Create a new image with proper settings
+    // Clean up first
+    cleanup();
+    
+    // Create a new image but don't add it to the DOM
     const image = new Image();
     image.src = imageUrl;
     image.crossOrigin = "anonymous";
-    image.style.display = 'none'; // Ensure the image itself is not visible
+    image.style.display = 'none';
     imageRef.current = image;
 
     image.onload = () => {
@@ -61,11 +69,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
       }
     };
 
-    return () => {
-      if (animation) {
-        animation.stop();
-      }
-    };
+    return cleanup;
   }, [imageUrl, duration, onRevealComplete]);
 
   useEffect(() => {
@@ -130,7 +134,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   }, [animation, duration, onRevealComplete, isActive]);
 
   return (
-    <div className="pixel-reveal-container glass-panel relative w-full h-full">
+    <div className="pixel-reveal-container glass-panel relative w-full h-full overflow-hidden">
       {!isLoaded && (
         <div className="absolute inset-0 flex items-center justify-center bg-secondary animate-pulse-subtle">
           <span className="text-muted-foreground">Loading image...</span>
