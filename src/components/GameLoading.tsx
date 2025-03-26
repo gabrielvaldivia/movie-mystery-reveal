@@ -9,6 +9,17 @@ interface GameLoadingProps {
 }
 
 const GameLoading: React.FC<GameLoadingProps> = ({ loadingProgress }) => {
+  // Change the message based on the loading stage
+  const getMessage = () => {
+    if (loadingProgress < 50) {
+      return "Loading game assets...";
+    } else if (loadingProgress < 95) {
+      return "Preparing game content...";
+    } else {
+      return "Loading movie image...";
+    }
+  };
+
   return (
     <div className="w-full h-full flex flex-col items-center justify-center gap-8 p-6 bg-gradient-to-b from-background/90 to-background">
       <div className="animate-pulse">
@@ -18,7 +29,7 @@ const GameLoading: React.FC<GameLoadingProps> = ({ loadingProgress }) => {
       <div className="w-3/4 max-w-xs space-y-4">
         <Progress value={loadingProgress} className="h-2" />
         <p className="text-center text-sm text-muted-foreground">
-          Loading game assets... {Math.round(loadingProgress)}%
+          {getMessage()} {Math.round(loadingProgress)}%
         </p>
       </div>
       

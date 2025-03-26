@@ -43,9 +43,8 @@ export function useGameState() {
     } catch (error) {
       console.error("Error starting new round:", error);
       setImageLoadError(true);
-    } finally {
-      setIsLoading(false);
     }
+    // We don't set isLoading to false here anymore - we'll do that after the image loads
   }, [currentMovie]);
 
   // Initialize game on first load only
@@ -58,7 +57,7 @@ export function useGameState() {
           const progressInterval = setInterval(() => {
             setLoadingProgress(prev => {
               const newProgress = prev + (100 - prev) * 0.1;
-              return newProgress >= 99 ? 99 : newProgress;
+              return newProgress >= 95 ? 95 : newProgress; // Cap at 95% to leave room for image loading
             });
           }, 200);
           
@@ -128,12 +127,16 @@ export function useGameState() {
   };
 
   const handleImageLoaded = () => {
+    // Complete the loading progress and finish the loading state
     setIsImageLoaded(true);
+    setLoadingProgress(100);
+    setIsLoading(false);
     setIsGameActive(true);
   };
   
   const handleImageError = () => {
     setImageLoadError(true);
+    setIsLoading(false);
     setTimeout(() => {
       startNewRound();
     }, 2000);
