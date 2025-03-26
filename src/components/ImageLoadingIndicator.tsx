@@ -21,12 +21,21 @@ const ImageLoadingIndicator: React.FC<ImageLoadingIndicatorProps> = ({
 }) => {
   if (error || timeout) {
     return (
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary/80 backdrop-blur-sm">
-        <AlertCircle className="w-10 h-10 text-destructive mb-2" />
-        <p className="text-center text-destructive-foreground mb-3">
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm z-10">
+        <AlertCircle className="w-10 h-10 text-red-500 mb-2" />
+        <p className="text-center text-white font-medium mb-4">
           {timeout ? "Image load timed out" : "Failed to load image"}
         </p>
-        <Button onClick={onRetry} variant="outline" size="sm" className="flex items-center gap-2">
+        <Button 
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            onRetry();
+          }} 
+          variant="outline" 
+          size="sm" 
+          className="flex items-center gap-2 bg-white hover:bg-gray-100"
+        >
           <RefreshCw className="w-4 h-4" />
           Retry
         </Button>
