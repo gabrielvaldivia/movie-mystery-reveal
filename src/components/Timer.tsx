@@ -12,14 +12,11 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
   const [timeRemaining, setTimeRemaining] = useState(duration);
   const timerRef = useRef<number | null>(null);
   const hasStartedRef = useRef<boolean>(false);
-  const previousIsRunningRef = useRef<boolean>(false);
-  const onTimeUpCalledRef = useRef<boolean>(false);
   
   // Reset timer when duration changes
   useEffect(() => {
     setTimeRemaining(duration);
     hasStartedRef.current = false;
-    onTimeUpCalledRef.current = false;
   }, [duration]);
   
   // Clear interval on unmount
@@ -33,10 +30,6 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
   
   // Handle running state changes
   useEffect(() => {
-    // Store the previous running state to detect pause/resume
-    const wasPreviouslyRunning = previousIsRunningRef.current;
-    previousIsRunningRef.current = isRunning;
-    
     // Clear any existing interval first
     if (timerRef.current) {
       clearInterval(timerRef.current);
@@ -55,9 +48,7 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
               timerRef.current = null;
             }
             // Only trigger time up if the timer has actually been running
-            // and we haven't already called onTimeUp for this round
-            if (hasStartedRef.current && !onTimeUpCalledRef.current) {
-              onTimeUpCalledRef.current = true;
+            if (hasStartedRef.current) {
               setTimeout(() => onTimeUp(), 0);
             }
             return 0;

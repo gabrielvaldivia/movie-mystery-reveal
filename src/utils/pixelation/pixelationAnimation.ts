@@ -24,21 +24,14 @@ export const createPixelationAnimation = (
 } => {
   let animationFrameId: number | null = null;
   let startTime: number | null = null;
-  let pauseTime: number | null = null;
-  let elapsedBeforePause: number = 0;
   let currentLevel = 1; // Start with maximum pixelation
-  let isAnimating = false;
-  let completionCalled = false;
 
   const animate = (timestamp: number) => {
-    if (!isAnimating) return;
-    
     if (startTime === null) {
       startTime = timestamp;
     }
 
-    // Calculate elapsed time accounting for pauses
-    const elapsed = timestamp - startTime + elapsedBeforePause;
+    const elapsed = timestamp - startTime;
     
     // Calculate current pixelation level (1 to 0 over duration)
     currentLevel = Math.max(0, 1 - elapsed / duration);
@@ -53,7 +46,6 @@ export const createPixelationAnimation = (
         animationFrameId = null;
       }
       currentLevel = 0;
-      isAnimating = false;
       return;
     }
 
@@ -68,13 +60,7 @@ export const createPixelationAnimation = (
       } catch (error) {
         console.error("Error in final animation frame:", error);
       }
-      isAnimating = false;
-      
-      // Only call completion once
-      if (onComplete && !completionCalled) {
-        completionCalled = true;
-        onComplete();
-      }
+      if (onComplete) onComplete();
     }
   };
 
@@ -84,62 +70,32 @@ export const createPixelationAnimation = (
       cancelAnimationFrame(animationFrameId);
       animationFrameId = null;
     }
-    isAnimating = false;
     currentLevel = 0;
     try {
       applyPixelation(imageElement, canvas, currentLevel);
     } catch (error) {
       console.error("Error in force complete:", error);
     }
-    
-    // Only call completion once
-    if (onComplete && !completionCalled) {
-      completionCalled = true;
-      onComplete();
-    }
+    if (onComplete) onComplete();
   };
 
   return {
     start: () => {
-      // If already animating, do nothing
-      if (isAnimating) return;
-      
-      // Reset animation state if it was completed
-      if (currentLevel === 0) {
-        currentLevel = 1;
-        elapsedBeforePause = 0;
-        completionCalled = false;
-      }
-      
-      // If we were paused, calculate elapsed time before pause
-      if (pauseTime !== null && startTime !== null) {
-        elapsedBeforePause += pauseTime - startTime;
-      }
-      
-      // Reset timing variables for the new animation segment
-      startTime = null;
-      pauseTime = null;
-      isAnimating = true;
-      
-      // Start animation
+      // Reset animation state
       if (animationFrameId !== null) {
         cancelAnimationFrame(animationFrameId);
       }
+      
+      startTime = null;
+      currentLevel = 1;
+      
       animationFrameId = requestAnimationFrame(animate);
       console.log("Animation started");
     },
     stop: () => {
-      // Only do something if we are currently animating
-      if (isAnimating) {
-        // Record when we paused
-        pauseTime = performance.now();
-        isAnimating = false;
-        
-        if (animationFrameId !== null) {
-          cancelAnimationFrame(animationFrameId);
-          animationFrameId = null;
-        }
-        console.log("Animation paused");
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
       }
     },
     forceComplete
