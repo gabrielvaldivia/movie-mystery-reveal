@@ -8,14 +8,14 @@ export const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w780"; // Medium 
 // Cache fetched movies here instead of using local collections
 let cachedMovies: Movie[] = [];
 
-// Get movies from TMDB API - limited to top 500 popular movies
+// Get movies from TMDB API - limited to top 500 popular American movies
 export const getMoviesCollection = async (): Promise<Movie[]> => {
   if (cachedMovies.length > 0) {
     return cachedMovies;
   }
   
   try {
-    // Fetch 25 pages to get approximately 500 popular movies (20 per page)
+    // Fetch 25 pages to get approximately 500 popular American movies (20 per page)
     const allMovies: Movie[] = [];
     const pagesToFetch = 25; // 25 pages * 20 movies = 500 movies
     

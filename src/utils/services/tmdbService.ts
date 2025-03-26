@@ -1,3 +1,4 @@
+
 import { Movie } from '../types/movieTypes';
 
 // The Movie Database API configuration
@@ -11,8 +12,9 @@ const TMDB_API_KEY = "2dca580c2a14b55200e784d157207b4d";
 // Fetch popular movies from TMDB
 export const fetchPopularMovies = async (page: number = 1): Promise<Movie[]> => {
   try {
+    // Add region=US parameter to only get American movies
     const response = await fetch(
-      `${TMDB_API_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&language=en-US&page=${page}`
+      `${TMDB_API_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&language=en-US&page=${page}&region=US`
     );
     
     if (!response.ok) {
@@ -41,8 +43,9 @@ export const fetchPopularMovies = async (page: number = 1): Promise<Movie[]> => 
 // Search movies by title
 export const searchMovies = async (query: string): Promise<Movie[]> => {
   try {
+    // Add region=US parameter to only get American movies
     const response = await fetch(
-      `${TMDB_API_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&language=en-US&query=${encodeURIComponent(query)}&page=1`
+      `${TMDB_API_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&language=en-US&query=${encodeURIComponent(query)}&page=1&region=US`
     );
     
     if (!response.ok) {
