@@ -38,10 +38,9 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
                   <CommandItem
                     key={movie.id}
                     onSelect={() => {
-                      // Call onSelect directly with the movie title
+                      console.log(`Selected movie: ${movie.title}`);
                       onSelect(movie.title);
-                      // Call onSubmit to close the dropdown after selection
-                      if (onSubmit) onSubmit();
+                      onSubmit();
                     }}
                     className={`flex items-center py-2 px-3 cursor-pointer ${
                       index === highlightedIndex ? 'bg-accent' : ''

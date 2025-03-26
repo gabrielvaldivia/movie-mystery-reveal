@@ -30,6 +30,7 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
     if (guess.trim() && !disabled) {
       console.log("Submitting guess:", guess.trim());
       onGuess(guess.trim());
+      setGuess(""); // Clear input after submission
       setSuggestions([]);
       setIsSuggestionsOpen(false);
     }
@@ -58,18 +59,16 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
 
   const handleSuggestionSelect = (title: string) => {
     console.log("GuessInput - Selected suggestion:", title);
-    // Set the guess and immediately submit
+    
+    // Set the guess to the selected title
     setGuess(title);
     
-    // Use a requestAnimationFrame to ensure the state has been updated
-    requestAnimationFrame(() => {
-      // Submit the form with the selected title
-      onGuess(title.trim());
-      
-      // Clean up the UI state
-      setSuggestions([]);
-      setIsSuggestionsOpen(false);
-    });
+    // Submit the guess immediately - don't wait for state update
+    onGuess(title);
+    
+    // Reset UI state
+    setSuggestions([]);
+    setIsSuggestionsOpen(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
