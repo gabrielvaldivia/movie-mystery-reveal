@@ -1,3 +1,4 @@
+
 /**
  * Utility to create a pixelation effect on an image
  * The pixelation level goes from 0 (no pixelation) to 1 (maximum pixelation)
@@ -22,7 +23,7 @@ export const applyPixelation = (
     ctx.fillStyle = "#ffffff";
     ctx.font = "16px sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText("Image not available", canvas.width / 2, canvas.height / 2);
+    ctx.fillText("Using movie placeholder", canvas.width / 2, canvas.height / 2);
     return;
   }
 

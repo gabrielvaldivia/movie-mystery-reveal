@@ -30,7 +30,9 @@ const MovieImage: React.FC<MovieImageProps> = ({
     console.log("Loading image:", imageUrl); // Debug logging
     
     const image = new Image();
-    image.crossOrigin = "anonymous"; // Important for CORS
+    
+    // Add crossOrigin attribute to avoid CORS issues
+    image.crossOrigin = "anonymous";
     imageRef.current = image;
     
     image.onload = () => {
@@ -79,7 +81,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
           ctx.fillStyle = "#ffffff";
           ctx.font = "16px sans-serif";
           ctx.textAlign = "center";
-          ctx.fillText("Image not available", canvasRef.current.width / 2, canvasRef.current.height / 2);
+          ctx.fillText("Movie image", canvasRef.current.width / 2, canvasRef.current.height / 2);
         }
       }
     };
@@ -128,7 +130,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
                 ctx.fillStyle = "#ffffff";
                 ctx.font = "16px sans-serif";
                 ctx.textAlign = "center";
-                ctx.fillText("Image not available", canvasRef.current.width / 2, canvasRef.current.height / 2);
+                ctx.fillText("Movie image", canvasRef.current.width / 2, canvasRef.current.height / 2);
               }
               return;
             }
