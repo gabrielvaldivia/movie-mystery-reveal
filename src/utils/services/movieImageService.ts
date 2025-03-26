@@ -52,7 +52,7 @@ export const fetchMovieImages = async (movie: Movie): Promise<string> => {
 // Cache for valid movies (ones we've checked have images)
 const validMovies: Movie[] = [];
 
-// Load a movie with image, on-demand
+// Load a movie with image, on-demand, randomizing selection from the entire collection
 export const getMovieWithImage = async (): Promise<Movie> => {
   // If we have previously validated movies, return a random one
   if (validMovies.length > 10) {
@@ -60,6 +60,7 @@ export const getMovieWithImage = async (): Promise<Movie> => {
   }
   
   // Otherwise, we need to find movies with valid images
+  // Shuffle the entire movie collection to ensure true randomness
   const shuffledMovies = [...moviesCollection].sort(() => Math.random() - 0.5);
   
   // Try to find a movie with a valid image

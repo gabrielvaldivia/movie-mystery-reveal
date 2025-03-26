@@ -1,9 +1,10 @@
 
 import { Movie } from '../types/movieTypes';
 import { getMovieWithImage, getValidMovies } from './movieImageService';
+import { moviesCollection } from '../data/movieCollection';
 
 export const getRandomMovie = async (): Promise<Movie> => {
-  // Get a random movie with a valid image
+  // Get a completely random movie with a valid image
   const movie = await getMovieWithImage();
   return movie;
 };
