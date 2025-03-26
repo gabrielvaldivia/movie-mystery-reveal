@@ -28,7 +28,7 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
     }
     
     if (guess.trim() && !disabled) {
-      console.log("Submitting guess:", guess.trim());
+      console.log("Submitting guess from form:", guess.trim());
       onGuess(guess.trim());
       setGuess(""); // Clear input after submission
       setSuggestions([]);
@@ -57,16 +57,15 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
     setHighlightedIndex(-1);
   };
 
+  // This new approach directly submits the selection without any intermediate state updates
   const handleSuggestionSelect = (title: string) => {
-    console.log("GuessInput - Selected suggestion:", title);
+    console.log("Direct handleSuggestionSelect called with:", title);
     
-    // Set the guess to the selected title
-    setGuess(title);
-    
-    // Submit the guess immediately - don't wait for state update
+    // Directly call onGuess with the selected title
     onGuess(title);
     
     // Reset UI state
+    setGuess("");
     setSuggestions([]);
     setIsSuggestionsOpen(false);
   };
@@ -116,6 +115,10 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
     }
   }, [disabled]);
 
+  const closeSuggestions = () => {
+    setIsSuggestionsOpen(false);
+  };
+
   return (
     <form onSubmit={handleSubmit} className="w-full">
       <div className="relative flex items-center gap-2">
@@ -147,7 +150,7 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
             isOpen={isSuggestionsOpen}
             onSelect={handleSuggestionSelect}
             highlightedIndex={highlightedIndex}
-            onSubmit={() => setIsSuggestionsOpen(false)}
+            onSubmit={closeSuggestions}
           />
         </div>
       </div>

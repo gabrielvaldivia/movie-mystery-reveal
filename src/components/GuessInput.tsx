@@ -36,15 +36,31 @@ const GuessInput: React.FC<GuessInputProps> = ({
     }
   }, [correctAnswer, onNextRound]);
 
-  return <div className="w-full space-y-4">
-      {correctAnswer ? onNextRound && <NextRoundButton onNextRound={onNextRound} /> : <div className="relative flex items-center gap-2">
+  // Direct pass-through of the onGuess function
+  const handleGuess = (guess: string) => {
+    console.log("GuessInput passing through guess:", guess);
+    onGuess(guess);
+  };
+
+  return (
+    <div className="w-full space-y-4">
+      {correctAnswer ? (
+        onNextRound && <NextRoundButton onNextRound={onNextRound} />
+      ) : (
+        <div className="relative flex items-center gap-2">
           {hint && <HintPopover hint={hint} />}
           
           <div className="flex-grow">
-            <MovieGuessInput onGuess={onGuess} disabled={disabled} hasIncorrectGuess={hasIncorrectGuess} />
+            <MovieGuessInput 
+              onGuess={handleGuess} 
+              disabled={disabled} 
+              hasIncorrectGuess={hasIncorrectGuess} 
+            />
           </div>
-        </div>}
-    </div>;
+        </div>
+      )}
+    </div>
+  );
 };
 
 export default GuessInput;
