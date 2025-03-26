@@ -1,3 +1,4 @@
+
 // Movie data with TMDB API integration
 
 export interface Movie {
@@ -10,8 +11,8 @@ export interface Movie {
 }
 
 // TMDB API configuration
-const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w780"; // Medium size images
-const TMDB_BACKDROP_BASE_URL = "https://image.tmdb.org/t/p/w780"; // Using backdrops instead of posters
+// Using images with CORS-friendly proxy or direct absolute URLs when possible
+const PROXY_URL = ""; // Left empty for now, we'll use direct URLs
 
 // Top 100 movies collection with backdrop image URLs
 export const moviesCollection: Movie[] = [
@@ -821,33 +822,52 @@ export const moviesCollection: Movie[] = [
   }
 ];
 
-// Helper function to preload all movie images
+// Helper function to preload movie images with improved error handling
 export const loadAllMovieImages = async (): Promise<void> => {
   const preloadImage = (url: string): Promise<void> => {
     return new Promise((resolve) => {
+      console.log(`Starting to preload: ${url}`);
       const img = new Image();
-      img.onload = () => resolve();
-      img.onerror = () => {
-        console.error(`Failed to load image: ${url}`);
-        resolve(); // We still resolve to prevent hanging the promise chain
+      img.crossOrigin = "anonymous";
+      
+      img.onload = () => {
+        console.log(`Successfully preloaded: ${url}`);
+        resolve();
       };
+      
+      img.onerror = (e) => {
+        console.error(`Failed to preload image: ${url}`, e);
+        resolve(); // Still resolve to prevent hanging the promise chain
+      };
+      
       img.src = url;
     });
   };
 
-  // Load the first 5 images first (for immediate display)
-  const initialImages = moviesCollection.slice(0, 5).map(movie => preloadImage(movie.imageUrl));
-  await Promise.all(initialImages);
+  try {
+    console.log("Starting image preloading...");
+    
+    // Load the first 5 images first (for immediate display)
+    const initialImages = moviesCollection.slice(0, 5).map(movie => preloadImage(movie.imageUrl));
+    await Promise.all(initialImages);
+    console.log("Initial images loaded");
 
-  // Then load the rest in the background
-  const remainingImages = moviesCollection.slice(5).map(movie => preloadImage(movie.imageUrl));
-  Promise.all(remainingImages).catch(err => {
-    console.error("Error preloading remaining images:", err);
-  });
+    // Then load the rest in the background
+    const remainingImages = moviesCollection.slice(5).map(movie => preloadImage(movie.imageUrl));
+    Promise.all(remainingImages)
+      .then(() => console.log("All images preloaded"))
+      .catch(err => {
+        console.error("Error preloading remaining images:", err);
+      });
+  } catch (error) {
+    console.error("Error in loadAllMovieImages:", error);
+  }
 };
 
 // Get a random movie from the collection
 export const getRandomMovie = async (): Promise<Movie> => {
+  console.log("Getting random movie...");
+  
   // Ensure we have movies to select from
   if (moviesCollection.length === 0) {
     throw new Error("No movies available");
@@ -856,12 +876,15 @@ export const getRandomMovie = async (): Promise<Movie> => {
   // Get a random movie
   const randomIndex = Math.floor(Math.random() * moviesCollection.length);
   const movie = moviesCollection[randomIndex];
-
+  
+  console.log(`Selected movie: ${movie.title}`);
   return movie;
 };
 
 // Get next movie, ensuring it's different from the current one
 export const getNextMovie = async (currentMovieId: string): Promise<Movie> => {
+  console.log(`Getting next movie after movie ID: ${currentMovieId}`);
+  
   // Filter out the current movie
   const availableMovies = moviesCollection.filter(movie => movie.id !== currentMovieId);
 
@@ -871,5 +894,8 @@ export const getNextMovie = async (currentMovieId: string): Promise<Movie> => {
 
   // Get a random movie from the filtered list
   const randomIndex = Math.floor(Math.random() * availableMovies.length);
-  return availableMovies[randomIndex];
+  const nextMovie = availableMovies[randomIndex];
+  
+  console.log(`Selected next movie: ${nextMovie.title}`);
+  return nextMovie;
 };

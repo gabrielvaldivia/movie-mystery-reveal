@@ -25,14 +25,16 @@ const MovieImage: React.FC<MovieImageProps> = ({
     getCurrentLevel: () => number;
   } | null>(null);
 
-  // Set up canvas and image when component mounts or image URL changes
+  // Create and set up image when component mounts or imageUrl changes
   useEffect(() => {
+    console.log("Loading image:", imageUrl); // Debug logging
+    
     const image = new Image();
-    image.src = imageUrl;
-    image.crossOrigin = "anonymous";
+    image.crossOrigin = "anonymous"; // Important for CORS
     imageRef.current = image;
-
+    
     image.onload = () => {
+      console.log("Image loaded successfully:", imageUrl);
       setIsLoaded(true);
       setHasError(false);
       
@@ -40,7 +42,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
         // Match canvas dimensions to container while maintaining aspect ratio
         const container = canvasRef.current.parentElement;
         if (container) {
-          // For backdrops (screenshots), use the full container width
           const containerWidth = container.clientWidth;
           canvasRef.current.width = containerWidth;
           canvasRef.current.height = (containerWidth * 9) / 16; // Force 16:9 aspect ratio
@@ -58,8 +59,8 @@ const MovieImage: React.FC<MovieImageProps> = ({
       }
     };
 
-    image.onerror = () => {
-      console.error(`Failed to load image: ${imageUrl}`);
+    image.onerror = (e) => {
+      console.error(`Failed to load image: ${imageUrl}`, e);
       setIsLoaded(true); // Still mark as loaded so we can show fallback
       setHasError(true);
       
@@ -72,7 +73,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
         
         const ctx = canvasRef.current.getContext("2d");
         if (ctx) {
-          // Draw fallback image
+          // Draw fallback message
           ctx.fillStyle = "#3a3a3a";
           ctx.fillRect(0, 0, canvasRef.current.width, canvasRef.current.height);
           ctx.fillStyle = "#ffffff";
@@ -82,6 +83,9 @@ const MovieImage: React.FC<MovieImageProps> = ({
         }
       }
     };
+    
+    // Set the source AFTER setting up handlers
+    image.src = imageUrl;
 
     return () => {
       if (animation) {

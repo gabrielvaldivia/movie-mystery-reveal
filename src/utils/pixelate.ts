@@ -1,4 +1,3 @@
-
 /**
  * Utility to create a pixelation effect on an image
  * The pixelation level goes from 0 (no pixelation) to 1 (maximum pixelation)
@@ -9,6 +8,7 @@ export const applyPixelation = (
   canvas: HTMLCanvasElement,
   pixelationLevel: number // 0 to 1, where 1 is most pixelated
 ): void => {
+  // Handle image loading errors
   if (!imageElement.complete || imageElement.naturalWidth === 0) {
     // Image not loaded or failed to load
     const ctx = canvas.getContext("2d");
@@ -47,29 +47,27 @@ export const applyPixelation = (
     return;
   }
 
-  // Calculate the size of the pixelated image
-  const w = Math.ceil(canvas.width / pixelSize);
-  const h = Math.ceil(canvas.height / pixelSize);
-
-  // Step 1: Draw the image at a smaller size
-  ctx.drawImage(imageElement, 0, 0, w, h);
-
-  // Step 2: Save the small image data
-  const smallImageData = ctx.getImageData(0, 0, w, h);
+  // Draw using a pixelation technique that works more reliably
+  const w = Math.floor(canvas.width / pixelSize);
+  const h = Math.floor(canvas.height / pixelSize);
   
-  // Step 3: Clear the canvas
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Create a temporary canvas for the smaller image
+  const tempCanvas = document.createElement('canvas');
+  const tempCtx = tempCanvas.getContext('2d');
+  if (!tempCtx) return;
   
-  // Step 4: Turn off image smoothing for a blocky look
+  // Set size of temporary canvas
+  tempCanvas.width = w;
+  tempCanvas.height = h;
+  
+  // Draw the original image at a smaller size
+  tempCtx.drawImage(imageElement, 0, 0, w, h);
+  
+  // Turn off image smoothing for pixelated look
   ctx.imageSmoothingEnabled = false;
   
-  // Step 5: Draw the small image back to the canvas at full size
-  ctx.putImageData(smallImageData, 0, 0);
-  ctx.drawImage(
-    canvas, 
-    0, 0, w, h,
-    0, 0, canvas.width, canvas.height
-  );
+  // Draw the small image back at full size for a pixelated effect
+  ctx.drawImage(tempCanvas, 0, 0, w, h, 0, 0, canvas.width, canvas.height);
 };
 
 // Utility function to create timed pixelation animation
