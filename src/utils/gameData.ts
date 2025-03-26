@@ -10,7 +10,8 @@ export { moviesCollection, TMDB_IMAGE_BASE_URL } from './data/movieCollection';
 // Export image services
 export { 
   fetchMovieImages,
-  loadAllMovieImages
+  getMovieWithImage,
+  getValidMovies
 } from './services/movieImageService';
 
 // Export game mechanics

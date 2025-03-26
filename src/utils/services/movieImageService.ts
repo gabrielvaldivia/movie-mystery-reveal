@@ -1,4 +1,3 @@
-
 import { Movie } from '../types/movieTypes';
 import { moviesCollection } from '../data/movieCollection';
 
@@ -50,65 +49,42 @@ export const fetchMovieImages = async (movie: Movie): Promise<string> => {
   }
 };
 
-// Cache for loaded movies with images
-let moviesWithImages: Movie[] = [];
-let imagesLoaded = false;
-let loadAttempted = false;
+// Cache for valid movies (ones we've checked have images)
+const validMovies: Movie[] = [];
 
-export const loadAllMovieImages = async (): Promise<void> => {
-  if (imagesLoaded || loadAttempted) return;
-  
-  loadAttempted = true;
-  
-  try {
-    console.log(`Attempting to load images for ${moviesCollection.length} movies...`);
-    
-    // Process all movies and assign image URLs with concurrency limit
-    const results = [];
-    const concurrencyLimit = 5; // Process 5 movies at a time to avoid overwhelming the network
-    
-    for (let i = 0; i < moviesCollection.length; i += concurrencyLimit) {
-      const batch = moviesCollection.slice(i, i + concurrencyLimit);
-      const batchResults = await Promise.all(
-        batch.map(async (movie) => {
-          try {
-            const imageUrl = await fetchMovieImages(movie);
-            console.log(`Successfully loaded image for ${movie.title}`);
-            return { success: true, movie: { ...movie, imageUrl } };
-          } catch (error) {
-            console.error(`Failed to load image for ${movie.title}, skipping movie`);
-            return { success: false, movie };
-          }
-        })
-      );
-      results.push(...batchResults);
-    }
-    
-    // Filter out movies without valid images
-    moviesWithImages = results
-      .filter(result => result.success)
-      .map(result => result.movie);
-    
-    imagesLoaded = moviesWithImages.length > 0;
-    console.log(`Loaded ${moviesWithImages.length} movies with valid images`);
-    
-    if (moviesWithImages.length === 0) {
-      console.error("No valid movie images were loaded. Game may not function properly.");
-    }
-  } catch (err) {
-    console.error("Error loading all movie images:", err);
-    throw err; // Propagate error to be handled by caller
+// Load a movie with image, on-demand
+export const getMovieWithImage = async (): Promise<Movie> => {
+  // If we have previously validated movies, return a random one
+  if (validMovies.length > 10) {
+    return validMovies[Math.floor(Math.random() * validMovies.length)];
   }
+  
+  // Otherwise, we need to find movies with valid images
+  const shuffledMovies = [...moviesCollection].sort(() => Math.random() - 0.5);
+  
+  // Try to find a movie with a valid image
+  for (const movie of shuffledMovies) {
+    try {
+      const imageUrl = await fetchMovieImages(movie);
+      const movieWithImage = { ...movie, imageUrl };
+      
+      // Add to our valid movies cache if not already there
+      if (!validMovies.some(m => m.id === movie.id)) {
+        validMovies.push(movieWithImage);
+      }
+      
+      return movieWithImage;
+    } catch (error) {
+      // Just skip this movie and try another
+      console.log(`Skipping movie without valid image: ${movie.title}`);
+      continue;
+    }
+  }
+  
+  throw new Error("Could not find any movies with valid images");
 };
 
-// Getter function for the cached movies
-export const getLoadedMovies = (): Movie[] => {
-  return moviesWithImages;
-};
-
-// Function to reset the loading state and try again
-export const resetImageLoading = (): void => {
-  imagesLoaded = false;
-  loadAttempted = false;
-  moviesWithImages = [];
+// Get the list of movies we've validated have images
+export const getValidMovies = (): Movie[] => {
+  return validMovies;
 };

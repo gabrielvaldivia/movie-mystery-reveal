@@ -1,6 +1,6 @@
-
 import { useState, useEffect } from 'react';
-import { Movie, getRandomMovie, getNextMovie, loadAllMovieImages } from '../utils/gameData';
+import { Movie } from '../utils/types/movieTypes';
+import { getRandomMovie, getNextMovie } from '../utils/gameData';
 
 export function useGameState() {
   const [currentMovie, setCurrentMovie] = useState<Movie | null>(null);
@@ -21,7 +21,7 @@ export function useGameState() {
     const initGame = async () => {
       setIsLoading(true);
       try {
-        // Simulate progressive loading of all game assets
+        // Simulate progressive loading
         const progressInterval = setInterval(() => {
           setLoadingProgress(prev => {
             const newProgress = prev + (100 - prev) * 0.1;
@@ -29,7 +29,7 @@ export function useGameState() {
           });
         }, 200);
         
-        await loadAllMovieImages();
+        // Just start a new round directly
         await startNewRound();
         
         clearInterval(progressInterval);
@@ -38,6 +38,7 @@ export function useGameState() {
         console.error("Error initializing game:", error);
         setLoadingProgress(100);
         setIsLoading(false);
+        setImageLoadError(true);
       }
     };
     
@@ -55,6 +56,7 @@ export function useGameState() {
       // Generate a new image key to force re-mounting of MovieImage
       setImageKey(Date.now());
       
+      // Get a movie with a valid image
       const nextMovie = currentMovie 
         ? await getNextMovie(currentMovie.id) 
         : await getRandomMovie();
