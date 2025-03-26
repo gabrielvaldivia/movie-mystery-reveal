@@ -1,9 +1,10 @@
-
 import React, { useState, useEffect } from 'react';
 import MovieImage from './MovieImage';
 import GuessInput from './GuessInput';
 import Timer from './Timer';
 import { getRandomMovie, Movie, getNextMovie, loadAllMovieImages } from '../utils/gameData';
+import { Button } from './ui/button';
+import { SkipForward } from 'lucide-react';
 
 const GAME_DURATION = 30000; // 30 seconds
 
@@ -90,6 +91,14 @@ const GameContainer: React.FC = () => {
     await startNewRound();
   };
   
+  const handleSkip = async () => {
+    if (isGameActive) {
+      setIsGameActive(false);
+      setIsRoundComplete(true);
+      await startNewRound();
+    }
+  };
+  
   return (
     <div className="w-full h-full flex items-center justify-center">
       <div className="flex flex-col items-center w-full max-w-3xl aspect-[2/3] h-full max-h-[85vh]">
@@ -99,12 +108,21 @@ const GameContainer: React.FC = () => {
           </div>
         ) : currentMovie ? (
           <div className="relative w-full h-full">
-            <div className="absolute top-0 left-0 right-0 z-10 px-4 py-2">
+            <div className="absolute top-0 left-0 right-0 z-10 px-4 py-2 flex justify-between items-center">
               <Timer 
                 duration={GAME_DURATION} 
                 onTimeUp={handleTimeUp} 
                 isRunning={isGameActive} 
               />
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={handleSkip}
+                className="bg-black/30 text-white hover:bg-black/50 transition-colors"
+                aria-label="Skip this movie"
+              >
+                <SkipForward className="h-5 w-5" />
+              </Button>
             </div>
             <MovieImage 
               imageUrl={currentMovie.imageUrl}
