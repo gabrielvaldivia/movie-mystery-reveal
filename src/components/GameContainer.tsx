@@ -1,3 +1,4 @@
+
 import React from 'react';
 import MovieImage from './MovieImage';
 import GuessInput from './GuessInput';
@@ -22,6 +23,7 @@ const GameContainer: React.FC = () => {
     isCorrectGuess,
     isRoundComplete,
     imageLoadError,
+    isPaused,
     handleGuess,
     handleTimeUp,
     handleImageLoaded,
@@ -29,6 +31,7 @@ const GameContainer: React.FC = () => {
     handleRevealComplete,
     handleNextRound,
     handleSkip,
+    togglePause,
   } = useGameState();
   
   return (
@@ -43,7 +46,7 @@ const GameContainer: React.FC = () => {
                 <GameHeader 
                   duration={GAME_DURATION}
                   onTimeUp={handleTimeUp}
-                  isRunning={isGameActive && isImageLoaded && !showSuccessDialog}
+                  isRunning={isGameActive && isImageLoaded && !showSuccessDialog && !isPaused}
                   onSkip={handleSkip}
                 />
                 
@@ -55,6 +58,8 @@ const GameContainer: React.FC = () => {
                   isActive={isGameActive && !showSuccessDialog}
                   onImageLoaded={handleImageLoaded}
                   onImageError={handleImageError}
+                  isPaused={isPaused}
+                  onTogglePause={togglePause}
                 >
                   <GuessInput 
                     onGuess={handleGuess}

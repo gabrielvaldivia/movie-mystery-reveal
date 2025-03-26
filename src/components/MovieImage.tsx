@@ -13,6 +13,8 @@ interface MovieImageProps {
   onImageLoaded?: () => void;
   onImageError?: () => void;
   onRetry?: () => void;
+  isPaused?: boolean;
+  onTogglePause?: () => void;
 }
 
 const MovieImage: React.FC<MovieImageProps> = ({ 
@@ -23,7 +25,9 @@ const MovieImage: React.FC<MovieImageProps> = ({
   children,
   onImageLoaded,
   onImageError,
-  onRetry
+  onRetry,
+  isPaused = false,
+  onTogglePause
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -34,11 +38,19 @@ const MovieImage: React.FC<MovieImageProps> = ({
   const animationRef = useRef<{ 
     start: () => void; 
     stop: () => void; 
+    pause: () => void;
+    resume: () => void;
     forceComplete: () => void 
   } | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const loadingProgressRef = useRef<number>(0);
   const [loadingProgress, setLoadingProgress] = useState(0);
+
+  const handleCanvasClick = () => {
+    if (onTogglePause && isLoaded && !isLoading) {
+      onTogglePause();
+    }
+  };
 
   const loadImage = () => {
     setIsLoading(true);
@@ -161,12 +173,24 @@ const MovieImage: React.FC<MovieImageProps> = ({
   useEffect(() => {
     if (!animationRef.current || !isLoaded) return;
     
-    if (isActive) {
+    if (isActive && !isPaused) {
       animationRef.current.start();
+    } else if (isActive && isPaused) {
+      animationRef.current.pause();
     } else {
       animationRef.current.forceComplete();
     }
-  }, [isActive, isLoaded]);
+  }, [isActive, isLoaded, isPaused]);
+  
+  useEffect(() => {
+    if (animationRef.current && isLoaded) {
+      if (isPaused) {
+        animationRef.current.pause();
+      } else {
+        animationRef.current.resume();
+      }
+    }
+  }, [isPaused, isLoaded]);
   
   useEffect(() => {
     const handleResize = () => {
@@ -219,7 +243,10 @@ const MovieImage: React.FC<MovieImageProps> = ({
   };
 
   return (
-    <div className="pixel-reveal-container glass-panel no-rounded relative">
+    <div 
+      className="pixel-reveal-container glass-panel no-rounded relative"
+      onClick={handleCanvasClick}
+    >
       <PixelRevealCanvas ref={canvasRef} />
       
       <ImageLoadingIndicator 
@@ -231,6 +258,27 @@ const MovieImage: React.FC<MovieImageProps> = ({
       />
       
       {children && <MovieContentWrapper>{children}</MovieContentWrapper>}
+      
+      {isLoaded && isPaused && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black/20 z-10">
+          <div className="bg-black/60 p-3 rounded-full">
+            <svg 
+              xmlns="http://www.w3.org/2000/svg" 
+              width="36" 
+              height="36" 
+              viewBox="0 0 24 24" 
+              fill="none" 
+              stroke="currentColor" 
+              strokeWidth="2" 
+              strokeLinecap="round" 
+              strokeLinejoin="round" 
+              className="text-white"
+            >
+              <polygon points="5 3 19 12 5 21 5 3"></polygon>
+            </svg>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

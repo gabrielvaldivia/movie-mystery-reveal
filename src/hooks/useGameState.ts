@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Movie } from '../utils/types/movieTypes';
 import { getRandomMovie, getNextMovie } from '../utils/gameData';
@@ -17,6 +16,7 @@ export function useGameState() {
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [timeExpired, setTimeExpired] = useState(false);
   const [imageLoadError, setImageLoadError] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     const initGame = async () => {
@@ -50,6 +50,7 @@ export function useGameState() {
     setShowSuccessDialog(false);
     setTimeExpired(false);
     setImageLoadError(false);
+    setIsPaused(false);
     
     try {
       setImageKey(Date.now());
@@ -132,12 +133,19 @@ export function useGameState() {
       setTimeExpired(false);
       setShowSuccessDialog(false);
       setIsCorrectGuess(false);
+      setIsPaused(false);
       
       // Force a small delay before starting the new round to ensure state updates
       await new Promise(resolve => setTimeout(resolve, 10));
       
       // Start the new round
       await startNewRound();
+    }
+  };
+
+  const togglePause = () => {
+    if (isGameActive && !isRoundComplete) {
+      setIsPaused(prev => !prev);
     }
   };
 
@@ -155,6 +163,7 @@ export function useGameState() {
     loadingProgress,
     timeExpired,
     imageLoadError,
+    isPaused,
     handleGuess,
     handleTimeUp,
     handleImageLoaded,
@@ -162,5 +171,6 @@ export function useGameState() {
     handleRevealComplete,
     handleNextRound,
     handleSkip,
+    togglePause,
   };
 }

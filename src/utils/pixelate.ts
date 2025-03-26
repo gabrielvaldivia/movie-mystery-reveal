@@ -111,19 +111,26 @@ export const createPixelationAnimation = (
 ): { 
   start: () => void, 
   stop: () => void, 
+  pause: () => void,
+  resume: () => void,
   getCurrentLevel: () => number,
   forceComplete: () => void
 } => {
   let animationFrameId: number | null = null;
   let startTime: number | null = null;
+  let pauseTime: number | null = null;
+  let elapsedBeforePause: number = 0;
   let currentLevel = 1; // Start with maximum pixelation
+  let isPaused = false;
 
   const animate = (timestamp: number) => {
+    if (isPaused) return;
+    
     if (startTime === null) {
       startTime = timestamp;
     }
 
-    const elapsed = timestamp - startTime;
+    const elapsed = elapsedBeforePause + (timestamp - startTime);
     
     // Calculate current pixelation level (1 to 0 over duration)
     currentLevel = Math.max(0, 1 - elapsed / duration);
@@ -156,6 +163,28 @@ export const createPixelationAnimation = (
     }
   };
 
+  const pause = () => {
+    if (!isPaused && startTime !== null) {
+      isPaused = true;
+      pauseTime = performance.now();
+      if (startTime !== null) {
+        elapsedBeforePause += pauseTime - startTime;
+      }
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+    }
+  };
+
+  const resume = () => {
+    if (isPaused) {
+      isPaused = false;
+      startTime = performance.now();
+      animationFrameId = requestAnimationFrame(animate);
+    }
+  };
+
   const forceComplete = () => {
     // Force pixelation level to 0 (fully unpixelated)
     if (animationFrameId !== null) {
@@ -177,7 +206,10 @@ export const createPixelationAnimation = (
       if (animationFrameId !== null) {
         cancelAnimationFrame(animationFrameId);
       }
+      isPaused = false;
       startTime = null;
+      pauseTime = null;
+      elapsedBeforePause = 0;
       currentLevel = 1;
       animationFrameId = requestAnimationFrame(animate);
     },
@@ -187,6 +219,8 @@ export const createPixelationAnimation = (
         animationFrameId = null;
       }
     },
+    pause,
+    resume,
     getCurrentLevel: () => currentLevel,
     forceComplete
   };
