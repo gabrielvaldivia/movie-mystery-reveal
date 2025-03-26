@@ -102,11 +102,9 @@ const GameContainer: React.FC = () => {
     <div className="w-full max-w-md mx-auto px-4 py-8">
       <div className="flex flex-col items-center">
         <div className="w-full flex items-center justify-between mb-4">
-          <Timer 
-            duration={GAME_DURATION} 
-            onTimeUp={handleTimeUp} 
-            isRunning={isGameActive} 
-          />
+          <div className="glass-panel px-3 py-1 rounded-full">
+            <span className="text-xs font-medium">Round {round}/{TOTAL_ROUNDS}</span>
+          </div>
           
           {currentMovie?.hint && (
             <div className="glass-panel px-3 py-1 rounded-full">
@@ -121,6 +119,13 @@ const GameContainer: React.FC = () => {
           </div>
         ) : currentMovie ? (
           <div className="relative">
+            <div className="absolute top-0 left-0 right-0 z-10">
+              <Timer 
+                duration={GAME_DURATION} 
+                onTimeUp={handleTimeUp} 
+                isRunning={isGameActive} 
+              />
+            </div>
             <MovieImage 
               imageUrl={currentMovie.imageUrl}
               duration={GAME_DURATION}

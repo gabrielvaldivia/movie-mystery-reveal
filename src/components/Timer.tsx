@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { Progress } from './ui/progress';
 
 interface TimerProps {
   duration: number;
@@ -39,35 +40,14 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
     };
   }, [isRunning, timeRemaining, onTimeUp]);
   
-  const progress = Math.max(0, timeRemaining / duration);
+  const progress = Math.max(0, (timeRemaining / duration) * 100);
   
   return (
-    <div className="w-20 h-20 rounded-full bg-muted p-2 flex items-center justify-center relative animate-fade-in">
-      <svg className="w-full h-full -rotate-90" viewBox="0 0 100 100">
-        <circle 
-          className="text-muted-foreground stroke-current" 
-          strokeWidth="6"
-          fill="transparent"
-          r="40" 
-          cx="50" 
-          cy="50" 
-        />
-        <circle 
-          className="text-primary stroke-current transition-all duration-100"
-          strokeWidth="6"
-          strokeLinecap="round"
-          strokeDasharray={`${Math.min(250, 2 * Math.PI * 40 * progress)} ${2 * Math.PI * 40}`}
-          fill="transparent"
-          r="40" 
-          cx="50" 
-          cy="50" 
-        />
-      </svg>
-      
-      <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-lg font-medium">{Math.ceil(timeRemaining / 1000)}</span>
-      </div>
-    </div>
+    <Progress 
+      value={progress} 
+      className="h-1 w-full rounded-none bg-transparent" 
+      indicatorClassName="bg-primary transition-all duration-100" 
+    />
   );
 };
 
