@@ -38,8 +38,8 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
                   <CommandItem
                     key={movie.id}
                     onSelect={() => {
-                      console.log(`Direct select with movie: ${movie.title}`);
-                      // Call onSelect with the movie title
+                      console.log(`Selected movie for prefill: ${movie.title}`);
+                      // Only prefill the input field, don't submit
                       onSelect(movie.title);
                     }}
                     className={`flex items-center py-2 px-3 cursor-pointer ${

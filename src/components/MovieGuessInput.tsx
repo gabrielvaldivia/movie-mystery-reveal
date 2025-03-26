@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { Send } from 'lucide-react';
 import MovieSuggestions from './MovieSuggestions';
@@ -57,16 +56,12 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
     setHighlightedIndex(-1);
   };
 
-  // This new approach directly submits the selection without any intermediate state updates
   const handleSuggestionSelect = (title: string) => {
-    console.log("Direct handleSuggestionSelect called with:", title);
-    
-    // Directly call onGuess with the selected title
-    onGuess(title);
-    
-    // Reset UI state
-    setGuess("");
-    setSuggestions([]);
+    console.log("Prefilling input with:", title);
+    setGuess(title);
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
     setIsSuggestionsOpen(false);
   };
 
@@ -88,7 +83,8 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
     else if (e.key === 'Enter' && highlightedIndex >= 0) {
       e.preventDefault();
       if (suggestions[highlightedIndex] && suggestions[highlightedIndex].title) {
-        handleSuggestionSelect(suggestions[highlightedIndex].title);
+        setGuess(suggestions[highlightedIndex].title);
+        setIsSuggestionsOpen(false);
       }
     }
     else if (e.key === 'Escape') {
