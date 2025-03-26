@@ -6,14 +6,12 @@ import Timer from './Timer';
 import { getRandomMovie, Movie, getNextMovie, loadAllMovieImages } from '../utils/gameData';
 
 const GAME_DURATION = 30000; // 30 seconds
-const TOTAL_ROUNDS = 5;
 
 const GameContainer: React.FC = () => {
   const [currentMovie, setCurrentMovie] = useState<Movie | null>(null);
   const [isGameActive, setIsGameActive] = useState(false);
   const [isRoundComplete, setIsRoundComplete] = useState(false);
   const [score, setScore] = useState(0);
-  const [round, setRound] = useState(1);
   const [isCorrectGuess, setIsCorrectGuess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasIncorrectGuess, setHasIncorrectGuess] = useState(false);
@@ -88,24 +86,14 @@ const GameContainer: React.FC = () => {
   };
   
   const handleNextRound = async () => {
-    if (round >= TOTAL_ROUNDS) {
-      setRound(1);
-      setScore(0);
-      await startNewRound();
-    } else {
-      setRound(prev => prev + 1);
-      await startNewRound();
-    }
+    setScore(0);
+    await startNewRound();
   };
   
   return (
     <div className="w-full max-w-md mx-auto px-4 py-8">
       <div className="flex flex-col items-center">
         <div className="w-full flex items-center justify-between mb-4">
-          <div className="glass-panel px-3 py-1 rounded-full">
-            <span className="text-xs font-medium">Round {round}/{TOTAL_ROUNDS}</span>
-          </div>
-          
           {currentMovie?.hint && (
             <div className="glass-panel px-3 py-1 rounded-full">
               <span className="text-xs font-medium">Hint: {currentMovie.hint}</span>
