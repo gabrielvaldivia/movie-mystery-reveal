@@ -111,8 +111,6 @@ const GameContainer: React.FC = () => {
   return (
     <div className="w-full max-w-md mx-auto px-4 py-8">
       <div className="flex flex-col items-center">
-        <h1 className="text-2xl font-bold mb-6 reveal-animation">Movie Mystery Reveal</h1>
-        
         <GameHeader score={score} round={round} totalRounds={TOTAL_ROUNDS} />
         
         <div className="w-full flex items-center justify-between mb-4">

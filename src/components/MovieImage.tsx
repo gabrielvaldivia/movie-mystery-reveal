@@ -127,7 +127,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
         className="w-full h-full object-cover transition-opacity duration-300"
         style={{ objectFit: 'cover' }}
       />
-      <div className="shine-effect"></div>
     </div>
   );
 };
