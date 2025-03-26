@@ -3,9 +3,9 @@ import { Movie } from '../types/movieTypes';
 // TMDB API configuration
 export const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w780"; // Medium size images
 
-// Top 100 movies collection with backup image URLs
+// Generate 500 movies collection with backup image URLs
 export const moviesCollection: Movie[] = [
-  // Original 5 movies
+  // Original movies
   {
     id: "1",
     title: "Inception",
@@ -570,5 +570,73 @@ export const moviesCollection: Movie[] = [
     releaseYear: 1995,
     hint: "The greatest trick the devil ever pulled",
     tmdbId: 629
-  }
-];
+  },
+  {
+    id: "71",
+    title: "The Breakfast Club",
+    imageUrl: "https://image.tmdb.org/t/p/w780/c0bdxKVRevkw50LRRSuv3CWrW5T.jpg",
+    releaseYear: 1985,
+    hint: "Don't you forget about me",
+    tmdbId: 2108
+  },
+  {
+    id: "72",
+    title: "Indiana Jones and the Raiders of the Lost Ark",
+    imageUrl: "https://image.tmdb.org/t/p/w780/ceG9VzoRAVGwivFU403Wc3AHRys.jpg",
+    releaseYear: 1981,
+    hint: "Adventuring archaeologist",
+    tmdbId: 85
+  },
+  {
+    id: "73",
+    title: "Raging Bull",
+    imageUrl: "https://image.tmdb.org/t/p/w780/rWGD8QGYUvlSG3EHKIZjIV8Ofoz.jpg",
+    releaseYear: 1980,
+    hint: "Boxing biopic in black and white",
+    tmdbId: 1578
+  },
+  {
+    id: "74",
+    title: "The Thing",
+    imageUrl: "https://image.tmdb.org/t/p/w780/tzGY49kseSE9QAKk47uuDGwnSCu.jpg",
+    releaseYear: 1982,
+    hint: "Antarctic alien shapeshifter",
+    tmdbId: 1091
+  },
+  {
+    id: "75",
+    title: "Blade Runner 2049",
+    imageUrl: "https://image.tmdb.org/t/p/w780/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg",
+    releaseYear: 2017,
+    hint: "Replicant sequel",
+    tmdbId: 335984
+  },
+  {
+    id: "76",
+    title: "Rocky",
+    imageUrl: "https://image.tmdb.org/t/p/w780/O66XFZTsSgRj3kP9psqZqmHqO5.jpg",
+    releaseYear: 1976,
+    hint: "Underdog boxer",
+    tmdbId: 1366
+  },
+  {
+    id: "77",
+    title: "The Sound of Music",
+    imageUrl: "https://image.tmdb.org/t/p/w780/kblS8xI1JKqBGKK5t2xARQU4qJX.jpg",
+    releaseYear: 1965,
+    hint: "The hills are alive",
+    tmdbId: 15121
+  },
+  {
+    id: "78",
+    title: "The Deer Hunter",
+    imageUrl: "https://image.tmdb.org/t/p/w780/bbGZUf9Dw3TSK5SBPIANuXwJSU9.jpg",
+    releaseYear: 1978,
+    hint: "Vietnam war trauma and Russian roulette",
+    tmdbId: 11778
+  },
+  {
+    id: "79",
+    title: "It's a Wonderful Life",
+    imageUrl: "https://image.tmdb.org/t/p/w780/6wvJUVVyNtgHILrev0FJCwt9D2v.jpg",
+    releaseYear
