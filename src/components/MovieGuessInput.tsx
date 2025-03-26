@@ -1,9 +1,9 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { Send } from 'lucide-react';
-import MovieSuggestions from './MovieSuggestions';
 import { Movie } from '@/utils/types/movieTypes';
 import { getMovieSuggestions } from '@/utils/services/gameService';
+import { Input } from './ui/input';
 
 interface MovieGuessInputProps {
   onGuess: (guess: string) => void;
@@ -58,19 +58,19 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
   };
 
   const handleSuggestionSelect = (movie: Movie) => {
-    console.log("Selecting suggestion with direct movie object:", movie.title);
-    // Directly update input value using the DOM
-    if (inputRef.current) {
-      inputRef.current.value = movie.title;
-      // Also update React state
-      setGuess(movie.title);
-    }
+    console.log("Selected movie:", movie.title);
+    // Update the state
+    setGuess(movie.title);
     // Close suggestions
     setIsSuggestionsOpen(false);
-    // Focus the input
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
+    
+    // Give React a chance to update the DOM
+    setTimeout(() => {
+      // Focus the input after selection
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, 50);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -117,12 +117,19 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
       inputRef.current.focus();
     }
   }, [disabled]);
+  
+  // This effect runs when guess changes from external updates (like suggestion selection)
+  useEffect(() => {
+    if (inputRef.current && inputRef.current.value !== guess) {
+      inputRef.current.value = guess;
+    }
+  }, [guess]);
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
       <div className="relative flex items-center gap-2">
         <div className="relative flex-grow">
-          <input
+          <Input
             ref={inputRef}
             type="text"
             value={guess}
@@ -130,10 +137,10 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
             onKeyDown={handleKeyDown}
             placeholder="Guess the movie..."
             disabled={disabled}
-            className={`w-full py-2 px-3 pr-10 bg-white/90 rounded-md border focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed transition-all ${
+            className={`w-full py-2 px-3 pr-10 bg-white/90 focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed transition-all ${
               hasIncorrectGuess 
                 ? 'border-destructive ring-2 ring-destructive/50 shake-animation' 
-                : 'border-input'
+                : ''
             }`}
           />
           <button
@@ -144,12 +151,14 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
             <Send className="h-3 w-3" />
           </button>
           
-          <MovieSuggestions 
-            suggestions={suggestions}
-            isOpen={isSuggestionsOpen}
-            onSelect={handleSuggestionSelect}
-            highlightedIndex={highlightedIndex}
-          />
+          {isSuggestionsOpen && (
+            <MovieSuggestions 
+              suggestions={suggestions}
+              isOpen={isSuggestionsOpen}
+              onSelect={handleSuggestionSelect}
+              highlightedIndex={highlightedIndex}
+            />
+          )}
         </div>
       </div>
     </form>
