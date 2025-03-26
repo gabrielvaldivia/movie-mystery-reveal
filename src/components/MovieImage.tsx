@@ -27,31 +27,27 @@ const MovieImage: React.FC<MovieImageProps> = ({
     forceComplete: () => void;
   } | null>(null);
 
+  // Use a single effect for image handling to prevent multiple image creations
   useEffect(() => {
-    // Clean up any previous image elements
-    const cleanup = () => {
-      if (imageRef.current) {
-        if (imageRef.current.parentNode) {
-          imageRef.current.parentNode.removeChild(imageRef.current);
-        }
-        imageRef.current = null;
-      }
-    };
-    
-    // Clean up first
-    cleanup();
-    
-    // Create a new image but don't add it to the DOM
-    const image = new Image();
-    image.src = imageUrl;
-    image.crossOrigin = "anonymous";
-    image.style.display = 'none';
-    imageRef.current = image;
+    // Always clean up previous animation before creating a new one
+    if (animation) {
+      animation.stop();
+    }
 
-    image.onload = () => {
+    // Create image WITHOUT adding it to the DOM
+    const image = new Image();
+    
+    // Store reference - this will replace any previous reference
+    imageRef.current = image;
+    
+    // Configure image
+    image.crossOrigin = "anonymous";
+    image.src = imageUrl;
+
+    const handleImageLoad = () => {
       setIsLoaded(true);
       
-      if (canvasRef.current) {
+      if (canvasRef.current && imageRef.current) {
         const container = canvasRef.current.parentElement;
         if (container) {
           canvasRef.current.width = container.clientWidth;
@@ -59,32 +55,53 @@ const MovieImage: React.FC<MovieImageProps> = ({
         }
         
         const pixelAnimation = createPixelationAnimation(
-          image,
+          imageRef.current,
           canvasRef.current,
           duration,
           onRevealComplete
         );
         
         setAnimation(pixelAnimation);
+        
+        // If active, start the animation right away
+        if (isActive) {
+          pixelAnimation.start();
+        } else {
+          pixelAnimation.forceComplete();
+        }
       }
     };
 
-    return cleanup;
+    // Set up the onload handler
+    image.onload = handleImageLoad;
+
+    // Clean up function
+    return () => {
+      if (animation) {
+        animation.stop();
+      }
+      
+      // Remove event listener
+      image.onload = null;
+      
+      // Clear reference
+      imageRef.current = null;
+    };
   }, [imageUrl, duration, onRevealComplete]);
 
+  // Handle active state changes
   useEffect(() => {
     if (animation && isLoaded) {
       if (isActive) {
         animation.start();
       } else {
         animation.stop();
-        if (!isActive) {
-          animation.forceComplete();
-        }
+        animation.forceComplete();
       }
     }
   }, [isActive, animation, isLoaded]);
 
+  // Handle resize events
   useEffect(() => {
     const handleResize = () => {
       if (canvasRef.current && imageRef.current) {
@@ -102,26 +119,19 @@ const MovieImage: React.FC<MovieImageProps> = ({
             if (animation) {
               animation.stop();
               
+              const newAnimation = createPixelationAnimation(
+                imageRef.current,
+                canvasRef.current,
+                duration,
+                onRevealComplete
+              );
+              
+              setAnimation(newAnimation);
+              
               if (isActive) {
-                const newAnimation = createPixelationAnimation(
-                  imageRef.current,
-                  canvasRef.current,
-                  duration,
-                  onRevealComplete
-                );
-                setAnimation(newAnimation);
                 newAnimation.start();
               } else {
-                const newAnimation = createPixelationAnimation(
-                  imageRef.current,
-                  canvasRef.current,
-                  duration,
-                  onRevealComplete
-                );
-                setAnimation(newAnimation);
-                if (newAnimation) {
-                  newAnimation.forceComplete();
-                }
+                newAnimation.forceComplete();
               }
             }
           }
