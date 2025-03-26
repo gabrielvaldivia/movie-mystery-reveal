@@ -8,4 +8,5 @@ export interface Movie {
   releaseYear: number;
   hint?: string;
   tmdbId?: number;
+  poster_path?: string;  // Added for TMDB API compatibility
 }
