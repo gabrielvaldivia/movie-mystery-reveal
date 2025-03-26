@@ -6,7 +6,6 @@ import Timer from './Timer';
 import { getRandomMovie, Movie, getNextMovie, loadAllMovieImages } from '../utils/gameData';
 import { Button } from './ui/button';
 import { SkipForward } from 'lucide-react';
-import { useToast } from "@/hooks/use-toast";
 
 const GAME_DURATION = 30000; // 30 seconds
 const MAX_SCORE = 1000; // Maximum possible score for fastest guess
@@ -21,7 +20,6 @@ const GameContainer: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasIncorrectGuess, setHasIncorrectGuess] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
-  const { toast } = useToast();
   
   useEffect(() => {
     const initGame = async () => {
@@ -99,12 +97,6 @@ const GameContainer: React.FC = () => {
       setIsGameActive(false);
       setIsRoundComplete(true);
       setIsCorrectGuess(true);
-      
-      toast({
-        title: "Correct!",
-        description: `You earned ${calculatedScore} points!`,
-        duration: 3000,
-      });
     } else {
       setHasIncorrectGuess(true);
       setTimeout(() => {
@@ -136,9 +128,13 @@ const GameContainer: React.FC = () => {
           <div className="relative w-full h-full">
             <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/40 to-transparent h-12 flex justify-between items-center px-4 py-2">
               <div className="flex flex-col w-full mr-2">
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-white text-xs">Score: {score}</span>
-                  {isCorrectGuess && <span className="text-white text-xs">+{roundScore}</span>}
+                <div className="mb-1">
+                  {isCorrectGuess && (
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-black/70 text-white px-6 py-4 rounded-lg z-20 text-center">
+                      <p className="text-xl font-bold">+{roundScore}</p>
+                      <p className="text-lg">Total Score: {score}</p>
+                    </div>
+                  )}
                 </div>
                 <Timer 
                   duration={GAME_DURATION} 
