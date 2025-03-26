@@ -26,15 +26,6 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
   // Ensure suggestions is always an array
   const safeSuggestions = Array.isArray(suggestions) ? suggestions : [];
 
-  // Update the selection handler to properly pass the movie title
-  const handleSelection = (title: string) => {
-    console.log("MovieSuggestions - handleSelection called with:", title);
-    // Pass the selection back to the parent component
-    onSelect(title);
-    // Close the dropdown
-    onSubmit();
-  };
-
   return (
     <div className="relative w-full">
       <div className="absolute bottom-full left-0 right-0 z-50 mb-11 overflow-hidden bg-white dark:bg-gray-800 rounded-md border shadow-lg">
@@ -46,7 +37,12 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
                 {safeSuggestions.map((movie, index) => (
                   <CommandItem
                     key={movie.id}
-                    onSelect={() => handleSelection(movie.title)}
+                    onSelect={() => {
+                      // Call onSelect directly with the movie title
+                      onSelect(movie.title);
+                      // Call onSubmit to close the dropdown after selection
+                      if (onSubmit) onSubmit();
+                    }}
                     className={`flex items-center py-2 px-3 cursor-pointer ${
                       index === highlightedIndex ? 'bg-accent' : ''
                     }`}

@@ -20,7 +20,6 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
   const [suggestions, setSuggestions] = useState<Movie[]>([]);
   const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
-  const [shouldSubmit, setShouldSubmit] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   
   const handleSubmit = (e?: React.FormEvent) => {
@@ -55,23 +54,23 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
       setIsSuggestionsOpen(false);
     }
     setHighlightedIndex(-1);
-    setShouldSubmit(false); // Reset submission flag when input changes
   };
 
   const handleSuggestionSelect = (title: string) => {
     console.log("GuessInput - Selected suggestion:", title);
+    // Set the guess and immediately submit
     setGuess(title);
-    setShouldSubmit(true); // Set flag to submit on next render
+    
+    // Use a requestAnimationFrame to ensure the state has been updated
+    requestAnimationFrame(() => {
+      // Submit the form with the selected title
+      onGuess(title.trim());
+      
+      // Clean up the UI state
+      setSuggestions([]);
+      setIsSuggestionsOpen(false);
+    });
   };
-  
-  // Effect to handle form submission after state update
-  useEffect(() => {
-    if (shouldSubmit && guess.trim()) {
-      console.log("Submitting after selection:", guess);
-      handleSubmit();
-      setShouldSubmit(false);
-    }
-  }, [shouldSubmit, guess]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isSuggestionsOpen) return;
