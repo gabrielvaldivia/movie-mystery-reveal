@@ -8,7 +8,7 @@ interface UseLoadingProgressProps {
 
 export function useLoadingProgress({ 
   isLoading, 
-  duration = 3000 
+  duration = 1500 // Reduce default duration to 1.5 seconds
 }: UseLoadingProgressProps) {
   const [loadingProgress, setLoadingProgress] = useState(0);
   const loadingProgressRef = useRef<number>(0);
@@ -20,23 +20,23 @@ export function useLoadingProgress({
       loadingProgressRef.current = 0;
       setLoadingProgress(0);
       
-      // Start immediate visual feedback with a small progress increment
+      // Immediate visual feedback with a larger initial progress
       setTimeout(() => {
-        loadingProgressRef.current = 10;
-        setLoadingProgress(10);
-      }, 100);
+        loadingProgressRef.current = 20;
+        setLoadingProgress(20);
+      }, 50); // Faster initial feedback
       
-      // Set up progress simulation with smaller, more frequent updates
+      // Set up progress simulation with more frequent updates
       progressIntervalRef.current = setInterval(() => {
         if (loadingProgressRef.current < 85) {
-          // Add a random increment between 3-8% to make it feel more dynamic
-          const increment = Math.random() * 5 + 3;
+          // Larger increments for faster progress
+          const increment = Math.random() * 8 + 5;
           loadingProgressRef.current += increment;
           setLoadingProgress(loadingProgressRef.current);
         } else {
-          // Slow down at the end to simulate waiting for final resources
+          // Faster progression at the end
           if (loadingProgressRef.current < 95) {
-            loadingProgressRef.current += 0.5;
+            loadingProgressRef.current += 1;
             setLoadingProgress(loadingProgressRef.current);
           } else {
             if (progressIntervalRef.current) {
@@ -45,7 +45,7 @@ export function useLoadingProgress({
             }
           }
         }
-      }, duration / 40); // More frequent updates for smoother animation
+      }, duration / 60); // Even more frequent updates for smoother animation
     } else {
       // Clean up interval if loading stops
       if (progressIntervalRef.current) {
@@ -53,7 +53,7 @@ export function useLoadingProgress({
         progressIntervalRef.current = null;
       }
       
-      // If loading completed successfully, set progress to 100%
+      // Jump to 100% when loading completes
       if (loadingProgressRef.current > 0) {
         loadingProgressRef.current = 100;
         setLoadingProgress(100);

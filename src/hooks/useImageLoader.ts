@@ -23,7 +23,7 @@ export function useImageLoader({
   imageUrl,
   onImageLoaded,
   onImageError,
-  loadingTimeout = 8000
+  loadingTimeout = 4000 // Reduced from 8000ms to 4000ms
 }: UseImageLoaderProps): UseImageLoaderResult {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -32,10 +32,10 @@ export function useImageLoader({
   const imageRef = useRef<HTMLImageElement | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   
-  // Use the extracted loading progress hook
+  // Use the extracted loading progress hook with faster duration
   const { loadingProgress, resetProgress } = useLoadingProgress({ 
     isLoading,
-    duration: loadingTimeout * 0.8 // Use 80% of the timeout for the progress animation
+    duration: loadingTimeout * 0.6 // Use 60% of the timeout for the progress animation
   });
   
   const loadImage = () => {
@@ -75,9 +75,8 @@ export function useImageLoader({
       setIsLoading(false);
       
       if (onImageLoaded) {
-        setTimeout(() => {
-          onImageLoaded();
-        }, 100); // Small delay to ensure state updates have propagated
+        // Remove delay to make it seem faster
+        onImageLoaded();
       }
     };
     
@@ -93,9 +92,9 @@ export function useImageLoader({
       if (onImageError) onImageError();
     };
     
-    // Set a specific cache-busting parameter to prevent browser caching issues
+    // Set a more aggressive cache-busting parameter
     const cacheBuster = Date.now();
-    image.src = `${imageUrl}${imageUrl.includes('?') ? '&' : '?'}cb=${cacheBuster}`;
+    image.src = `${imageUrl}${imageUrl.includes('?') ? '&' : '?'}cb=${cacheBuster}&force=true`;
   };
 
   useEffect(() => {
