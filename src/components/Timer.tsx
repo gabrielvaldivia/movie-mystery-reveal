@@ -1,7 +1,6 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Progress } from './ui/progress';
-import { cn } from "@/lib/utils";
 
 interface TimerProps {
   duration: number;
@@ -11,10 +10,19 @@ interface TimerProps {
 
 const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
   const [timeRemaining, setTimeRemaining] = useState(duration);
+  const previousTimeRef = useRef(timeRemaining);
+  
+  // Store the current timeRemaining value when pausing
+  useEffect(() => {
+    if (!isRunning) {
+      previousTimeRef.current = timeRemaining;
+    }
+  }, [isRunning, timeRemaining]);
   
   useEffect(() => {
-    // Reset timer when isRunning changes to true
-    if (isRunning) {
+    // Only reset timer when duration changes or when isRunning changes from false to true
+    // and the previousTimeRef is at the duration (meaning it's a new round)
+    if (previousTimeRef.current === duration && isRunning) {
       setTimeRemaining(duration);
     }
   }, [isRunning, duration]);
