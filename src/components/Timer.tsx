@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Progress } from './ui/progress';
 import { cn } from "@/lib/utils";
 
@@ -25,6 +25,13 @@ const Timer: React.FC<TimerProps> = ({
     }
   }, [isRunning, duration]);
   
+  // Use useCallback to avoid recreating function on each render
+  const updateTime = useCallback((elapsed: number) => {
+    if (onTimeUpdate) {
+      onTimeUpdate(elapsed);
+    }
+  }, [onTimeUpdate]);
+  
   useEffect(() => {
     let timerId: number | null = null;
     
@@ -32,9 +39,10 @@ const Timer: React.FC<TimerProps> = ({
       timerId = window.setInterval(() => {
         setTimeRemaining(prev => {
           const newRemaining = Math.max(0, prev - 100);
-          if (onTimeUpdate) {
-            onTimeUpdate(duration - newRemaining);
-          }
+          const elapsed = duration - newRemaining;
+          
+          // Call update outside of state update to avoid warning
+          updateTime(elapsed);
           
           if (newRemaining <= 0) {
             if (timerId) clearInterval(timerId);
@@ -50,7 +58,7 @@ const Timer: React.FC<TimerProps> = ({
     return () => {
       if (timerId) clearInterval(timerId);
     };
-  }, [isRunning, timeRemaining, onTimeUp, duration, onTimeUpdate]);
+  }, [isRunning, timeRemaining, onTimeUp, duration, updateTime]);
   
   const progress = Math.max(0, (timeRemaining / duration) * 100);
   

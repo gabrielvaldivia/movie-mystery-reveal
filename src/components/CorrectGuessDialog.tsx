@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Movie } from '@/utils/types/movieTypes';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
@@ -25,9 +25,12 @@ const CorrectGuessDialog: React.FC<CorrectGuessDialogProps> = ({
   return (
     <Dialog open={open} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-md">
+        <DialogTitle className="text-2xl font-bold text-center">Correct!</DialogTitle>
+        <DialogDescription className="sr-only">
+          Correct answer dialog showing the movie poster, title and your score
+        </DialogDescription>
+        
         <div className="flex flex-col items-center space-y-4">
-          <h2 className="text-2xl font-bold text-center">Correct!</h2>
-          
           {/* Movie poster */}
           <div className="w-full max-w-xs overflow-hidden rounded-md">
             <AspectRatio ratio={2/3}>

@@ -121,13 +121,20 @@ export const createPixelationAnimation = (
   let animationFrameId: number | null = null;
   let startTime: number | null = null;
   let currentLevel = 1; // Start with maximum pixelation
+  let isPaused = false;
+  let elapsedAtPause = 0;
 
   const animate = (timestamp: number) => {
+    if (isPaused) {
+      startTime = timestamp - elapsedAtPause;
+    }
+    
     if (startTime === null) {
       startTime = timestamp;
     }
 
     const elapsed = timestamp - startTime;
+    elapsedAtPause = elapsed;
     
     // Calculate current pixelation level (1 to 0 over duration)
     currentLevel = Math.max(0, 1 - elapsed / duration);
@@ -158,12 +165,18 @@ export const createPixelationAnimation = (
       if (animationFrameId !== null) {
         cancelAnimationFrame(animationFrameId);
       }
-      startTime = null;
-      currentLevel = 1;
+      isPaused = false;
+      // Only reset if we're starting fresh, not resuming
+      if (startTime === null || currentLevel >= 0.99) {
+        startTime = null;
+        currentLevel = 1;
+        elapsedAtPause = 0;
+      }
       animationFrameId = requestAnimationFrame(animate);
     },
     stop: () => {
       if (animationFrameId !== null) {
+        isPaused = true;
         cancelAnimationFrame(animationFrameId);
         animationFrameId = null;
       }

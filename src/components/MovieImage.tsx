@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { createPixelationAnimation } from '../utils/pixelate';
 import { AspectRatio } from './ui/aspect-ratio';
@@ -63,18 +64,31 @@ const MovieImage: React.FC<MovieImageProps> = ({
     };
   }, [imageUrl, duration, onRevealComplete]);
 
+  // Handle isActive changes to start/stop animation
   useEffect(() => {
     if (animation && isLoaded) {
       if (isActive) {
+        // Start or resume the animation
         animation.start();
       } else {
+        // Pause the animation
         animation.stop();
-        if (!isActive) {
-          animation.forceComplete();
-        }
       }
     }
   }, [isActive, animation, isLoaded]);
+
+  // Handle fully stopping animation
+  useEffect(() => {
+    if (!isActive && animation) {
+      animation.stop();
+    }
+    
+    return () => {
+      if (animation) {
+        animation.stop();
+      }
+    };
+  }, [isActive, animation]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -90,29 +104,23 @@ const MovieImage: React.FC<MovieImageProps> = ({
             canvasRef.current.width = containerWidth;
             canvasRef.current.height = containerHeight;
             
+            // Create a new animation with the updated canvas size
             if (animation) {
               animation.stop();
               
+              const currentLevel = animation.getCurrentLevel();
+              const newAnimation = createPixelationAnimation(
+                imageRef.current,
+                canvasRef.current,
+                duration,
+                onRevealComplete
+              );
+              
+              setAnimation(newAnimation);
+              
+              // If still active, continue the animation
               if (isActive) {
-                const newAnimation = createPixelationAnimation(
-                  imageRef.current,
-                  canvasRef.current,
-                  duration,
-                  onRevealComplete
-                );
-                setAnimation(newAnimation);
                 newAnimation.start();
-              } else {
-                const newAnimation = createPixelationAnimation(
-                  imageRef.current,
-                  canvasRef.current,
-                  duration,
-                  onRevealComplete
-                );
-                setAnimation(newAnimation);
-                if (newAnimation) {
-                  newAnimation.forceComplete();
-                }
               }
             }
           }
