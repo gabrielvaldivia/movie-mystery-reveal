@@ -4,6 +4,7 @@ import ImageLoadingIndicator from './ImageLoadingIndicator';
 import PixelRevealCanvas from './PixelRevealCanvas';
 import MovieContentWrapper from './MovieContentWrapper';
 import { usePixelReveal } from '../hooks/usePixelReveal';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface MovieImageProps {
   imageUrl: string;
@@ -26,6 +27,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   onImageError,
   onRetry
 }) => {
+  const isMobile = useIsMobile();
   const {
     canvasRef,
     isLoading,
@@ -51,7 +53,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   };
 
   return (
-    <div className="pixel-reveal-container glass-panel no-rounded relative">
+    <div className={`pixel-reveal-container glass-panel no-rounded relative ${isMobile ? 'h-full' : ''}`}>
       <PixelRevealCanvas ref={canvasRef} />
       
       <ImageLoadingIndicator 
