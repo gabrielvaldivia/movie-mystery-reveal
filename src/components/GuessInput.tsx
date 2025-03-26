@@ -29,6 +29,14 @@ const GuessInput: React.FC<GuessInputProps> = ({
     }
   };
 
+  // Clear input when Next Round is clicked
+  const handleNextRound = () => {
+    setGuess("");
+    if (onNextRound) {
+      onNextRound();
+    }
+  };
+
   // Focus input on mount and when disabled state changes
   useEffect(() => {
     if (!disabled && inputRef.current) {
@@ -56,7 +64,7 @@ const GuessInput: React.FC<GuessInputProps> = ({
           {onNextRound && (
             <button
               id="next-round-button" 
-              onClick={onNextRound}
+              onClick={handleNextRound}
               className="w-full mt-4 bg-primary text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all hover:bg-primary/90 active:scale-[0.98]"
             >
               <RefreshCw className="h-5 w-5" />
