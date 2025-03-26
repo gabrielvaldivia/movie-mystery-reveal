@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { createPixelationAnimation } from '../utils/pixelate';
 import { AspectRatio } from './ui/aspect-ratio';
@@ -18,7 +19,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   children
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
+  const imageRef = useRef<HTMLImageElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [animation, setAnimation] = useState<{
     start: () => void;
@@ -63,19 +64,24 @@ const MovieImage: React.FC<MovieImageProps> = ({
     };
   }, [imageUrl, duration, onRevealComplete]);
 
+  // Effect to handle animation state changes
   useEffect(() => {
     if (animation && isLoaded) {
       if (isActive) {
+        // Start the animation when isActive becomes true
         animation.start();
       } else {
+        // Stop the animation when isActive becomes false
         animation.stop();
-        if (!isActive) {
-          animation.forceComplete();
-        }
+        
+        // If we're transitioning from active to inactive state
+        // and it's not because the game is over, complete the animation
+        animation.forceComplete();
       }
     }
   }, [isActive, animation, isLoaded]);
 
+  // Handle resize to maintain proper pixelation
   useEffect(() => {
     const handleResize = () => {
       if (canvasRef.current && imageRef.current) {
