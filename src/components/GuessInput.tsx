@@ -3,6 +3,9 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Send, RefreshCw, HelpCircle } from 'lucide-react';
 import { Button } from './ui/button';
 import { Popover, PopoverTrigger, PopoverContent } from './ui/popover';
+import MovieSuggestions from './MovieSuggestions';
+import { Movie } from '@/utils/types/movieTypes';
+import { getMovieSuggestions } from '@/utils/services/gameService';
 
 interface GuessInputProps {
   onGuess: (guess: string) => void;
@@ -24,22 +27,99 @@ const GuessInput: React.FC<GuessInputProps> = ({
   hint
 }) => {
   const [guess, setGuess] = useState("");
+  const [suggestions, setSuggestions] = useState<Movie[]>([]);
+  const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (guess.trim() && !disabled) {
       onGuess(guess.trim());
+      setSuggestions([]);
+      setIsSuggestionsOpen(false);
     }
   };
 
   // Clear input when Next Round is clicked
   const handleNextRound = () => {
     setGuess("");
+    setSuggestions([]);
+    setIsSuggestionsOpen(false);
     if (onNextRound) {
       onNextRound();
     }
   };
+
+  // Handle input change and fetch suggestions
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setGuess(value);
+    
+    if (value.trim().length >= 2) {
+      // Fetch suggestions when user types at least 2 characters
+      const movieSuggestions = getMovieSuggestions(value);
+      setSuggestions(movieSuggestions);
+      setIsSuggestionsOpen(movieSuggestions.length > 0);
+    } else {
+      setSuggestions([]);
+      setIsSuggestionsOpen(false);
+    }
+    setHighlightedIndex(-1);
+  };
+
+  // Handle suggestion selection
+  const handleSuggestionSelect = (title: string) => {
+    setGuess(title);
+    setSuggestions([]);
+    setIsSuggestionsOpen(false);
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
+
+  // Handle keyboard navigation in suggestions
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (!isSuggestionsOpen) return;
+    
+    // Arrow down
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlightedIndex(prev => 
+        prev < suggestions.length - 1 ? prev + 1 : prev
+      );
+    }
+    // Arrow up
+    else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlightedIndex(prev => 
+        prev > 0 ? prev - 1 : 0
+      );
+    }
+    // Enter key
+    else if (e.key === 'Enter' && highlightedIndex >= 0) {
+      e.preventDefault();
+      handleSuggestionSelect(suggestions[highlightedIndex].title);
+    }
+    // Escape key
+    else if (e.key === 'Escape') {
+      setIsSuggestionsOpen(false);
+    }
+  };
+
+  // Close suggestions when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (inputRef.current && !inputRef.current.contains(e.target as Node)) {
+        setIsSuggestionsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   // Focus input on mount and when disabled state changes
   useEffect(() => {
@@ -103,7 +183,8 @@ const GuessInput: React.FC<GuessInputProps> = ({
                 ref={inputRef}
                 type="text"
                 value={guess}
-                onChange={(e) => setGuess(e.target.value)}
+                onChange={handleInputChange}
+                onKeyDown={handleKeyDown}
                 placeholder="Guess the movie..."
                 disabled={disabled}
                 className={`w-full py-2 px-3 pr-10 bg-white/90 rounded-md border focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed transition-all ${
@@ -119,6 +200,13 @@ const GuessInput: React.FC<GuessInputProps> = ({
               >
                 <Send className="h-3 w-3" />
               </button>
+              
+              <MovieSuggestions 
+                suggestions={suggestions}
+                isOpen={isSuggestionsOpen}
+                onSelect={handleSuggestionSelect}
+                highlightedIndex={highlightedIndex}
+              />
             </div>
           </div>
         </form>

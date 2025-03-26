@@ -26,3 +26,21 @@ export const getNextMovie = async (currentId: string): Promise<Movie> => {
   
   return nextMovie;
 };
+
+// New function to get movie suggestions based on user input
+export const getMovieSuggestions = (query: string): Movie[] => {
+  if (!query || query.trim().length < 2) {
+    return [];
+  }
+  
+  const lowercaseQuery = query.toLowerCase().trim();
+  const moviesWithImages = getLoadedMovies();
+  
+  // Filter movies that match the query
+  const matchingMovies = moviesWithImages.filter(movie => 
+    movie.title.toLowerCase().includes(lowercaseQuery)
+  );
+  
+  // Limit the number of suggestions to avoid overwhelming the UI
+  return matchingMovies.slice(0, 5);
+};
