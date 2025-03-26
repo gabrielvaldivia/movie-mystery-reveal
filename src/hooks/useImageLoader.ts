@@ -23,7 +23,7 @@ export function useImageLoader({
   imageUrl,
   onImageLoaded,
   onImageError,
-  loadingTimeout = 15000
+  loadingTimeout = 8000
 }: UseImageLoaderProps): UseImageLoaderResult {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -39,6 +39,7 @@ export function useImageLoader({
   });
   
   const loadImage = () => {
+    console.log("Starting to load image:", imageUrl);
     setIsLoading(true);
     setIsLoaded(false);
     setLoadError(false);
@@ -52,6 +53,7 @@ export function useImageLoader({
     
     timerRef.current = setTimeout(() => {
       if (!isLoaded) {
+        console.error("Image load timed out:", imageUrl);
         setTimeoutError(true);
         setIsLoading(false);
         if (onImageError) onImageError();
@@ -62,6 +64,7 @@ export function useImageLoader({
     image.crossOrigin = "anonymous";
     
     image.onload = () => {
+      console.log("Image loaded successfully:", imageUrl);
       if (timerRef.current) {
         clearTimeout(timerRef.current);
         timerRef.current = null;
@@ -72,23 +75,27 @@ export function useImageLoader({
       setIsLoading(false);
       
       if (onImageLoaded) {
-        onImageLoaded();
+        setTimeout(() => {
+          onImageLoaded();
+        }, 100); // Small delay to ensure state updates have propagated
       }
     };
     
-    image.onerror = () => {
+    image.onerror = (error) => {
+      console.error("Error loading image:", imageUrl, error);
       if (timerRef.current) {
         clearTimeout(timerRef.current);
         timerRef.current = null;
       }
       
-      console.error("Error loading image:", imageUrl);
       setLoadError(true);
       setIsLoading(false);
       if (onImageError) onImageError();
     };
     
-    image.src = imageUrl;
+    // Set a specific cache-busting parameter to prevent browser caching issues
+    const cacheBuster = Date.now();
+    image.src = `${imageUrl}${imageUrl.includes('?') ? '&' : '?'}cb=${cacheBuster}`;
   };
 
   useEffect(() => {

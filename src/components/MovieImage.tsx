@@ -47,6 +47,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   });
 
   const handleRetryClick = () => {
+    console.log("Retry clicked");
     if (onRetry) {
       onRetry();
     } else {

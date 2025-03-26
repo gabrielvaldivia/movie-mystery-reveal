@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { Movie } from '../utils/types/movieTypes';
 import { getRandomMovie, getNextMovie } from '../utils/gameData';
@@ -18,6 +17,7 @@ export function useGameState() {
   const [timeExpired, setTimeExpired] = useState(false);
   const [imageLoadError, setImageLoadError] = useState(false);
   const [gameInitialized, setGameInitialized] = useState(false);
+  const [imageLoadTimeout, setImageLoadTimeout] = useState<NodeJS.Timeout | null>(null);
 
   const startNewRound = useCallback(async () => {
     setIsLoading(true);
@@ -27,6 +27,10 @@ export function useGameState() {
     setImageLoadError(false);
     setIsGameActive(false);
     setIsRoundComplete(false);
+    
+    if (imageLoadTimeout) {
+      clearTimeout(imageLoadTimeout);
+    }
     
     try {
       setImageKey(Date.now());
@@ -40,14 +44,24 @@ export function useGameState() {
       setCurrentMovie(nextMovie);
       setIsCorrectGuess(false);
       setHasIncorrectGuess(false);
+      
+      const timeout = setTimeout(() => {
+        console.log("Image load timeout triggered - forcing game start");
+        setIsLoading(false);
+        setIsImageLoaded(true);
+        setIsGameActive(true);
+        setLoadingProgress(100);
+      }, 10000);
+      
+      setImageLoadTimeout(timeout);
+      
     } catch (error) {
       console.error("Error starting new round:", error);
       setImageLoadError(true);
+      setIsLoading(false);
     }
-    // We don't set isLoading to false here anymore - we'll do that after the image loads
-  }, [currentMovie]);
+  }, [currentMovie, imageLoadTimeout]);
 
-  // Initialize game on first load only
   useEffect(() => {
     if (!gameInitialized) {
       const initGame = async () => {
@@ -64,7 +78,6 @@ export function useGameState() {
           await startNewRound();
           
           clearInterval(progressInterval);
-          setLoadingProgress(100);
           setGameInitialized(true);
         } catch (error) {
           console.error("Error initializing game:", error);
@@ -76,9 +89,19 @@ export function useGameState() {
       
       initGame();
     }
-  }, [gameInitialized, startNewRound]);
+    
+    return () => {
+      if (imageLoadTimeout) {
+        clearTimeout(imageLoadTimeout);
+      }
+    };
+  }, [gameInitialized, startNewRound, imageLoadTimeout]);
 
   const resetGame = useCallback(() => {
+    if (imageLoadTimeout) {
+      clearTimeout(imageLoadTimeout);
+    }
+    
     setCurrentMovie(null);
     setIsGameActive(false);
     setIsRoundComplete(false);
@@ -92,8 +115,8 @@ export function useGameState() {
     setLoadingProgress(0);
     setTimeExpired(false);
     setImageLoadError(false);
-    setGameInitialized(false); // Reset initialized state to trigger a fresh load
-  }, []);
+    setGameInitialized(false);
+  }, [imageLoadTimeout]);
 
   const handleGuess = (guess: string) => {
     if (!currentMovie || !isGameActive) return;
@@ -127,7 +150,13 @@ export function useGameState() {
   };
 
   const handleImageLoaded = () => {
-    // Complete the loading progress and finish the loading state
+    console.log("Image loaded successfully - activating game");
+    
+    if (imageLoadTimeout) {
+      clearTimeout(imageLoadTimeout);
+      setImageLoadTimeout(null);
+    }
+    
     setIsImageLoaded(true);
     setLoadingProgress(100);
     setIsLoading(false);
@@ -135,6 +164,13 @@ export function useGameState() {
   };
   
   const handleImageError = () => {
+    console.error("Error loading image - attempting to load next movie");
+    
+    if (imageLoadTimeout) {
+      clearTimeout(imageLoadTimeout);
+      setImageLoadTimeout(null);
+    }
+    
     setImageLoadError(true);
     setIsLoading(false);
     setTimeout(() => {
