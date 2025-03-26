@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, RefreshCw, HelpCircle } from 'lucide-react';
 import { Button } from './ui/button';
@@ -54,9 +55,15 @@ const GuessInput: React.FC<GuessInputProps> = ({
     setGuess(value);
     
     if (value.trim().length >= 2) {
-      const movieSuggestions = getMovieSuggestions(value);
-      setSuggestions(movieSuggestions || []);
-      setIsSuggestionsOpen(movieSuggestions && movieSuggestions.length > 0);
+      try {
+        const movieSuggestions = getMovieSuggestions(value);
+        setSuggestions(Array.isArray(movieSuggestions) ? movieSuggestions : []);
+        setIsSuggestionsOpen(movieSuggestions && movieSuggestions.length > 0);
+      } catch (error) {
+        console.error('Error getting movie suggestions:', error);
+        setSuggestions([]);
+        setIsSuggestionsOpen(false);
+      }
     } else {
       setSuggestions([]);
       setIsSuggestionsOpen(false);
@@ -90,7 +97,9 @@ const GuessInput: React.FC<GuessInputProps> = ({
     }
     else if (e.key === 'Enter' && highlightedIndex >= 0) {
       e.preventDefault();
-      handleSuggestionSelect(suggestions[highlightedIndex].title);
+      if (suggestions[highlightedIndex] && suggestions[highlightedIndex].title) {
+        handleSuggestionSelect(suggestions[highlightedIndex].title);
+      }
     }
     else if (e.key === 'Escape') {
       setIsSuggestionsOpen(false);
@@ -189,7 +198,7 @@ const GuessInput: React.FC<GuessInputProps> = ({
               </button>
               
               <MovieSuggestions 
-                suggestions={suggestions || []}
+                suggestions={suggestions}
                 isOpen={isSuggestionsOpen}
                 onSelect={handleSuggestionSelect}
                 highlightedIndex={highlightedIndex}

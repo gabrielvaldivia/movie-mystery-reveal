@@ -28,9 +28,10 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
     <div className="relative w-full">
       <div className="absolute top-1 left-0 right-0 z-50 overflow-hidden bg-white dark:bg-gray-800 rounded-md border shadow-lg">
         <Command className="w-full">
-          <CommandGroup>
-            {safeSuggestions.length > 0 ? (
-              safeSuggestions.map((movie, index) => (
+          <CommandEmpty>No movies found</CommandEmpty>
+          {safeSuggestions.length > 0 && (
+            <CommandGroup>
+              {safeSuggestions.map((movie, index) => (
                 <CommandItem
                   key={movie.id}
                   onSelect={() => onSelect(movie.title)}
@@ -40,11 +41,9 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
                 >
                   <span className="truncate">{movie.title}</span>
                 </CommandItem>
-              ))
-            ) : (
-              <CommandEmpty>No movies found</CommandEmpty>
-            )}
-          </CommandGroup>
+              ))}
+            </CommandGroup>
+          )}
         </Command>
       </div>
     </div>
