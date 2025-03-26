@@ -1,4 +1,3 @@
-
 import { Movie } from '../types/movieTypes';
 
 // The Movie Database API configuration
@@ -9,65 +8,48 @@ export const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w780";
 // In a production app, this should be stored securely
 const TMDB_API_KEY = "2dca580c2a14b55200e784d157207b4d";
 
-// Generate a more obscure hint that doesn't give away the movie
+// Generate a short, obscure hint (max 15 words)
 const generateObscureHint = (overview: string, title: string): string => {
   if (!overview || overview.trim() === '') {
-    return "A mysterious film awaits your guess";
+    return "A mysterious film awaits";
   }
   
   // Remove any direct mentions of the movie title from the overview
   const titleWords = title.toLowerCase().split(/\s+/);
-  let sanitizedOverview = overview.toLowerCase();
   
-  // Remove the title and any words from the title that are 4+ characters
-  titleWords.forEach(word => {
-    if (word.length >= 4) {
-      const regex = new RegExp(`\\b${word}\\b`, 'gi');
-      sanitizedOverview = sanitizedOverview.replace(regex, '...');
+  // Extract some keywords from the overview
+  const words = overview.split(/\s+/);
+  
+  // Filter out common words, short words, and words from the title
+  const keywords = words.filter(word => {
+    const cleanWord = word.toLowerCase().replace(/[^a-z0-9]/g, '');
+    // Skip words that are too short, numbers, or common words
+    if (cleanWord.length < 5 || /^\d+$/.test(cleanWord)) {
+      return false;
     }
+    
+    // Skip words that are in the title
+    if (titleWords.some(titleWord => 
+      titleWord.length >= 4 && cleanWord.includes(titleWord.toLowerCase())
+    )) {
+      return false;
+    }
+    
+    return true;
   });
   
-  // Get the first sentence that doesn't contain the movie title
-  const sentences = overview.split('.');
-  let hint = '';
+  // Get 2-4 unique keywords
+  const uniqueKeywords = [...new Set(keywords)].slice(0, 4);
   
-  for (const sentence of sentences) {
-    if (sentence.trim().length > 15) { // Ensure sentence has reasonable length
-      const lowerSentence = sentence.toLowerCase();
-      let containsTitle = false;
-      
-      // Check if sentence contains any significant words from title
-      titleWords.forEach(word => {
-        if (word.length >= 4 && lowerSentence.includes(word.toLowerCase())) {
-          containsTitle = true;
-        }
-      });
-      
-      if (!containsTitle) {
-        hint = sentence.trim();
-        break;
-      }
-    }
+  // Create a short hint
+  if (uniqueKeywords.length >= 2) {
+    // Get just 2-4 keywords and join them
+    const hintWords = uniqueKeywords.slice(0, 4);
+    return `Think: ${hintWords.join(', ')}`;
+  } else {
+    // Fallback to a generic hint based on the first word of the title
+    return `A mysterious film with ${title.split(' ')[0].toLowerCase()} vibes`;
   }
-  
-  // If we couldn't find a good sentence, use a cryptic hint based on themes
-  if (!hint) {
-    // Extract some keywords from the overview
-    const words = overview.split(/\s+/);
-    const keywords = words.filter(word => 
-      word.length > 5 && 
-      !titleWords.some(titleWord => word.toLowerCase().includes(titleWord.toLowerCase()))
-    ).slice(0, 3);
-    
-    if (keywords.length > 0) {
-      hint = `Themes include: ${keywords.join(', ')}`;
-    } else {
-      // Fix: Use the provided title parameter instead of accessing movie.release_date
-      hint = `A film from ${title.split(' ')[0]}`; // Use first word of title as fallback
-    }
-  }
-  
-  return hint;
 };
 
 // Fetch popular movies from TMDB
