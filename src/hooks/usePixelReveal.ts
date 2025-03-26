@@ -1,6 +1,5 @@
-
 import { useState, useEffect, useRef } from 'react';
-import { createPixelationAnimation } from '../utils/pixelate';
+import { createPixelationAnimation } from '../utils/pixelation';
 
 interface UsePixelRevealProps {
   imageUrl: string;
