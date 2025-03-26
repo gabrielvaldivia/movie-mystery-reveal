@@ -1,3 +1,4 @@
+
 import { Movie } from '../types/movieTypes';
 
 // First 150 movies (Original collection)
@@ -639,5 +640,6 @@ export const moviesCollectionPart1: Movie[] = [
     releaseYear: 1946,
     hint: "An angel helps a man see his impact on others",
     tmdbId: 1585
-  },
-  //
+  }
+  // Additional movies would be added here to reach 150
+];
