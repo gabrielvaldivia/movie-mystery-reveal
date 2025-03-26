@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import MovieImage from './MovieImage';
 import GuessInput from './GuessInput';
 import SuccessDialog from './SuccessDialog';
@@ -12,6 +12,7 @@ const GAME_DURATION = 30000; // 30 seconds
 
 const GameContainer: React.FC = () => {
   const isMobile = useIsMobile();
+  const [isPaused, setIsPaused] = useState(false);
   const {
     currentMovie,
     isGameActive,
@@ -34,6 +35,10 @@ const GameContainer: React.FC = () => {
     handleSkip,
   } = useGameState();
   
+  const handlePauseToggle = () => {
+    setIsPaused(!isPaused);
+  };
+  
   return (
     <div className={`w-full ${isMobile ? 'h-full absolute inset-0' : 'h-full'} flex items-center justify-center`}>
       <div className={`flex flex-col items-center w-full max-w-2xl ${isMobile ? 'h-full max-h-none' : 'aspect-[3/5] h-full max-h-screen'}`}>
@@ -46,8 +51,9 @@ const GameContainer: React.FC = () => {
                 <GameHeader 
                   duration={GAME_DURATION}
                   onTimeUp={handleTimeUp}
-                  isRunning={isGameActive && isImageLoaded && !showSuccessDialog}
+                  isRunning={isGameActive && isImageLoaded && !showSuccessDialog && !isPaused}
                   onSkip={handleSkip}
+                  onPauseToggle={handlePauseToggle}
                 />
                 
                 <MovieImage 
@@ -55,13 +61,13 @@ const GameContainer: React.FC = () => {
                   imageUrl={currentMovie.imageUrl}
                   duration={GAME_DURATION}
                   onRevealComplete={handleRevealComplete}
-                  isActive={isGameActive && !showSuccessDialog}
+                  isActive={isGameActive && !showSuccessDialog && !isPaused}
                   onImageLoaded={handleImageLoaded}
                   onImageError={handleImageError}
                 >
                   <GuessInput 
                     onGuess={handleGuess}
-                    disabled={!isGameActive || isLoading || !isImageLoaded}
+                    disabled={!isGameActive || isLoading || !isImageLoaded || isPaused}
                     correctAnswer={isRoundComplete ? currentMovie?.title : undefined}
                     isCorrect={isCorrectGuess}
                     hasIncorrectGuess={hasIncorrectGuess}
