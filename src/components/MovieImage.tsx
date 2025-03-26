@@ -39,8 +39,9 @@ const MovieImage: React.FC<MovieImageProps> = ({
         const container = canvasRef.current.parentElement;
         if (container) {
           const containerWidth = container.clientWidth;
+          const containerHeight = container.clientHeight;
           canvasRef.current.width = containerWidth;
-          canvasRef.current.height = (containerWidth / image.width) * image.height;
+          canvasRef.current.height = containerHeight;
         }
         
         // Create and store animation controller
@@ -79,17 +80,18 @@ const MovieImage: React.FC<MovieImageProps> = ({
       if (canvasRef.current && imageRef.current) {
         const container = canvasRef.current.parentElement;
         if (container) {
-          const oldWidth = canvasRef.current.width;
           const containerWidth = container.clientWidth;
+          const containerHeight = container.clientHeight;
           
-          if (Math.abs(oldWidth - containerWidth) > 10) {
-            // Only resize if the width difference is significant
+          // Only resize if the dimensions change significantly
+          if (Math.abs(canvasRef.current.width - containerWidth) > 10 || 
+              Math.abs(canvasRef.current.height - containerHeight) > 10) {
+            
             canvasRef.current.width = containerWidth;
-            canvasRef.current.height = (containerWidth / imageRef.current.width) * imageRef.current.height;
+            canvasRef.current.height = containerHeight;
             
             // Reapply current pixelation level after resize
             if (animation) {
-              const currentLevel = animation.getCurrentLevel();
               animation.stop();
               
               if (isActive) {
@@ -122,7 +124,8 @@ const MovieImage: React.FC<MovieImageProps> = ({
       )}
       <canvas 
         ref={canvasRef}
-        className={`w-full h-full object-cover transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+        className="w-full h-full object-cover transition-opacity duration-300"
+        style={{ objectFit: 'cover' }}
       />
       <div className="shine-effect"></div>
     </div>

@@ -81,7 +81,7 @@
 .pixel-reveal-container {
   position: relative;
   width: 100%;
-  aspect-ratio: 16/9;
+  aspect-ratio: 9/16;
   overflow: hidden;
   border-radius: var(--radius);
   transform: translateZ(0);
