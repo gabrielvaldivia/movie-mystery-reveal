@@ -73,6 +73,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
         animation.stop();
         // When round is over (isActive is false), force the image to be fully unpixelated
         if (!isActive) {
+          // Only call forceComplete if it exists
           animation.forceComplete();
         }
       }
@@ -118,7 +119,10 @@ const MovieImage: React.FC<MovieImageProps> = ({
                   onRevealComplete
                 );
                 setAnimation(newAnimation);
-                newAnimation.forceComplete();
+                // Only call forceComplete if it exists
+                if (newAnimation) {
+                  newAnimation.forceComplete();
+                }
               }
             }
           }

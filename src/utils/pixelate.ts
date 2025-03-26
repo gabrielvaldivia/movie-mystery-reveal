@@ -169,6 +169,6 @@ export const createPixelationAnimation = (
       }
     },
     getCurrentLevel: () => currentLevel,
-    forceComplete: forceComplete
+    forceComplete
   };
 };
