@@ -1,3 +1,4 @@
+
 import { Movie } from '../types/movieTypes';
 
 // TMDB API configuration
@@ -639,4 +640,9 @@ export const moviesCollection: Movie[] = [
     id: "79",
     title: "It's a Wonderful Life",
     imageUrl: "https://image.tmdb.org/t/p/w780/6wvJUVVyNtgHILrev0FJCwt9D2v.jpg",
-    releaseYear
+    releaseYear: 1946,
+    hint: "An angel helps a man see his impact on others",
+    tmdbId: 1585
+  }
+  // Additional movies would continue here to reach 500
+];
