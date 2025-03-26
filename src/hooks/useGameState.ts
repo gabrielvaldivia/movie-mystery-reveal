@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Movie } from '../utils/types/movieTypes';
 import { getRandomMovie, getNextMovie } from '../utils/gameData';
@@ -51,6 +52,8 @@ export function useGameState() {
     setTimeExpired(false);
     setImageLoadError(false);
     setIsPaused(false);
+    setIsGameActive(false);  // Reset game active state
+    setIsRoundComplete(false);  // Ensure round is marked as not complete
     
     try {
       setImageKey(Date.now());
@@ -60,7 +63,6 @@ export function useGameState() {
         : await getRandomMovie();
       
       setCurrentMovie(nextMovie);
-      setIsRoundComplete(false);
       setIsCorrectGuess(false);
       setHasIncorrectGuess(false);
     } catch (error) {
@@ -94,7 +96,7 @@ export function useGameState() {
   };
 
   const handleTimeUp = () => {
-    if (!isRoundComplete) {
+    if (isGameActive && !isRoundComplete) {  // Only handle time up if game is active
       setIsGameActive(false);
       setIsRoundComplete(true);
       setTimeExpired(true);
@@ -104,7 +106,7 @@ export function useGameState() {
 
   const handleImageLoaded = () => {
     setIsImageLoaded(true);
-    setIsGameActive(true);
+    setIsGameActive(true);  // Now set game active once image is loaded
   };
   
   const handleImageError = () => {
@@ -115,7 +117,7 @@ export function useGameState() {
   };
   
   const handleRevealComplete = () => {
-    if (!isRoundComplete) {
+    if (isGameActive && !isRoundComplete) {  // Only handle reveal complete if game is active
       handleTimeUp();
     }
   };

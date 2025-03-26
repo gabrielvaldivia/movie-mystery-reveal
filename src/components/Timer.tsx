@@ -11,10 +11,12 @@ interface TimerProps {
 const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
   const [timeRemaining, setTimeRemaining] = useState(duration);
   const timerRef = useRef<number | null>(null);
+  const hasStartedRef = useRef<boolean>(false);
   
   // Reset timer when duration changes
   useEffect(() => {
     setTimeRemaining(duration);
+    hasStartedRef.current = false;
   }, [duration]);
   
   // Clear interval on unmount
@@ -36,6 +38,8 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
     
     // Start timer if running and we have time left
     if (isRunning && timeRemaining > 0) {
+      hasStartedRef.current = true;
+      
       timerRef.current = window.setInterval(() => {
         setTimeRemaining((prev) => {
           if (prev <= 100) {
@@ -43,7 +47,10 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
               clearInterval(timerRef.current);
               timerRef.current = null;
             }
-            setTimeout(() => onTimeUp(), 0);
+            // Only trigger time up if the timer has actually been running
+            if (hasStartedRef.current) {
+              setTimeout(() => onTimeUp(), 0);
+            }
             return 0;
           }
           return prev - 100;
