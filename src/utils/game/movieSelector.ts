@@ -6,23 +6,19 @@ import { loadAllMovieImages } from '../loaders/imageLoader';
 // Get a random movie from the collection
 export const getRandomMovie = async (): Promise<Movie> => {
   // Ensure we have movies to select from
-  const filteredMovies = allMovies;
-  if (filteredMovies.length === 0) {
+  if (allMovies.length === 0) {
     throw new Error("No movies available");
   }
 
   // Get a random movie
-  const randomIndex = Math.floor(Math.random() * filteredMovies.length);
-  const movie = filteredMovies[randomIndex];
-  
-  return movie;
+  const randomIndex = Math.floor(Math.random() * allMovies.length);
+  return allMovies[randomIndex];
 };
 
 // Get next movie, ensuring it's different from the current one
 export const getNextMovie = async (currentMovieId: string): Promise<Movie> => {
   // Filter out the current movie
-  const filteredMovies = allMovies;
-  const availableMovies = filteredMovies.filter(movie => movie.id !== currentMovieId);
+  const availableMovies = allMovies.filter(movie => movie.id !== currentMovieId);
 
   if (availableMovies.length === 0) {
     throw new Error("No more movies available");
@@ -30,9 +26,7 @@ export const getNextMovie = async (currentMovieId: string): Promise<Movie> => {
 
   // Get a random movie from the filtered list
   const randomIndex = Math.floor(Math.random() * availableMovies.length);
-  const movie = availableMovies[randomIndex];
-  
-  return movie;
+  return availableMovies[randomIndex];
 };
 
 // Load all movie images

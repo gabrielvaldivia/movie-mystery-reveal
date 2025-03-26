@@ -13,19 +13,14 @@ export const loadAllMovieImages = async (imageUrls: string[]): Promise<void> => 
     });
   };
 
-  try {
-    // Try to load first few images first for immediate display
-    const initialImages = imageUrls.slice(0, 5).map(url => preloadImage(url));
-    await Promise.all(initialImages);
-
-    // Then load the rest in the background
-    imageUrls.slice(5).forEach(url => {
-      preloadImage(url).catch(() => {
-        // Silently fail individual images
-      });
-    });
-  } catch (error) {
-    console.error("Error during image preloading:", error);
-    // Continue execution even if some images fail to load
+  // Load images in batches to avoid overwhelming the browser
+  const batchSize = 5;
+  for (let i = 0; i < imageUrls.length; i += batchSize) {
+    const batch = imageUrls.slice(i, i + batchSize);
+    try {
+      await Promise.all(batch.map(url => preloadImage(url)));
+    } catch (error) {
+      console.error("Error during image preloading:", error);
+    }
   }
 };

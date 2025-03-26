@@ -17,7 +17,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
   isActive
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const imageRef = useRef<HTMLImageElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [hasError, setHasError] = useState(false);
   const [animation, setAnimation] = useState<{
@@ -32,25 +31,19 @@ const MovieImage: React.FC<MovieImageProps> = ({
     setHasError(false);
     
     const image = new Image();
-    imageRef.current = image;
     
-    image.crossOrigin = "anonymous";
-    
-    const handleLoad = () => {
-      console.log("Image loaded successfully:", imageUrl);
+    image.onload = () => {
       setIsLoaded(true);
-      setHasError(false);
       
       if (canvasRef.current) {
-        // Match canvas dimensions to container while maintaining aspect ratio
+        // Set canvas dimensions based on container
         const container = canvasRef.current.parentElement;
         if (container) {
-          const containerWidth = container.clientWidth;
-          canvasRef.current.width = containerWidth;
-          canvasRef.current.height = (containerWidth / image.width) * image.height;
+          canvasRef.current.width = container.clientWidth;
+          canvasRef.current.height = (container.clientWidth / image.width) * image.height;
         }
         
-        // Create and store animation controller
+        // Create pixelation animation
         const pixelAnimation = createPixelationAnimation(
           image,
           canvasRef.current,
@@ -62,18 +55,13 @@ const MovieImage: React.FC<MovieImageProps> = ({
       }
     };
     
-    const handleError = () => {
-      console.error("Failed to load image:", imageUrl);
+    image.onerror = () => {
       setHasError(true);
-      setIsLoaded(false);
     };
     
-    image.onload = handleLoad;
-    image.onerror = handleError;
-    
-    // Set image source after setting up event handlers
+    // Set image source
     image.src = imageUrl;
-
+    
     return () => {
       if (animation) {
         animation.stop();
@@ -83,74 +71,29 @@ const MovieImage: React.FC<MovieImageProps> = ({
 
   // Start or stop animation based on isActive prop
   useEffect(() => {
-    if (animation && isLoaded) {
-      if (isActive) {
-        animation.start();
-      } else {
-        animation.stop();
-      }
+    if (animation && isLoaded && isActive) {
+      animation.start();
+    } else if (animation) {
+      animation.stop();
     }
   }, [isActive, animation, isLoaded]);
-
-  // Handle window resize
-  useEffect(() => {
-    const handleResize = () => {
-      if (canvasRef.current && imageRef.current) {
-        const container = canvasRef.current.parentElement;
-        if (container) {
-          const oldWidth = canvasRef.current.width;
-          const containerWidth = container.clientWidth;
-          
-          if (Math.abs(oldWidth - containerWidth) > 10) {
-            // Only resize if the width difference is significant
-            canvasRef.current.width = containerWidth;
-            canvasRef.current.height = (containerWidth / imageRef.current.width) * imageRef.current.height;
-            
-            // Reapply current pixelation level after resize
-            if (animation) {
-              const currentLevel = animation.getCurrentLevel();
-              animation.stop();
-              
-              if (isActive) {
-                // Restart animation with new dimensions
-                const newAnimation = createPixelationAnimation(
-                  imageRef.current,
-                  canvasRef.current,
-                  duration,
-                  onRevealComplete
-                );
-                setAnimation(newAnimation);
-                newAnimation.start();
-              }
-            }
-          }
-        }
-      }
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [animation, duration, onRevealComplete, isActive]);
 
   return (
     <div className="pixel-reveal-container glass-panel rounded-md overflow-hidden relative">
       {!isLoaded && !hasError && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <Skeleton className="w-full h-full" />
-        </div>
+        <Skeleton className="w-full h-full" />
       )}
       
       {hasError && (
-        <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary/50 text-center p-4">
+        <div className="absolute inset-0 flex items-center justify-center bg-secondary/50">
           <span className="text-muted-foreground">Image failed to load</span>
         </div>
       )}
       
       <canvas 
         ref={canvasRef}
-        className={`w-full h-full object-cover transition-opacity duration-300 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+        className={`w-full h-full ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
       />
-      <div className="shine-effect"></div>
     </div>
   );
 };
