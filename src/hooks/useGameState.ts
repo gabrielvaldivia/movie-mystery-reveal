@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Movie } from '../utils/types/movieTypes';
 import { getRandomMovie, getNextMovie } from '../utils/gameData';
@@ -61,6 +60,8 @@ export function useGameState() {
       const nextMovie = currentMovie 
         ? await getNextMovie(currentMovie.id) 
         : await getRandomMovie();
+      
+      console.log(`Loaded movie: "${nextMovie.title}" (${nextMovie.releaseYear})`);
       
       setCurrentMovie(nextMovie);
       setIsCorrectGuess(false);

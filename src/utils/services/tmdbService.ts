@@ -12,9 +12,12 @@ const TMDB_API_KEY = "2dca580c2a14b55200e784d157207b4d";
 // Fetch popular movies from TMDB
 export const fetchPopularMovies = async (page: number = 1): Promise<Movie[]> => {
   try {
-    // Add region=US parameter to only get American movies
+    console.log(`Fetching popular American movies - page ${page}`);
+    
+    // Use region=US parameter to only get American movies
+    // Also add 'with_original_language=en' to further filter for English language films
     const response = await fetch(
-      `${TMDB_API_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&language=en-US&page=${page}&region=US`
+      `${TMDB_API_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&language=en-US&page=${page}&region=US&with_original_language=en`
     );
     
     if (!response.ok) {
@@ -22,9 +25,18 @@ export const fetchPopularMovies = async (page: number = 1): Promise<Movie[]> => 
     }
 
     const data = await response.json();
+    console.log(`Received ${data.results.length} movies from page ${page}`);
+    
+    // Additional filter to make sure we're only getting US movies (some might slip through)
+    const usMovies = data.results.filter((movie: any) => {
+      return movie.original_language === 'en' && 
+             (!movie.origin_country || movie.origin_country.includes('US'));
+    });
+    
+    console.log(`Filtered to ${usMovies.length} American movies from page ${page}`);
     
     // Map TMDB movie format to our app's Movie format
-    return data.results.map((movie: any) => ({
+    return usMovies.map((movie: any) => ({
       id: movie.id.toString(),
       title: movie.title,
       imageUrl: movie.poster_path ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}` : "",
@@ -45,7 +57,7 @@ export const searchMovies = async (query: string): Promise<Movie[]> => {
   try {
     // Add region=US parameter to only get American movies
     const response = await fetch(
-      `${TMDB_API_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&language=en-US&query=${encodeURIComponent(query)}&page=1&region=US`
+      `${TMDB_API_BASE_URL}/search/movie?api_key=${TMDB_API_KEY}&language=en-US&query=${encodeURIComponent(query)}&page=1&region=US&with_original_language=en`
     );
     
     if (!response.ok) {
@@ -54,7 +66,13 @@ export const searchMovies = async (query: string): Promise<Movie[]> => {
 
     const data = await response.json();
     
-    return data.results.map((movie: any) => ({
+    // Additional filter for American movies
+    const usMovies = data.results.filter((movie: any) => 
+      movie.original_language === 'en' && 
+      (!movie.origin_country || movie.origin_country.includes('US'))
+    );
+    
+    return usMovies.map((movie: any) => ({
       id: movie.id.toString(),
       title: movie.title,
       imageUrl: movie.poster_path ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}` : "",
