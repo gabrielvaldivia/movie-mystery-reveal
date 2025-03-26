@@ -2,47 +2,22 @@
 import { Movie } from '../types/movieTypes';
 import { moviesCollection } from '../data/movieCollection';
 
-// TMDB image sizes from largest to smallest for fallback
-const IMAGE_SIZES = ['w780', 'w500', 'w342', 'w185', 'w154', 'w92'];
+// TMDB image size - use one high quality size only
+const PRIMARY_IMAGE_SIZE = 'w780';
 
 export const fetchMovieImages = async (movie: Movie): Promise<string> => {
-  // Return existing valid image URL if available and not from TMDB or unsplash
+  // Return existing valid image URL if available
   if (movie.imageUrl && !movie.imageUrl.includes('tmdb.org') && !movie.imageUrl.includes('unsplash.com')) {
     return movie.imageUrl;
   }
   
-  // If movie has a TMDB poster path, try different sizes
+  // If movie has a TMDB poster path, construct and return the URL
   if (movie.poster_path) {
-    // Try each size until one works
-    for (const size of IMAGE_SIZES) {
-      const imageUrl = `https://image.tmdb.org/t/p/${size}${movie.poster_path}`;
-      try {
-        // Test if the image loads
-        await testImageUrl(imageUrl);
-        console.log(`Loaded image for ${movie.title} at size ${size}`);
-        return imageUrl;
-      } catch (error) {
-        console.warn(`Failed to load ${size} image for ${movie.title}, trying next size...`);
-        continue;
-      }
-    }
+    return `https://image.tmdb.org/t/p/${PRIMARY_IMAGE_SIZE}${movie.poster_path}`;
   }
   
   // No valid image found, throw error to be handled by caller
   throw new Error(`No valid image source for movie: ${movie.title}`);
-};
-
-// Helper function to test if an image URL is valid
-const testImageUrl = (url: string): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    const img = new Image();
-    img.onload = () => resolve();
-    img.onerror = () => reject(new Error(`Failed to load image: ${url}`));
-    img.src = url;
-    
-    // Add a timeout to avoid hanging indefinitely
-    setTimeout(() => reject(new Error('Image load timed out')), 5000);
-  });
 };
 
 // Cache for loaded movies with images
