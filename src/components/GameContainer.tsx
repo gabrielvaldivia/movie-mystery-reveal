@@ -6,7 +6,6 @@ import Timer from './Timer';
 import { getRandomMovie, Movie, getNextMovie, loadAllMovieImages } from '../utils/gameData';
 import { Button } from './ui/button';
 import { SkipForward } from 'lucide-react';
-import CorrectGuessDialog from './CorrectGuessDialog';
 
 const GAME_DURATION = 30000; // 30 seconds
 
@@ -15,12 +14,9 @@ const GameContainer: React.FC = () => {
   const [isGameActive, setIsGameActive] = useState(false);
   const [isRoundComplete, setIsRoundComplete] = useState(false);
   const [score, setScore] = useState(0);
-  const [roundScore, setRoundScore] = useState(0);
   const [isCorrectGuess, setIsCorrectGuess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasIncorrectGuess, setHasIncorrectGuess] = useState(false);
-  const [showDialog, setShowDialog] = useState(false);
-  const [timeElapsed, setTimeElapsed] = useState(0);
   
   useEffect(() => {
     const initGame = async () => {
@@ -50,8 +46,6 @@ const GameContainer: React.FC = () => {
       setIsRoundComplete(false);
       setIsCorrectGuess(false);
       setHasIncorrectGuess(false);
-      setShowDialog(false);
-      setTimeElapsed(0);
     } catch (error) {
       console.error("Error starting new round:", error);
     } finally {
@@ -71,10 +65,6 @@ const GameContainer: React.FC = () => {
       handleTimeUp();
     }
   };
-
-  const handleTimeUpdate = (elapsed: number) => {
-    setTimeElapsed(elapsed);
-  };
   
   const handleGuess = (guess: string) => {
     if (!currentMovie || !isGameActive) return;
@@ -85,16 +75,10 @@ const GameContainer: React.FC = () => {
     const isCorrect = normalizedGuess === normalizedTitle;
     
     if (isCorrect) {
-      // Calculate score based on time remaining
-      const timeRemaining = GAME_DURATION - timeElapsed;
-      const calculatedScore = Math.max(Math.floor((timeRemaining / GAME_DURATION) * 1000), 100);
-      
       setIsGameActive(false);
       setIsRoundComplete(true);
       setIsCorrectGuess(true);
-      setRoundScore(calculatedScore);
-      setScore(prev => prev + calculatedScore);
-      setShowDialog(true);
+      setScore(prev => prev + 100);
     } else {
       setHasIncorrectGuess(true);
       setTimeout(() => {
@@ -104,6 +88,7 @@ const GameContainer: React.FC = () => {
   };
   
   const handleNextRound = async () => {
+    setScore(0);
     await startNewRound();
   };
   
@@ -113,10 +98,6 @@ const GameContainer: React.FC = () => {
       setIsRoundComplete(true);
       await startNewRound();
     }
-  };
-
-  const handleCloseDialog = () => {
-    setShowDialog(false);
   };
   
   return (
@@ -133,8 +114,7 @@ const GameContainer: React.FC = () => {
                 <Timer 
                   duration={GAME_DURATION} 
                   onTimeUp={handleTimeUp} 
-                  isRunning={isGameActive}
-                  onTimeUpdate={handleTimeUpdate}
+                  isRunning={isGameActive} 
                 />
               </div>
               <Button 
@@ -153,29 +133,19 @@ const GameContainer: React.FC = () => {
               onRevealComplete={handleRevealComplete}
               isActive={isGameActive}
             >
-              {!showDialog && (
-                <GuessInput 
-                  onGuess={handleGuess}
-                  disabled={!isGameActive || isLoading}
-                  correctAnswer={isRoundComplete ? currentMovie?.title : undefined}
-                  isCorrect={isCorrectGuess}
-                  hasIncorrectGuess={hasIncorrectGuess}
-                  onNextRound={handleNextRound}
-                  hint={currentMovie?.hint}
-                />
-              )}
+              <GuessInput 
+                onGuess={handleGuess}
+                disabled={!isGameActive || isLoading}
+                correctAnswer={isRoundComplete ? currentMovie?.title : undefined}
+                isCorrect={isCorrectGuess}
+                hasIncorrectGuess={hasIncorrectGuess}
+                onNextRound={handleNextRound}
+                hint={currentMovie?.hint}
+              />
             </MovieImage>
           </div>
         ) : null}
       </div>
-
-      <CorrectGuessDialog
-        open={showDialog}
-        movie={currentMovie}
-        score={roundScore}
-        onClose={handleCloseDialog}
-        onNextMovie={handleNextRound}
-      />
     </div>
   );
 };
