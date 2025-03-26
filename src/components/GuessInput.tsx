@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Send, RefreshCw, HelpCircle } from 'lucide-react';
 import { Button } from './ui/button';
@@ -77,6 +78,7 @@ const GuessInput: React.FC<GuessInputProps> = ({
   const handleSuggestionSelect = (title: string) => {
     console.log("GuessInput - Selected suggestion:", title);
     setGuess(title);
+    // We don't need to call handleSubmit here as MovieSuggestions will call onSubmit directly
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -98,6 +100,8 @@ const GuessInput: React.FC<GuessInputProps> = ({
       e.preventDefault();
       if (suggestions[highlightedIndex] && suggestions[highlightedIndex].title) {
         handleSuggestionSelect(suggestions[highlightedIndex].title);
+        // Submit the form immediately when pressing Enter on a highlighted suggestion
+        handleSubmit();
       }
     }
     else if (e.key === 'Escape') {

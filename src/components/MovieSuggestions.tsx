@@ -8,7 +8,7 @@ interface MovieSuggestionsProps {
   isOpen: boolean;
   onSelect: (title: string) => void;
   highlightedIndex: number;
-  onSubmit: () => void; // Prop for submitting the form
+  onSubmit: () => void; 
 }
 
 const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
@@ -16,7 +16,7 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
   isOpen,
   onSelect,
   highlightedIndex,
-  onSubmit, // Receive the onSubmit prop
+  onSubmit,
 }) => {
   // Don't render anything if not open
   if (!isOpen) {
@@ -30,11 +30,10 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
   const handleSelection = (title: string) => {
     console.log("MovieSuggestions - handleSelection called with:", title);
     onSelect(title);
-    // Submit the form immediately after setting the title
-    setTimeout(() => {
-      console.log("MovieSuggestions - calling onSubmit after selection");
-      onSubmit();
-    }, 0);
+    
+    // Submit the form immediately after selection
+    console.log("MovieSuggestions - calling onSubmit after selection");
+    onSubmit();
   };
 
   return (
