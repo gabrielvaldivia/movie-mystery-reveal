@@ -258,8 +258,8 @@ const MovieImage: React.FC<MovieImageProps> = ({
       
       {isLoaded && isPaused && (
         <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-          <div className="rounded-full bg-black/40 p-3 backdrop-blur-sm">
-            <Play className="h-8 w-8 text-white" />
+          <div className="rounded-full bg-black/30 p-2 backdrop-blur-sm">
+            <Play className="h-6 w-6 text-white" />
           </div>
         </div>
       )}
