@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import ImageLoadingIndicator from './ImageLoadingIndicator';
 import PixelRevealCanvas from './PixelRevealCanvas';
@@ -173,21 +172,17 @@ const MovieImage: React.FC<MovieImageProps> = ({
   }, [imageUrl, duration, onImageLoaded, onRevealComplete, onImageError]);
   
   useEffect(() => {
-    // Handle animation state changes based on active and paused states
     if (!animationRef.current || !isLoaded) return;
     
     console.log("Animation state changed. isActive:", isActive, "isPaused:", isPaused);
     
     if (isActive && !isPaused) {
-      // Resume animation if it was paused
       console.log("Resuming animation");
       animationRef.current.resume();
     } else if (isActive && isPaused) {
-      // Pause animation
       console.log("Pausing animation");
       animationRef.current.pause();
     } else {
-      // Not active - force complete
       console.log("Forcing animation complete");
       animationRef.current.forceComplete();
     }
