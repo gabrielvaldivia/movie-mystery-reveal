@@ -2,45 +2,57 @@
 import { Movie } from '../types/movieTypes';
 import { moviesCollection } from '../data/movieCollection';
 
-// Since the API key is invalid, we'll use the backup image URLs directly
-// This function no longer attempts to fetch from TMDB
+// Fallback images
+const FALLBACK_IMAGES = [
+  '/lovable-uploads/7b774628-fcec-47de-8506-f083317dcfbc.png',
+  'https://images.unsplash.com/photo-1440404653325-ab127d49abc1?q=80&w=1470&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1596727147705-61a532a659bd?q=80&w=1374&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1627483297886-49710ae1fc22?q=80&w=1530&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1478720568477-152d9b164e26?q=80&w=1470&auto=format&fit=crop',
+  'https://images.unsplash.com/photo-1536440136628-849c177e76a1?q=80&w=1450&auto=format&fit=crop'
+];
+
+// Get a random fallback image
+const getRandomFallbackImage = (): string => {
+  const index = Math.floor(Math.random() * FALLBACK_IMAGES.length);
+  return FALLBACK_IMAGES[index];
+};
+
+// Updated to always use fallback images since TMDB API is not working
 export const fetchMovieImages = async (movie: Movie): Promise<string> => {
   try {
-    // Return the backup image URL that's already provided in the movie object
-    if (movie.imageUrl) {
+    // If movie already has an imageUrl that isn't from TMDB, use it
+    if (movie.imageUrl && !movie.imageUrl.includes('tmdb.org')) {
       return movie.imageUrl;
     }
     
-    // Fallback image if no backup image URL is available
-    return "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=1459&auto=format&fit=crop";
+    // Use a random fallback image
+    return getRandomFallbackImage();
   } catch (error) {
     console.error("Error with movie image:", error);
-    return "https://images.unsplash.com/photo-1485846234645-a62644f84728?q=80&w=1459&auto=format&fit=crop"; // Fallback image
+    return getRandomFallbackImage();
   }
 };
 
 // Cache for loaded movies with images
-let moviesWithImages: Movie[] = [...moviesCollection];
+let moviesWithImages: Movie[] = [];
 let imagesLoaded = false;
 
 export const loadAllMovieImages = async (): Promise<void> => {
   if (imagesLoaded) return;
   
-  // Since we're using backup URLs, this function is simpler now
-  // We just need to ensure all movies have an imageUrl
+  // Assign fallback images to all movies
   const updatedMovies = await Promise.all(
-    moviesCollection.map(async (movie) => {
-      // Only fetch if the movie doesn't already have an imageUrl
-      if (!movie.imageUrl) {
-        const imageUrl = await fetchMovieImages(movie);
-        return { ...movie, imageUrl };
-      }
-      return movie;
+    moviesCollection.map(async (movie, index) => {
+      // Use a deterministic fallback image based on movie index
+      const imageUrl = FALLBACK_IMAGES[index % FALLBACK_IMAGES.length];
+      return { ...movie, imageUrl };
     })
   );
   
   moviesWithImages = updatedMovies;
   imagesLoaded = true;
+  console.log("All movies loaded with fallback images");
 };
 
 // Getter function for the cached movies
