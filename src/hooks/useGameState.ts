@@ -128,6 +128,7 @@ export function useGameState() {
     if (isGameActive) {
       setIsGameActive(false);
       setShowSuccessDialog(false); // Ensure the success dialog doesn't show
+      setTimeExpired(false); // Additionally ensure the time expired state is reset
       await startNewRound();
     }
   };
