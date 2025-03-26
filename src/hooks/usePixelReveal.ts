@@ -9,6 +9,7 @@ interface UsePixelRevealProps {
   onImageLoaded?: () => void;
   onImageError?: () => void;
   isActive: boolean;
+  isPaused?: boolean;
 }
 
 export function usePixelReveal({
@@ -17,7 +18,8 @@ export function usePixelReveal({
   onRevealComplete,
   onImageLoaded,
   onImageError,
-  isActive
+  isActive,
+  isPaused = false
 }: UsePixelRevealProps) {
   // Use the image loader hook
   const {
@@ -35,13 +37,20 @@ export function usePixelReveal({
   });
 
   // Use the pixelation animation hook
-  const { canvasRef } = usePixelationAnimation({
+  const { canvasRef, pauseAnimation, resumeAnimation } = usePixelationAnimation({
     imageRef,
     duration,
     onRevealComplete,
     isActive,
     isLoaded
   });
+  
+  // Handle pause/resume
+  if (isPaused) {
+    pauseAnimation();
+  } else if (isActive && isLoaded) {
+    resumeAnimation();
+  }
 
   return {
     canvasRef,

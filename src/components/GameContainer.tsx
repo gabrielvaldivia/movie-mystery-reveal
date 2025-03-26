@@ -23,6 +23,7 @@ const GameContainer: React.FC = () => {
     isCorrectGuess,
     isRoundComplete,
     imageLoadError,
+    isPaused,
     handleGuess,
     handleTimeUp,
     handleImageLoaded,
@@ -30,6 +31,7 @@ const GameContainer: React.FC = () => {
     handleRevealComplete,
     handleNextRound,
     handleSkip,
+    handlePauseToggle,
   } = useGameState();
   
   return (
@@ -46,6 +48,8 @@ const GameContainer: React.FC = () => {
                   onTimeUp={handleTimeUp}
                   isRunning={isGameActive && isImageLoaded && !showSuccessDialog}
                   onSkip={handleSkip}
+                  isPaused={isPaused}
+                  onPauseToggle={handlePauseToggle}
                 />
                 
                 <MovieImage 
@@ -54,12 +58,13 @@ const GameContainer: React.FC = () => {
                   duration={GAME_DURATION}
                   onRevealComplete={handleRevealComplete}
                   isActive={isGameActive && !showSuccessDialog}
+                  isPaused={isPaused}
                   onImageLoaded={handleImageLoaded}
                   onImageError={handleImageError}
                 >
                   <GuessInput 
                     onGuess={handleGuess}
-                    disabled={!isGameActive || isLoading || !isImageLoaded}
+                    disabled={!isGameActive || isLoading || !isImageLoaded || isPaused}
                     correctAnswer={isRoundComplete ? currentMovie?.title : undefined}
                     isCorrect={isCorrectGuess}
                     hasIncorrectGuess={hasIncorrectGuess}

@@ -21,6 +21,8 @@ export function usePixelationAnimation({
   const animationRef = useRef<{ 
     start: () => void; 
     stop: () => void; 
+    pause: () => void;
+    resume: () => void;
     forceComplete: () => void 
   } | null>(null);
 
@@ -117,6 +119,16 @@ export function usePixelationAnimation({
 
   return {
     canvasRef,
-    animationRef
+    animationRef,
+    pauseAnimation: () => {
+      if (animationRef.current) {
+        animationRef.current.pause();
+      }
+    },
+    resumeAnimation: () => {
+      if (animationRef.current) {
+        animationRef.current.resume();
+      }
+    }
   };
 }
