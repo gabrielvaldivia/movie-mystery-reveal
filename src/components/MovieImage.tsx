@@ -18,7 +18,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
   children
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const imageRef = useRef<HTMLImageElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [animation, setAnimation] = useState<{
     start: () => void;
@@ -34,20 +33,17 @@ const MovieImage: React.FC<MovieImageProps> = ({
       animation.stop();
     }
 
-    // Create image WITHOUT adding it to the DOM
+    // Create image separately without adding it to DOM
     const image = new Image();
-    
-    // Store reference - this will replace any previous reference
-    imageRef.current = image;
     
     // Configure image
     image.crossOrigin = "anonymous";
-    image.src = imageUrl;
-
+    image.style.display = "none"; // Ensure image is never visible
+    
     const handleImageLoad = () => {
       setIsLoaded(true);
       
-      if (canvasRef.current && imageRef.current) {
+      if (canvasRef.current) {
         const container = canvasRef.current.parentElement;
         if (container) {
           canvasRef.current.width = container.clientWidth;
@@ -55,7 +51,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
         }
         
         const pixelAnimation = createPixelationAnimation(
-          imageRef.current,
+          image,
           canvasRef.current,
           duration,
           onRevealComplete
@@ -74,6 +70,9 @@ const MovieImage: React.FC<MovieImageProps> = ({
 
     // Set up the onload handler
     image.onload = handleImageLoad;
+    
+    // Set the src last to avoid race conditions
+    image.src = imageUrl;
 
     // Clean up function
     return () => {
@@ -84,8 +83,8 @@ const MovieImage: React.FC<MovieImageProps> = ({
       // Remove event listener
       image.onload = null;
       
-      // Clear reference
-      imageRef.current = null;
+      // Explicitly remove the image src to help garbage collection
+      image.src = '';
     };
   }, [imageUrl, duration, onRevealComplete]);
 
@@ -104,7 +103,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   // Handle resize events
   useEffect(() => {
     const handleResize = () => {
-      if (canvasRef.current && imageRef.current) {
+      if (canvasRef.current) {
         const container = canvasRef.current.parentElement;
         if (container) {
           const containerWidth = container.clientWidth;
@@ -119,19 +118,32 @@ const MovieImage: React.FC<MovieImageProps> = ({
             if (animation) {
               animation.stop();
               
-              const newAnimation = createPixelationAnimation(
-                imageRef.current,
-                canvasRef.current,
-                duration,
-                onRevealComplete
-              );
-              
-              setAnimation(newAnimation);
-              
-              if (isActive) {
-                newAnimation.start();
-              } else {
-                newAnimation.forceComplete();
+              // We don't need to create a new Image here
+              // Just recreate the animation with the existing canvas
+              if (canvasRef.current) {
+                // Create a new temporary image for this resize operation
+                const tempImage = new Image();
+                tempImage.crossOrigin = "anonymous";
+                tempImage.style.display = "none";
+                
+                tempImage.onload = () => {
+                  const newAnimation = createPixelationAnimation(
+                    tempImage,
+                    canvasRef.current!,
+                    duration,
+                    onRevealComplete
+                  );
+                  
+                  setAnimation(newAnimation);
+                  
+                  if (isActive) {
+                    newAnimation.start();
+                  } else {
+                    newAnimation.forceComplete();
+                  }
+                };
+                
+                tempImage.src = imageUrl;
               }
             }
           }
@@ -141,7 +153,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [animation, duration, onRevealComplete, isActive]);
+  }, [animation, duration, onRevealComplete, isActive, imageUrl]);
 
   return (
     <div className="pixel-reveal-container glass-panel relative w-full h-full overflow-hidden">

@@ -68,7 +68,7 @@ export const applyPixelation = (
     0, 0, canvas.width, canvas.height
   );
   
-  // Clean up temporary canvas
+  // Clean up temporary canvas - ensure it doesn't stay in memory
   tempCanvas.width = 0;
   tempCanvas.height = 0;
 };
