@@ -126,9 +126,17 @@ export function useGameState() {
   
   const handleSkip = async () => {
     if (isGameActive) {
+      // Reset all state variables related to game completion and dialogs
       setIsGameActive(false);
-      setShowSuccessDialog(false); // Ensure the success dialog doesn't show
-      setTimeExpired(false); // Additionally ensure the time expired state is reset
+      setIsRoundComplete(false);
+      setTimeExpired(false);
+      setShowSuccessDialog(false);
+      setIsCorrectGuess(false);
+      
+      // Force a small delay before starting the new round to ensure state updates
+      await new Promise(resolve => setTimeout(resolve, 10));
+      
+      // Start the new round
       await startNewRound();
     }
   };
