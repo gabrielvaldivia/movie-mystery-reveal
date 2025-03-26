@@ -76,9 +76,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
       }
     }, 300);
     
-    // Create a new image element
     const image = new Image();
-    // Use crossOrigin anonymous to avoid CORS issues when drawing to canvas
     image.crossOrigin = "anonymous";
     
     image.onload = () => {
@@ -143,14 +141,11 @@ const MovieImage: React.FC<MovieImageProps> = ({
         timerRef.current = null;
       }
       
-      console.warn("Failed to load image:", imageUrl);
+      console.error("Error loading image:", imageUrl);
       setLoadError(true);
       setIsLoading(false);
       if (onImageError) onImageError();
     };
-    
-    // Add a specific attribute to reduce console noise about multiple renderings
-    image.setAttribute('willReadFrequently', 'true');
     
     // Set the image source
     image.src = imageUrl;
@@ -171,7 +166,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
         animationRef.current.stop();
       }
     };
-  }, [imageUrl, duration]);
+  }, [imageUrl, duration, onImageLoaded, onRevealComplete, onImageError]);
   
   // Handle isActive changes
   useEffect(() => {
