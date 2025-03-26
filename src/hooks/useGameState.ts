@@ -16,6 +16,7 @@ export function useGameState() {
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [timeExpired, setTimeExpired] = useState(false);
   const [imageLoadError, setImageLoadError] = useState(false);
+  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     const initGame = async () => {
@@ -138,6 +139,11 @@ export function useGameState() {
     }
   };
 
+  const handlePause = () => {
+    setIsPaused(prev => !prev);
+    setIsGameActive(prev => !prev);
+  };
+
   return {
     currentMovie,
     isGameActive,
@@ -152,6 +158,7 @@ export function useGameState() {
     loadingProgress,
     timeExpired,
     imageLoadError,
+    isPaused,
     handleGuess,
     handleTimeUp,
     handleImageLoaded,
@@ -159,5 +166,6 @@ export function useGameState() {
     handleRevealComplete,
     handleNextRound,
     handleSkip,
+    handlePause,
   };
 }

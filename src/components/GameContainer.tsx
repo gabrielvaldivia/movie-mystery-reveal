@@ -23,6 +23,7 @@ const GameContainer: React.FC = () => {
     isCorrectGuess,
     isRoundComplete,
     imageLoadError,
+    isPaused,
     handleGuess,
     handleTimeUp,
     handleImageLoaded,
@@ -30,6 +31,7 @@ const GameContainer: React.FC = () => {
     handleRevealComplete,
     handleNextRound,
     handleSkip,
+    handlePause,
   } = useGameState();
   
   return (
@@ -46,6 +48,7 @@ const GameContainer: React.FC = () => {
                   onTimeUp={handleTimeUp}
                   isRunning={isGameActive && isImageLoaded && !showSuccessDialog}
                   onSkip={handleSkip}
+                  onPause={handlePause}
                 />
                 
                 <MovieImage 
