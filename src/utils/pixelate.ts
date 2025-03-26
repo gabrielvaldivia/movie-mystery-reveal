@@ -30,26 +30,7 @@ export const applyPixelation = (
 
   // If pixelation level is very low, just draw the image normally
   if (pixelSize <= 1) {
-    // Calculate dimensions to center and cover the canvas
-    const { width: imgWidth, height: imgHeight } = imageElement;
-    const imgAspect = imgWidth / imgHeight;
-    const canvasAspect = canvas.width / canvas.height;
-    
-    let drawWidth, drawHeight, offsetX = 0, offsetY = 0;
-    
-    if (imgAspect > canvasAspect) {
-      // Image is wider than canvas (relative to height)
-      drawHeight = canvas.height;
-      drawWidth = drawHeight * imgAspect;
-      offsetX = (canvas.width - drawWidth) / 2;
-    } else {
-      // Image is taller than canvas (relative to width)
-      drawWidth = canvas.width;
-      drawHeight = drawWidth / imgAspect;
-      offsetY = (canvas.height - drawHeight) / 2;
-    }
-    
-    ctx.drawImage(imageElement, offsetX, offsetY, drawWidth, drawHeight);
+    drawImageProperly(ctx, imageElement, canvas.width, canvas.height);
     return;
   }
 
@@ -57,35 +38,17 @@ export const applyPixelation = (
   const w = Math.ceil(canvas.width / pixelSize);
   const h = Math.ceil(canvas.height / pixelSize);
 
-  // First, draw the image properly scaled to fill the canvas
-  const { width: imgWidth, height: imgHeight } = imageElement;
-  const imgAspect = imgWidth / imgHeight;
-  const canvasAspect = canvas.width / canvas.height;
-  
-  let drawWidth, drawHeight, offsetX = 0, offsetY = 0;
-  
-  if (imgAspect > canvasAspect) {
-    // Image is wider than canvas (relative to height)
-    drawHeight = canvas.height;
-    drawWidth = drawHeight * imgAspect;
-    offsetX = (canvas.width - drawWidth) / 2;
-  } else {
-    // Image is taller than canvas (relative to width)
-    drawWidth = canvas.width;
-    drawHeight = drawWidth / imgAspect;
-    offsetY = (canvas.height - drawHeight) / 2;
-  }
-  
-  // Clear and draw original image at full size first (we'll pixelate from this)
+  // Create a temporary canvas to draw the image properly first
   const tempCanvas = document.createElement('canvas');
   tempCanvas.width = canvas.width;
   tempCanvas.height = canvas.height;
   const tempCtx = tempCanvas.getContext('2d');
   if (!tempCtx) return;
   
-  tempCtx.drawImage(imageElement, offsetX, offsetY, drawWidth, drawHeight);
+  // Draw the image properly centered and contained in the temp canvas
+  drawImageProperly(tempCtx, imageElement, tempCanvas.width, tempCanvas.height);
   
-  // Step 1: Draw the scaled image at a smaller size
+  // Step 1: Draw the temp canvas at a smaller size
   ctx.drawImage(tempCanvas, 0, 0, w, h);
 
   // Step 2: Save the small image data
@@ -105,6 +68,43 @@ export const applyPixelation = (
     0, 0, canvas.width, canvas.height
   );
 };
+
+// Helper function to properly draw an image contained within a canvas
+function drawImageProperly(
+  ctx: CanvasRenderingContext2D, 
+  img: HTMLImageElement, 
+  canvasWidth: number, 
+  canvasHeight: number
+) {
+  // Get image dimensions
+  const imgWidth = img.naturalWidth;
+  const imgHeight = img.naturalHeight;
+  
+  // Calculate aspect ratios
+  const imgRatio = imgWidth / imgHeight;
+  const canvasRatio = canvasWidth / canvasHeight;
+  
+  let drawWidth, drawHeight, x, y;
+  
+  // Determine how to fit the image (contain)
+  if (imgRatio > canvasRatio) {
+    // Image is wider than canvas (relative to height)
+    drawWidth = canvasWidth;
+    drawHeight = drawWidth / imgRatio;
+    x = 0;
+    y = (canvasHeight - drawHeight) / 2;
+  } else {
+    // Image is taller than canvas (relative to width)
+    drawHeight = canvasHeight;
+    drawWidth = drawHeight * imgRatio;
+    x = (canvasWidth - drawWidth) / 2;
+    y = 0;
+  }
+  
+  // Draw the image centered and contained
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  ctx.drawImage(img, x, y, drawWidth, drawHeight);
+}
 
 // Utility function to create timed pixelation animation
 export const createPixelationAnimation = (

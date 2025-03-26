@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { createPixelationAnimation } from '../utils/pixelate';
 import { AspectRatio } from './ui/aspect-ratio';
@@ -125,7 +126,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   }, [animation, duration, onRevealComplete, isActive]);
 
   return (
-    <div className="pixel-reveal-container glass-panel relative">
+    <div className="pixel-reveal-container glass-panel relative w-full h-full">
       {!isLoaded && (
         <div className="absolute inset-0 flex items-center justify-center bg-secondary animate-pulse-subtle">
           <span className="text-muted-foreground">Loading image...</span>
@@ -133,8 +134,8 @@ const MovieImage: React.FC<MovieImageProps> = ({
       )}
       <canvas 
         ref={canvasRef}
-        className="w-full h-full object-cover transition-opacity duration-300"
-        style={{ objectFit: 'cover' }}
+        className="w-full h-full object-contain transition-opacity duration-300"
+        style={{ objectFit: 'contain' }}
       />
       
       {children && (
