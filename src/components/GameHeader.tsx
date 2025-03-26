@@ -32,7 +32,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
         <X className="h-5 w-5" />
       </Button>
       
-      <div className="w-full mx-2">
+      <div className="w-full mx-6">
         <Timer 
           duration={duration} 
           onTimeUp={onTimeUp} 
