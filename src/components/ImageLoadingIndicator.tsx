@@ -40,7 +40,7 @@ const ImageLoadingIndicator: React.FC<ImageLoadingIndicatorProps> = ({
         <div className="w-2/3 max-w-xs space-y-2">
           <Progress value={progress} className="h-1.5" />
           <p className="text-center text-xs text-muted-foreground">
-            Loading image...
+            Loading movie image...
           </p>
         </div>
       </div>
