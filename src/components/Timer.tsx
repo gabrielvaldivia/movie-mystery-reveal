@@ -7,9 +7,15 @@ interface TimerProps {
   duration: number;
   onTimeUp: () => void;
   isRunning: boolean;
+  onTimeUpdate?: (elapsed: number) => void;
 }
 
-const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
+const Timer: React.FC<TimerProps> = ({ 
+  duration, 
+  onTimeUp, 
+  isRunning,
+  onTimeUpdate 
+}) => {
   const [timeRemaining, setTimeRemaining] = useState(duration);
   
   useEffect(() => {
@@ -25,13 +31,18 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
     if (isRunning && timeRemaining > 0) {
       timerId = window.setInterval(() => {
         setTimeRemaining(prev => {
-          if (prev <= 100) {
+          const newRemaining = Math.max(0, prev - 100);
+          if (onTimeUpdate) {
+            onTimeUpdate(duration - newRemaining);
+          }
+          
+          if (newRemaining <= 0) {
             if (timerId) clearInterval(timerId);
             // Use a timeout to avoid state updates during rendering
             setTimeout(() => onTimeUp(), 0);
             return 0;
           }
-          return prev - 100;
+          return newRemaining;
         });
       }, 100);
     }
@@ -39,7 +50,7 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
     return () => {
       if (timerId) clearInterval(timerId);
     };
-  }, [isRunning, timeRemaining, onTimeUp]);
+  }, [isRunning, timeRemaining, onTimeUp, duration, onTimeUpdate]);
   
   const progress = Math.max(0, (timeRemaining / duration) * 100);
   
