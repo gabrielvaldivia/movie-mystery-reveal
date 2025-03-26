@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { Send } from 'lucide-react';
 import MovieSuggestions from './MovieSuggestions';
@@ -56,15 +57,20 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
     setHighlightedIndex(-1);
   };
 
-  const handleSuggestionSelect = (title: string) => {
-    console.log("Selecting suggestion:", title);
-    setGuess(title);
+  const handleSuggestionSelect = (movie: Movie) => {
+    console.log("Selecting suggestion with direct movie object:", movie.title);
+    // Directly update input value using the DOM
+    if (inputRef.current) {
+      inputRef.current.value = movie.title;
+      // Also update React state
+      setGuess(movie.title);
+    }
+    // Close suggestions
     setIsSuggestionsOpen(false);
-    setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
-      }
-    }, 0);
+    // Focus the input
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -84,8 +90,8 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
     }
     else if (e.key === 'Enter' && highlightedIndex >= 0) {
       e.preventDefault();
-      if (suggestions[highlightedIndex] && suggestions[highlightedIndex].title) {
-        handleSuggestionSelect(suggestions[highlightedIndex].title);
+      if (suggestions[highlightedIndex]) {
+        handleSuggestionSelect(suggestions[highlightedIndex]);
       }
     }
     else if (e.key === 'Escape') {
@@ -143,7 +149,6 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
             isOpen={isSuggestionsOpen}
             onSelect={handleSuggestionSelect}
             highlightedIndex={highlightedIndex}
-            onSubmit={() => setIsSuggestionsOpen(false)}
           />
         </div>
       </div>

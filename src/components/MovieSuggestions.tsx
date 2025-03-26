@@ -6,9 +6,8 @@ import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from '.
 interface MovieSuggestionsProps {
   suggestions: Movie[];
   isOpen: boolean;
-  onSelect: (title: string) => void;
+  onSelect: (movie: Movie) => void;
   highlightedIndex: number;
-  onSubmit: () => void; 
 }
 
 const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
@@ -16,7 +15,6 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
   isOpen,
   onSelect,
   highlightedIndex,
-  onSubmit,
 }) => {
   // Don't render anything if not open
   if (!isOpen) {
@@ -38,8 +36,8 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
                   <CommandItem
                     key={movie.id}
                     onSelect={() => {
-                      console.log(`Selected movie for prefill: ${movie.title}`);
-                      onSelect(movie.title);
+                      console.log(`Selected movie from dropdown: ${movie.title}`);
+                      onSelect(movie);
                     }}
                     className={`flex items-center py-2 px-3 cursor-pointer ${
                       index === highlightedIndex ? 'bg-accent' : ''
