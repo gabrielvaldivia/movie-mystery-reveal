@@ -3,6 +3,13 @@
 export const loadAllMovieImages = async (imageUrls: string[]): Promise<void> => {
   const preloadImage = (url: string): Promise<void> => {
     return new Promise((resolve) => {
+      // Skip TMDB URLs as they're consistently failing
+      if (url.includes('image.tmdb.org')) {
+        console.log(`Skipping TMDB image preload: ${url}`);
+        resolve();
+        return;
+      }
+      
       const img = new Image();
       img.onload = () => resolve();
       img.onerror = () => {

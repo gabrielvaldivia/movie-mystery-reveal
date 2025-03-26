@@ -33,10 +33,9 @@ const MovieImage: React.FC<MovieImageProps> = ({
     
     const image = new Image();
     
-    // Use a fallback placeholder if the URL is from TMDB (which seems to be failing)
-    const isTMDBImage = imageUrl.includes('image.tmdb.org');
-    const effectiveUrl = isTMDBImage 
-      ? `https://source.unsplash.com/random/800x450/?movie,film,cinema` 
+    // Always use fallback images for TMDB since they're consistently failing
+    const effectiveUrl = imageUrl.includes('image.tmdb.org') 
+      ? `https://source.unsplash.com/random/800x450/?movie,cinema,${encodeURIComponent(new Date().getTime().toString())}` 
       : imageUrl;
     
     image.crossOrigin = "anonymous";
@@ -73,10 +72,10 @@ const MovieImage: React.FC<MovieImageProps> = ({
       setHasError(true);
       setIsLoaded(false);
       
-      // Try loading a fallback image
-      if (!isTMDBImage) {
-        image.src = `https://source.unsplash.com/random/800x450/?movie,film,cinema`;
-      }
+      // Always try a unique fallback URL to prevent caching issues
+      const fallbackUrl = `https://source.unsplash.com/random/800x450/?film,movie,${encodeURIComponent(new Date().getTime().toString())}`;
+      console.log("Trying fallback image:", fallbackUrl);
+      image.src = fallbackUrl;
     };
     
     image.onload = handleLoad;
@@ -153,8 +152,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
       
       {hasError && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary/50 text-center p-4">
-          <span className="text-muted-foreground">Image could not be loaded</span>
-          <span className="text-xs text-muted-foreground mt-2">Using placeholder image instead</span>
+          <span className="text-muted-foreground">Loading movie image...</span>
         </div>
       )}
       
