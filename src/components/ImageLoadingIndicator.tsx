@@ -1,7 +1,6 @@
 
 import React from 'react';
-import { RefreshCw, AlertCircle } from 'lucide-react';
-import { Button } from './ui/button';
+import { AlertCircle } from 'lucide-react';
 import { Progress } from './ui/progress';
 
 interface ImageLoadingIndicatorProps {
@@ -16,8 +15,7 @@ const ImageLoadingIndicator: React.FC<ImageLoadingIndicatorProps> = ({
   isLoading,
   progress,
   error,
-  timeout,
-  onRetry
+  timeout
 }) => {
   if (error || timeout) {
     return (
@@ -26,19 +24,6 @@ const ImageLoadingIndicator: React.FC<ImageLoadingIndicatorProps> = ({
         <p className="text-center text-white font-medium mb-4">
           {timeout ? "Image load timed out" : "Failed to load image"}
         </p>
-        <Button 
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            onRetry();
-          }} 
-          variant="outline" 
-          size="sm" 
-          className="flex items-center gap-2 bg-white hover:bg-gray-100"
-        >
-          <RefreshCw className="w-4 h-4" />
-          Retry
-        </Button>
       </div>
     );
   }

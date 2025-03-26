@@ -15,6 +15,7 @@ export function useGameState() {
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [timeExpired, setTimeExpired] = useState(false);
+  const [imageLoadError, setImageLoadError] = useState(false);
 
   useEffect(() => {
     const initGame = async () => {
@@ -35,7 +36,7 @@ export function useGameState() {
         setLoadingProgress(100);
       } catch (error) {
         console.error("Error initializing game:", error);
-      } finally {
+        setLoadingProgress(100);
         setIsLoading(false);
       }
     };
@@ -48,6 +49,7 @@ export function useGameState() {
     setIsImageLoaded(false);
     setShowSuccessDialog(false);
     setTimeExpired(false);
+    setImageLoadError(false);
     
     try {
       // Generate a new image key to force re-mounting of MovieImage
@@ -64,6 +66,7 @@ export function useGameState() {
       // We'll set isGameActive to true after the image is loaded
     } catch (error) {
       console.error("Error starting new round:", error);
+      setImageLoadError(true);
     } finally {
       setIsLoading(false);
     }
@@ -106,6 +109,14 @@ export function useGameState() {
     setIsGameActive(true);
   };
   
+  const handleImageError = () => {
+    setImageLoadError(true);
+    // Try loading a new movie since this one failed
+    setTimeout(() => {
+      startNewRound();
+    }, 2000);
+  };
+  
   const handleRevealComplete = () => {
     if (!isRoundComplete) {
       handleTimeUp();
@@ -138,9 +149,11 @@ export function useGameState() {
     showSuccessDialog,
     loadingProgress,
     timeExpired,
+    imageLoadError,
     handleGuess,
     handleTimeUp,
     handleImageLoaded,
+    handleImageError,
     handleRevealComplete,
     handleNextRound,
     handleSkip,

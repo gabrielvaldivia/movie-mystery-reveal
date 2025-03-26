@@ -22,9 +22,11 @@ const GameContainer: React.FC = () => {
     hasIncorrectGuess,
     isCorrectGuess,
     isRoundComplete,
+    imageLoadError,
     handleGuess,
     handleTimeUp,
     handleImageLoaded,
+    handleImageError,
     handleRevealComplete,
     handleNextRound,
     handleSkip,
@@ -53,6 +55,7 @@ const GameContainer: React.FC = () => {
                   onRevealComplete={handleRevealComplete}
                   isActive={isGameActive && !showSuccessDialog}
                   onImageLoaded={handleImageLoaded}
+                  onImageError={handleImageError}
                 >
                   <GuessInput 
                     onGuess={handleGuess}
@@ -74,7 +77,25 @@ const GameContainer: React.FC = () => {
               timeExpired={timeExpired}
             />
           </>
-        ) : null}
+        ) : (
+          <div className="flex flex-col items-center justify-center h-full w-full bg-card text-card-foreground rounded-lg">
+            <h2 className="text-2xl font-bold mb-4">
+              {imageLoadError ? "Error Loading Movies" : "No Movies Available"}
+            </h2>
+            <p className="text-center text-muted-foreground mb-6 px-4">
+              {imageLoadError 
+                ? "There was a problem loading the movie images. Please try again later."
+                : "There are no movies available to play with. Please check back later."
+              }
+            </p>
+            <button 
+              onClick={handleNextRound}
+              className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+            >
+              Try Again
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

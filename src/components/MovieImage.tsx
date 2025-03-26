@@ -4,7 +4,6 @@ import ImageLoadingIndicator from './ImageLoadingIndicator';
 import PixelRevealCanvas from './PixelRevealCanvas';
 import MovieContentWrapper from './MovieContentWrapper';
 import { createPixelationAnimation } from '../utils/pixelate';
-import { getBackupImageUrl } from '../utils/services/movieImageService';
 
 interface MovieImageProps {
   imageUrl: string;
@@ -13,6 +12,7 @@ interface MovieImageProps {
   isActive: boolean;
   children?: React.ReactNode;
   onImageLoaded?: () => void;
+  onImageError?: () => void;
 }
 
 const MovieImage: React.FC<MovieImageProps> = ({ 
@@ -21,7 +21,8 @@ const MovieImage: React.FC<MovieImageProps> = ({
   onRevealComplete,
   isActive,
   children,
-  onImageLoaded
+  onImageLoaded,
+  onImageError
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -29,7 +30,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
   const [loadError, setLoadError] = useState(false);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const animationRef = useRef<{ start: () => void; stop: () => void; forceComplete: () => void } | null>(null);
-  const [currentImageUrl, setCurrentImageUrl] = useState(imageUrl);
 
   // Effect to handle image loading
   useEffect(() => {
@@ -42,9 +42,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
       animationRef.current.stop();
       animationRef.current = null;
     }
-    
-    // Start with the provided image URL
-    setCurrentImageUrl(imageUrl);
     
     const image = new Image();
     image.crossOrigin = "anonymous";
@@ -90,26 +87,19 @@ const MovieImage: React.FC<MovieImageProps> = ({
         console.error("Error creating animation:", error);
         setLoadError(true);
         setIsLoading(false);
+        if (onImageError) onImageError();
       }
     };
     
     image.onerror = () => {
-      console.error("Error loading image:", currentImageUrl);
-      
-      // If using primary URL, try backup URL
-      if (currentImageUrl === imageUrl) {
-        const backupUrl = getBackupImageUrl({ imageUrl: "", title: "", id: "", releaseYear: 0, poster_path: imageUrl.split('/').pop() });
-        console.log("Trying backup image URL:", backupUrl);
-        setCurrentImageUrl(backupUrl);
-      } else {
-        // Both primary and backup failed
-        setLoadError(true);
-        setIsLoading(false);
-      }
+      console.error("Error loading image:", imageUrl);
+      setLoadError(true);
+      setIsLoading(false);
+      if (onImageError) onImageError();
     };
     
     // Set the image source
-    image.src = currentImageUrl;
+    image.src = imageUrl;
     
     // Cleanup function
     return () => {
@@ -119,7 +109,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
         animationRef.current.stop();
       }
     };
-  }, [currentImageUrl, duration, imageUrl, isActive, onImageLoaded, onRevealComplete]);
+  }, [imageUrl, duration, isActive, onImageLoaded, onRevealComplete, onImageError]);
   
   // Handle isActive changes
   useEffect(() => {
@@ -178,13 +168,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, [duration, isActive, isLoaded, onRevealComplete]);
 
-  const retryLoading = () => {
-    // Reset image URL to original to retry loading
-    setCurrentImageUrl(imageUrl);
-    setLoadError(false);
-    setIsLoading(true);
-  };
-
   return (
     <div className="pixel-reveal-container glass-panel no-rounded relative">
       {/* Canvas for the pixelation effect */}
@@ -196,7 +179,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
         progress={isLoading ? 50 : 100}
         error={loadError}
         timeout={false}
-        onRetry={retryLoading}
+        onRetry={() => {}}
       />
       
       {/* Children (like buttons or UI controls) */}

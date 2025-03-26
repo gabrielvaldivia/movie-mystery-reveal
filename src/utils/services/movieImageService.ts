@@ -2,12 +2,8 @@
 import { Movie } from '../types/movieTypes';
 import { moviesCollection } from '../data/movieCollection';
 
-// TMDB image sizes
-const BACKUP_IMAGE_SIZE = 'w500';
+// TMDB image size - use one high quality size only
 const PRIMARY_IMAGE_SIZE = 'w780';
-
-// Public placeholder image as ultimate fallback
-const PUBLIC_FALLBACK = 'https://placehold.co/600x900/222222/FFFFFF?text=Movie+Not+Found';
 
 export const fetchMovieImages = async (movie: Movie): Promise<string> => {
   // Return existing valid image URL if available
@@ -17,12 +13,11 @@ export const fetchMovieImages = async (movie: Movie): Promise<string> => {
   
   // If movie has a TMDB poster path, construct and return the URL
   if (movie.poster_path) {
-    // Use a larger size by default
     return `https://image.tmdb.org/t/p/${PRIMARY_IMAGE_SIZE}${movie.poster_path}`;
   }
   
-  // Return public fallback if no valid image sources are available
-  return PUBLIC_FALLBACK;
+  // No valid image found, throw error to be handled by caller
+  throw new Error(`No valid image source for movie: ${movie.title}`);
 };
 
 // Cache for loaded movies with images
@@ -34,41 +29,32 @@ export const loadAllMovieImages = async (): Promise<void> => {
   
   try {
     // Process all movies and assign image URLs
-    const updatedMovies = await Promise.all(
+    const validMovies = await Promise.all(
       moviesCollection.map(async (movie) => {
         try {
           const imageUrl = await fetchMovieImages(movie);
-          return { ...movie, imageUrl };
+          return { success: true, movie: { ...movie, imageUrl } };
         } catch (error) {
-          console.error(`Failed to load image for ${movie.title}, using fallback`);
-          return { ...movie, imageUrl: PUBLIC_FALLBACK };
+          console.error(`Failed to load image for ${movie.title}, skipping movie`);
+          return { success: false, movie };
         }
       })
     );
     
-    moviesWithImages = updatedMovies;
+    // Filter out movies without valid images
+    moviesWithImages = validMovies
+      .filter(result => result.success)
+      .map(result => result.movie);
+    
     imagesLoaded = true;
-    console.log("All movies loaded with images");
+    console.log(`Loaded ${moviesWithImages.length} movies with valid images`);
   } catch (err) {
     console.error("Error loading all movie images:", err);
-    // Use fallback images if loading fails
-    moviesWithImages = moviesCollection.map(movie => ({
-      ...movie,
-      imageUrl: PUBLIC_FALLBACK
-    }));
-    imagesLoaded = true;
+    throw err; // Propagate error to be handled by caller
   }
 };
 
 // Getter function for the cached movies
 export const getLoadedMovies = (): Movie[] => {
   return moviesWithImages;
-};
-
-// Get a backup image URL if primary URL fails
-export const getBackupImageUrl = (movie: Movie): string => {
-  if (movie.poster_path) {
-    return `https://image.tmdb.org/t/p/${BACKUP_IMAGE_SIZE}${movie.poster_path}`;
-  }
-  return PUBLIC_FALLBACK;
 };
