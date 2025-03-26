@@ -33,9 +33,10 @@ const MovieImage: React.FC<MovieImageProps> = ({
     
     const image = new Image();
     
-    // Always use fallback images for TMDB since they're consistently failing
+    // Use a more reliable image source - placeholder or direct Unsplash API
+    // Avoid TMDB images completely since they're consistently failing
     const effectiveUrl = imageUrl.includes('image.tmdb.org') 
-      ? `https://source.unsplash.com/random/800x450/?movie,cinema,${encodeURIComponent(new Date().getTime().toString())}` 
+      ? `https://source.unsplash.com/featured/800x450/?movie,cinema,${Date.now()}`
       : imageUrl;
     
     image.crossOrigin = "anonymous";
@@ -72,9 +73,9 @@ const MovieImage: React.FC<MovieImageProps> = ({
       setHasError(true);
       setIsLoaded(false);
       
-      // Always try a unique fallback URL to prevent caching issues
-      const fallbackUrl = `https://source.unsplash.com/random/800x450/?film,movie,${encodeURIComponent(new Date().getTime().toString())}`;
-      console.log("Trying fallback image:", fallbackUrl);
+      // Use a direct static placeholder instead of another API call that might fail
+      const fallbackUrl = "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5";
+      console.log("Using static placeholder image");
       image.src = fallbackUrl;
     };
     
@@ -152,7 +153,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
       
       {hasError && (
         <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary/50 text-center p-4">
-          <span className="text-muted-foreground">Loading movie image...</span>
+          <span className="text-muted-foreground">Using placeholder movie image</span>
         </div>
       )}
       
