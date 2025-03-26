@@ -27,6 +27,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
         onClick={onPause}
         className="bg-black/30 text-white hover:bg-black/50 transition-colors rounded-full w-10 h-10 flex items-center justify-center"
         aria-label="Pause game"
+        style={{ width: '40px', height: '40px' }}
       >
         <Pause className="h-5 w-5" />
       </Button>
@@ -43,6 +44,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
         onClick={onSkip}
         className="bg-black/30 text-white hover:bg-black/50 transition-colors rounded-full w-10 h-10 flex items-center justify-center"
         aria-label="Skip this movie"
+        style={{ width: '40px', height: '40px' }}
       >
         <SkipForward className="h-5 w-5" />
       </Button>
