@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { Button } from './ui/button';
-import { SkipForward } from 'lucide-react';
 import { Movie } from '../utils/types/movieTypes';
 
 interface SuccessDialogProps {
@@ -44,7 +43,6 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({
           className="w-full mt-6"
           size="lg"
         >
-          <SkipForward className="mr-2 h-4 w-4" />
           Next Movie
         </Button>
       </div>
