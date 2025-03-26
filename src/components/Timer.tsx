@@ -10,43 +10,52 @@ interface TimerProps {
 
 const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
   const [timeRemaining, setTimeRemaining] = useState(duration);
-  const previousTimeRef = useRef(timeRemaining);
+  const timerRef = useRef<number | null>(null);
+  const previousRunningState = useRef(isRunning);
   
-  // Store the current timeRemaining value when pausing
+  // Reset timer when duration changes
   useEffect(() => {
-    if (!isRunning) {
-      previousTimeRef.current = timeRemaining;
-    }
-  }, [isRunning, timeRemaining]);
-  
-  useEffect(() => {
-    // Only reset timer when duration changes or when isRunning changes from false to true
-    // and the previousTimeRef is at the duration (meaning it's a new round)
-    if (previousTimeRef.current === duration && isRunning) {
-      setTimeRemaining(duration);
-    }
-  }, [isRunning, duration]);
+    setTimeRemaining(duration);
+  }, [duration]);
   
   useEffect(() => {
-    let timerId: number | null = null;
-    
-    if (isRunning && timeRemaining > 0) {
-      timerId = window.setInterval(() => {
-        setTimeRemaining(prev => {
-          if (prev <= 100) {
-            if (timerId) clearInterval(timerId);
-            // Use a timeout to avoid state updates during rendering
-            setTimeout(() => onTimeUp(), 0);
-            return 0;
-          }
-          return prev - 100;
-        });
-      }, 100);
-    }
-    
+    // Clear any existing interval when component unmounts or when isRunning changes
     return () => {
-      if (timerId) clearInterval(timerId);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
     };
+  }, []);
+  
+  useEffect(() => {
+    // Only setup or clear the timer when isRunning changes
+    if (isRunning && !previousRunningState.current) {
+      // Starting the timer
+      if (timeRemaining > 0) {
+        timerRef.current = window.setInterval(() => {
+          setTimeRemaining(prev => {
+            if (prev <= 100) {
+              if (timerRef.current) clearInterval(timerRef.current);
+              timerRef.current = null;
+              // Use a timeout to avoid state updates during rendering
+              setTimeout(() => onTimeUp(), 0);
+              return 0;
+            }
+            return prev - 100;
+          });
+        }, 100);
+      }
+    } else if (!isRunning && previousRunningState.current) {
+      // Pausing the timer
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+    
+    // Update the ref to track the current running state
+    previousRunningState.current = isRunning;
   }, [isRunning, timeRemaining, onTimeUp]);
   
   const progress = Math.max(0, (timeRemaining / duration) * 100);

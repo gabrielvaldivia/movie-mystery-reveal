@@ -22,7 +22,6 @@ export function useGameState() {
     const initGame = async () => {
       setIsLoading(true);
       try {
-        // Simulate progressive loading
         const progressInterval = setInterval(() => {
           setLoadingProgress(prev => {
             const newProgress = prev + (100 - prev) * 0.1;
@@ -30,7 +29,6 @@ export function useGameState() {
           });
         }, 200);
         
-        // Just start a new round directly
         await startNewRound();
         
         clearInterval(progressInterval);
@@ -54,10 +52,8 @@ export function useGameState() {
     setImageLoadError(false);
     
     try {
-      // Generate a new image key to force re-mounting of MovieImage
       setImageKey(Date.now());
       
-      // Get a movie with a valid image
       const nextMovie = currentMovie 
         ? await getNextMovie(currentMovie.id) 
         : await getRandomMovie();
@@ -66,7 +62,6 @@ export function useGameState() {
       setIsRoundComplete(false);
       setIsCorrectGuess(false);
       setHasIncorrectGuess(false);
-      // We'll set isGameActive to true after the image is loaded
     } catch (error) {
       console.error("Error starting new round:", error);
       setImageLoadError(true);
@@ -108,13 +103,11 @@ export function useGameState() {
 
   const handleImageLoaded = () => {
     setIsImageLoaded(true);
-    // Now that the image is loaded, we can start the game
     setIsGameActive(true);
   };
   
   const handleImageError = () => {
     setImageLoadError(true);
-    // Try loading a new movie since this one failed
     setTimeout(() => {
       startNewRound();
     }, 2000);
@@ -140,8 +133,8 @@ export function useGameState() {
   };
 
   const handlePause = () => {
-    setIsPaused(prev => !prev);
     setIsGameActive(prev => !prev);
+    setIsPaused(prev => !prev);
   };
 
   return {
