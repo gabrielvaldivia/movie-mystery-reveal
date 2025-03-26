@@ -41,10 +41,10 @@ const GameHeader: React.FC<GameHeaderProps> = ({
       </div>
       
       <Button 
-        variant="ghost" 
+        variant="default" 
         size="icon" 
         onClick={onSkip}
-        className="bg-black/30 text-white hover:bg-black/50 hover:text-white transition-colors rounded-full p-0 flex items-center justify-center"
+        className="bg-primary text-white hover:bg-primary/90 hover:text-white transition-colors rounded-full p-0 flex items-center justify-center"
         aria-label="Skip this movie"
         style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
       >
