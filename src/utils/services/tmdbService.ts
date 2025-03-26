@@ -1,4 +1,3 @@
-
 import { Movie } from '../types/movieTypes';
 
 // The Movie Database API configuration
@@ -33,8 +32,9 @@ export const fetchPopularMovies = async (page: number = 1): Promise<Movie[]> => 
       poster_path: movie.poster_path
     }));
   } catch (error) {
-    console.error("Error fetching popular movies:", error);
-    throw error;
+    console.error(`Error fetching popular movies (page ${page}):`, error);
+    // Return empty array instead of throwing to handle individual page failures gracefully
+    return [];
   }
 };
 
