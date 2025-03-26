@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Movie } from '../utils/types/movieTypes';
 import { getRandomMovie, getNextMovie } from '../utils/gameData';
@@ -71,6 +70,22 @@ export function useGameState() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const resetGame = () => {
+    setCurrentMovie(null);
+    setIsGameActive(false);
+    setIsRoundComplete(false);
+    setScore(0);
+    setIsCorrectGuess(false);
+    setIsLoading(true);
+    setHasIncorrectGuess(false);
+    setIsImageLoaded(false);
+    setImageKey(Date.now());
+    setShowSuccessDialog(false);
+    setLoadingProgress(0);
+    setTimeExpired(false);
+    setImageLoadError(false);
   };
 
   const handleGuess = (guess: string) => {
@@ -165,5 +180,6 @@ export function useGameState() {
     handleRevealComplete,
     handleNextRound,
     handleSkip,
+    resetGame,
   };
 }

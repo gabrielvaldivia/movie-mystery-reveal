@@ -1,16 +1,18 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import MovieImage from './MovieImage';
 import GuessInput from './GuessInput';
 import SuccessDialog from './SuccessDialog';
 import GameLoading from './GameLoading';
 import GameHeader from './GameHeader';
+import StartScreen from './StartScreen';
 import { useGameState } from '../hooks/useGameState';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const GAME_DURATION = 30000; // 30 seconds
 
 const GameContainer: React.FC = () => {
+  const [showStartScreen, setShowStartScreen] = useState(true);
   const isMobile = useIsMobile();
   const {
     currentMovie,
@@ -32,7 +34,27 @@ const GameContainer: React.FC = () => {
     handleRevealComplete,
     handleNextRound,
     handleSkip,
+    resetGame
   } = useGameState();
+  
+  const handleStartGame = () => {
+    setShowStartScreen(false);
+  };
+  
+  const handleCloseGame = () => {
+    setShowStartScreen(true);
+    resetGame();
+  };
+  
+  if (showStartScreen) {
+    return (
+      <div className={`w-full ${isMobile ? 'h-full absolute inset-0' : 'h-full'} flex items-center justify-center`}>
+        <div className={`flex flex-col items-center w-full max-w-2xl ${isMobile ? 'h-full max-h-none' : 'aspect-[3/5] h-full max-h-screen'}`}>
+          <StartScreen onStartGame={handleStartGame} />
+        </div>
+      </div>
+    );
+  }
   
   return (
     <div className={`w-full ${isMobile ? 'h-full absolute inset-0' : 'h-full'} flex items-center justify-center`}>
@@ -48,6 +70,7 @@ const GameContainer: React.FC = () => {
                   onTimeUp={handleTimeUp}
                   isRunning={isGameActive && isImageLoaded && !showSuccessDialog}
                   onSkip={handleSkip}
+                  onClose={handleCloseGame}
                 />
                 
                 <MovieImage 
