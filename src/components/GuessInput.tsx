@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, RefreshCw, SkipForward } from 'lucide-react';
+import { Send, RefreshCw } from 'lucide-react';
 
 interface GuessInputProps {
   onGuess: (guess: string) => void;
@@ -8,7 +8,6 @@ interface GuessInputProps {
   isCorrect?: boolean;
   correctAnswer?: string;
   onNextRound?: () => void;
-  onSkip?: () => void;
 }
 
 const GuessInput: React.FC<GuessInputProps> = ({ 
@@ -16,8 +15,7 @@ const GuessInput: React.FC<GuessInputProps> = ({
   disabled, 
   isCorrect, 
   correctAnswer,
-  onNextRound,
-  onSkip
+  onNextRound
 }) => {
   const [guess, setGuess] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -92,17 +90,6 @@ const GuessInput: React.FC<GuessInputProps> = ({
               <Send className="h-4 w-4" />
             </button>
           </div>
-          {onSkip && (
-            <button
-              type="button"
-              onClick={onSkip}
-              disabled={disabled}
-              className="w-full py-2 px-4 rounded-lg bg-secondary text-secondary-foreground flex items-center justify-center gap-2 transition-all hover:bg-secondary/80 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              <SkipForward className="h-4 w-4" />
-              <span>Skip</span>
-            </button>
-          )}
         </form>
       )}
     </div>
