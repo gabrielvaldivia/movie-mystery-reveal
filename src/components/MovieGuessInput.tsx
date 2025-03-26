@@ -4,7 +4,6 @@ import { Send } from 'lucide-react';
 import { Movie } from '@/utils/types/movieTypes';
 import { getMovieSuggestions } from '@/utils/services/gameService';
 import { Input } from './ui/input';
-import MovieSuggestions from './MovieSuggestions';
 
 interface MovieGuessInputProps {
   onGuess: (guess: string) => void;
