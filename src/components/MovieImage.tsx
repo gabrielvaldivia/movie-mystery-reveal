@@ -3,7 +3,6 @@ import ImageLoadingIndicator from './ImageLoadingIndicator';
 import PixelRevealCanvas from './PixelRevealCanvas';
 import MovieContentWrapper from './MovieContentWrapper';
 import { createPixelationAnimation } from '../utils/pixelate';
-import { Play } from 'lucide-react';
 
 interface MovieImageProps {
   imageUrl: string;
@@ -14,8 +13,6 @@ interface MovieImageProps {
   onImageLoaded?: () => void;
   onImageError?: () => void;
   onRetry?: () => void;
-  isPaused?: boolean;
-  onTogglePause?: () => void;
 }
 
 const MovieImage: React.FC<MovieImageProps> = ({ 
@@ -26,9 +23,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   children,
   onImageLoaded,
   onImageError,
-  onRetry,
-  isPaused = false,
-  onTogglePause
+  onRetry
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -39,20 +34,11 @@ const MovieImage: React.FC<MovieImageProps> = ({
   const animationRef = useRef<{ 
     start: () => void; 
     stop: () => void; 
-    pause: () => void;
-    resume: () => void;
     forceComplete: () => void 
   } | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const loadingProgressRef = useRef<number>(0);
   const [loadingProgress, setLoadingProgress] = useState(0);
-
-  const handleCanvasClick = () => {
-    console.log("Canvas clicked, toggling pause. Current isPaused:", isPaused);
-    if (onTogglePause && isLoaded && !isLoading) {
-      onTogglePause();
-    }
-  };
 
   const loadImage = () => {
     setIsLoading(true);
@@ -175,19 +161,16 @@ const MovieImage: React.FC<MovieImageProps> = ({
   useEffect(() => {
     if (!animationRef.current || !isLoaded) return;
     
-    console.log("Animation state changed. isActive:", isActive, "isPaused:", isPaused);
+    console.log("Animation state changed. isActive:", isActive);
     
-    if (isActive && !isPaused) {
-      console.log("Resuming animation");
-      animationRef.current.resume();
-    } else if (isActive && isPaused) {
-      console.log("Pausing animation");
-      animationRef.current.pause();
+    if (isActive) {
+      console.log("Starting animation");
+      animationRef.current.start();
     } else {
       console.log("Forcing animation complete");
       animationRef.current.forceComplete();
     }
-  }, [isActive, isLoaded, isPaused]);
+  }, [isActive, isLoaded]);
   
   useEffect(() => {
     const handleResize = () => {
@@ -240,10 +223,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   };
 
   return (
-    <div 
-      className="pixel-reveal-container glass-panel no-rounded relative cursor-pointer"
-      onClick={handleCanvasClick}
-    >
+    <div className="pixel-reveal-container glass-panel no-rounded relative">
       <PixelRevealCanvas ref={canvasRef} />
       
       <ImageLoadingIndicator 
@@ -255,14 +235,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
       />
       
       {children && <MovieContentWrapper>{children}</MovieContentWrapper>}
-      
-      {isLoaded && isPaused && (
-        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
-          <div className="bg-black/20 backdrop-blur-sm rounded-full p-4">
-            <Play className="h-10 w-10 text-white/90" fill="rgba(255,255,255,0.2)" />
-          </div>
-        </div>
-      )}
     </div>
   );
 };
