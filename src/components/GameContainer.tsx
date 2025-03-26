@@ -17,6 +17,7 @@ const GameContainer: React.FC = () => {
   const [isCorrectGuess, setIsCorrectGuess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasIncorrectGuess, setHasIncorrectGuess] = useState(false);
+  const [isImageLoaded, setIsImageLoaded] = useState(false);
   
   useEffect(() => {
     const initGame = async () => {
@@ -36,21 +37,28 @@ const GameContainer: React.FC = () => {
   
   const startNewRound = async () => {
     setIsLoading(true);
+    setIsImageLoaded(false);
     try {
       const nextMovie = currentMovie 
         ? await getNextMovie(currentMovie.id) 
         : await getRandomMovie();
       
       setCurrentMovie(nextMovie);
-      setIsGameActive(true);
       setIsRoundComplete(false);
       setIsCorrectGuess(false);
       setHasIncorrectGuess(false);
+      // We'll set isGameActive to true after the image is loaded
     } catch (error) {
       console.error("Error starting new round:", error);
     } finally {
       setIsLoading(false);
     }
+  };
+  
+  const handleImageLoaded = () => {
+    setIsImageLoaded(true);
+    // Now that the image is loaded, we can start the game
+    setIsGameActive(true);
   };
   
   const handleTimeUp = () => {
@@ -114,7 +122,7 @@ const GameContainer: React.FC = () => {
                 <Timer 
                   duration={GAME_DURATION} 
                   onTimeUp={handleTimeUp} 
-                  isRunning={isGameActive} 
+                  isRunning={isGameActive && isImageLoaded} 
                 />
               </div>
               <Button 
@@ -132,10 +140,11 @@ const GameContainer: React.FC = () => {
               duration={GAME_DURATION}
               onRevealComplete={handleRevealComplete}
               isActive={isGameActive}
+              onImageLoaded={handleImageLoaded}
             >
               <GuessInput 
                 onGuess={handleGuess}
-                disabled={!isGameActive || isLoading}
+                disabled={!isGameActive || isLoading || !isImageLoaded}
                 correctAnswer={isRoundComplete ? currentMovie?.title : undefined}
                 isCorrect={isCorrectGuess}
                 hasIncorrectGuess={hasIncorrectGuess}

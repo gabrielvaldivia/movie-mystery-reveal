@@ -1,3 +1,4 @@
+
 import React, { useRef, useEffect, useState } from 'react';
 import { createPixelationAnimation } from '../utils/pixelate';
 import { AspectRatio } from './ui/aspect-ratio';
@@ -8,6 +9,7 @@ interface MovieImageProps {
   onRevealComplete?: () => void;
   isActive: boolean;
   children?: React.ReactNode;
+  onImageLoaded?: () => void;
 }
 
 const MovieImage: React.FC<MovieImageProps> = ({ 
@@ -15,7 +17,8 @@ const MovieImage: React.FC<MovieImageProps> = ({
   duration, 
   onRevealComplete,
   isActive,
-  children
+  children,
+  onImageLoaded
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
@@ -53,6 +56,9 @@ const MovieImage: React.FC<MovieImageProps> = ({
         );
         
         setAnimation(pixelAnimation);
+        if (onImageLoaded) {
+          onImageLoaded();
+        }
       }
     };
 
@@ -61,7 +67,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
         animation.stop();
       }
     };
-  }, [imageUrl, duration, onRevealComplete]);
+  }, [imageUrl, duration, onRevealComplete, onImageLoaded]);
 
   useEffect(() => {
     if (animation && isLoaded) {
