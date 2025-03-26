@@ -1,10 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import MovieImage from './MovieImage';
 import GuessInput from './GuessInput';
 import Timer from './Timer';
 import GameHeader from './GameHeader';
-import GameFooter from './GameFooter';
 import { getRandomMovie, Movie, getNextMovie, loadAllMovieImages } from '../utils/gameData';
 
 const GAME_DURATION = 30000; // 30 seconds
@@ -83,7 +81,6 @@ const GameContainer: React.FC = () => {
       setScore(prev => prev + 100);
     } else {
       setHasIncorrectGuess(true);
-      // Reset the incorrect state after 1 second to remove the red outline effect
       setTimeout(() => {
         setHasIncorrectGuess(false);
       }, 1000);
@@ -92,12 +89,10 @@ const GameContainer: React.FC = () => {
   
   const handleNextRound = async () => {
     if (round >= TOTAL_ROUNDS) {
-      // Game complete - reset the game
       setRound(1);
       setScore(0);
       await startNewRound();
     } else {
-      // Next round
       setRound(prev => prev + 1);
       await startNewRound();
     }
@@ -155,8 +150,6 @@ const GameContainer: React.FC = () => {
             onNextRound={handleNextRound}
           />
         </div>
-        
-        <GameFooter />
       </div>
     </div>
   );
