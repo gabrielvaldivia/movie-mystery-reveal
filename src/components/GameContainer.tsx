@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import MovieImage from './MovieImage';
 import GuessInput from './GuessInput';
 import Timer from './Timer';
+import SuccessDialog from './SuccessDialog';
 import { getRandomMovie, Movie, getNextMovie, loadAllMovieImages } from '../utils/gameData';
 import { Button } from './ui/button';
 import { SkipForward } from 'lucide-react';
@@ -19,6 +20,7 @@ const GameContainer: React.FC = () => {
   const [hasIncorrectGuess, setHasIncorrectGuess] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [imageKey, setImageKey] = useState(Date.now()); // Add a key to force re-mounting
+  const [showSuccessDialog, setShowSuccessDialog] = useState(false);
   
   useEffect(() => {
     const initGame = async () => {
@@ -39,6 +41,7 @@ const GameContainer: React.FC = () => {
   const startNewRound = async () => {
     setIsLoading(true);
     setIsImageLoaded(false);
+    setShowSuccessDialog(false);
     
     try {
       // Generate a new image key to force re-mounting of MovieImage
@@ -92,6 +95,7 @@ const GameContainer: React.FC = () => {
       setIsRoundComplete(true);
       setIsCorrectGuess(true);
       setScore(prev => prev + 100);
+      setShowSuccessDialog(true);
     } else {
       setHasIncorrectGuess(true);
       setTimeout(() => {
@@ -121,44 +125,54 @@ const GameContainer: React.FC = () => {
             <div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></div>
           </div>
         ) : currentMovie ? (
-          <div className="relative w-full h-full">
-            <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/40 to-transparent h-12 flex justify-between items-center px-4 py-2">
-              <div className="w-full mr-2">
-                <Timer 
-                  duration={GAME_DURATION} 
-                  onTimeUp={handleTimeUp} 
-                  isRunning={isGameActive && isImageLoaded} 
-                />
+          <>
+            <div className="relative w-full h-full">
+              <div className="absolute top-0 left-0 right-0 z-10 bg-gradient-to-b from-black/40 to-transparent h-12 flex justify-between items-center px-4 py-2">
+                <div className="w-full mr-2">
+                  <Timer 
+                    duration={GAME_DURATION} 
+                    onTimeUp={handleTimeUp} 
+                    isRunning={isGameActive && isImageLoaded && !showSuccessDialog} 
+                  />
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={handleSkip}
+                  className="bg-black/30 text-white hover:bg-black/50 transition-colors"
+                  aria-label="Skip this movie"
+                >
+                  <SkipForward className="h-5 w-5" />
+                </Button>
               </div>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={handleSkip}
-                className="bg-black/30 text-white hover:bg-black/50 transition-colors"
-                aria-label="Skip this movie"
+              <MovieImage 
+                key={imageKey} // Force re-mount on new round
+                imageUrl={currentMovie.imageUrl}
+                duration={GAME_DURATION}
+                onRevealComplete={handleRevealComplete}
+                isActive={isGameActive && !showSuccessDialog}
+                onImageLoaded={handleImageLoaded}
               >
-                <SkipForward className="h-5 w-5" />
-              </Button>
+                {!showSuccessDialog && (
+                  <GuessInput 
+                    onGuess={handleGuess}
+                    disabled={!isGameActive || isLoading || !isImageLoaded}
+                    correctAnswer={isRoundComplete ? currentMovie?.title : undefined}
+                    isCorrect={isCorrectGuess}
+                    hasIncorrectGuess={hasIncorrectGuess}
+                    onNextRound={handleNextRound}
+                    hint={currentMovie?.hint}
+                  />
+                )}
+              </MovieImage>
             </div>
-            <MovieImage 
-              key={imageKey} // Force re-mount on new round
-              imageUrl={currentMovie.imageUrl}
-              duration={GAME_DURATION}
-              onRevealComplete={handleRevealComplete}
-              isActive={isGameActive}
-              onImageLoaded={handleImageLoaded}
-            >
-              <GuessInput 
-                onGuess={handleGuess}
-                disabled={!isGameActive || isLoading || !isImageLoaded}
-                correctAnswer={isRoundComplete ? currentMovie?.title : undefined}
-                isCorrect={isCorrectGuess}
-                hasIncorrectGuess={hasIncorrectGuess}
-                onNextRound={handleNextRound}
-                hint={currentMovie?.hint}
-              />
-            </MovieImage>
-          </div>
+            
+            <SuccessDialog 
+              isOpen={showSuccessDialog}
+              movie={currentMovie}
+              onNextRound={handleNextRound}
+            />
+          </>
         ) : null}
       </div>
     </div>
