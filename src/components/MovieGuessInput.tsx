@@ -109,7 +109,7 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
-      <div className="relative flex items-center gap-2 backdrop-blur-sm bg-background/80 rounded-lg p-2">
+      <div className="relative flex items-center gap-2">
         <div className="relative flex-grow">
           <input
             ref={inputRef}
