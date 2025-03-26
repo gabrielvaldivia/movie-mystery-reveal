@@ -35,7 +35,9 @@ const GuessInput: React.FC<GuessInputProps> = ({
     if (e) {
       e.preventDefault();
     }
+    
     if (guess.trim() && !disabled) {
+      console.log("Submitting guess:", guess.trim());
       onGuess(guess.trim());
       setSuggestions([]);
       setIsSuggestionsOpen(false);
@@ -73,12 +75,8 @@ const GuessInput: React.FC<GuessInputProps> = ({
   };
 
   const handleSuggestionSelect = (title: string) => {
+    console.log("Selected suggestion:", title);
     setGuess(title);
-    setSuggestions([]);
-    setIsSuggestionsOpen(false);
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {

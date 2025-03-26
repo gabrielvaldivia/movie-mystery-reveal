@@ -8,7 +8,7 @@ interface MovieSuggestionsProps {
   isOpen: boolean;
   onSelect: (title: string) => void;
   highlightedIndex: number;
-  onSubmit: () => void; // Add a new prop for submitting the form
+  onSubmit: () => void; // Prop for submitting the form
 }
 
 const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
@@ -29,8 +29,8 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
   // Handle the selection and submission
   const handleSelection = (title: string) => {
     onSelect(title);
-    // Submit the form after setting the title
-    setTimeout(() => onSubmit(), 10);
+    // Submit the form immediately after setting the title
+    onSubmit();
   };
 
   return (
