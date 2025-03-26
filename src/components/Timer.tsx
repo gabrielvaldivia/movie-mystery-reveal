@@ -73,7 +73,7 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
     <Progress 
       value={progress} 
       className="h-1 w-full rounded-full bg-transparent" 
-      indicatorClassName="bg-white"
+      indicatorClassName="bg-white rounded-full"
     />
   );
 };
