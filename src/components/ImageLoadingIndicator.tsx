@@ -15,7 +15,8 @@ const ImageLoadingIndicator: React.FC<ImageLoadingIndicatorProps> = ({
   isLoading,
   progress,
   error,
-  timeout
+  timeout,
+  onRetry
 }) => {
   if (error || timeout) {
     return (
@@ -24,6 +25,12 @@ const ImageLoadingIndicator: React.FC<ImageLoadingIndicatorProps> = ({
         <p className="text-center text-white font-medium mb-4">
           {timeout ? "Image load timed out" : "Failed to load image"}
         </p>
+        <button 
+          onClick={onRetry}
+          className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
+        >
+          Retry
+        </button>
       </div>
     );
   }
