@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Movie } from '../utils/types/movieTypes';
 import { getRandomMovie, getNextMovie } from '../utils/gameData';
@@ -126,6 +127,7 @@ export function useGameState() {
   const handleSkip = async () => {
     if (isGameActive) {
       setIsGameActive(false);
+      setShowSuccessDialog(false); // Ensure the success dialog doesn't show
       await startNewRound();
     }
   };
