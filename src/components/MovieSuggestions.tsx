@@ -26,11 +26,12 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
   // Ensure suggestions is always an array
   const safeSuggestions = Array.isArray(suggestions) ? suggestions : [];
 
-  // Handle the selection and submission
+  // Update the selection handler to properly pass the movie title
   const handleSelection = (title: string) => {
     console.log("MovieSuggestions - handleSelection called with:", title);
+    // Pass the selection back to the parent component
     onSelect(title);
-    // Call onSubmit directly after selection is set
+    // Close the dropdown
     onSubmit();
   };
 
