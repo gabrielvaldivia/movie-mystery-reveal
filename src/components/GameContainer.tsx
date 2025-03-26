@@ -6,6 +6,7 @@ import Timer from './Timer';
 import { getRandomMovie, Movie, getNextMovie, loadAllMovieImages } from '../utils/gameData';
 import { Button } from './ui/button';
 import { SkipForward } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const GAME_DURATION = 30000; // 30 seconds
 
@@ -17,6 +18,7 @@ const GameContainer: React.FC = () => {
   const [isCorrectGuess, setIsCorrectGuess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasIncorrectGuess, setHasIncorrectGuess] = useState(false);
+  const { toast } = useToast();
   
   useEffect(() => {
     const initGame = async () => {
@@ -80,7 +82,12 @@ const GameContainer: React.FC = () => {
       setIsCorrectGuess(true);
       setScore(prev => prev + 100);
       
-      // Toast removed
+      // Show toast instead of overlay
+      toast({
+        title: "Correct!",
+        description: currentMovie.title,
+        className: "bg-green-100 border-green-300"
+      });
     } else {
       setHasIncorrectGuess(true);
       setTimeout(() => {
@@ -104,14 +111,13 @@ const GameContainer: React.FC = () => {
   
   return (
     <div className="w-full h-full flex items-center justify-center">
-      <div className="flex flex-col items-center w-full h-full">
+      <div className="flex flex-col items-center w-full max-w-2xl aspect-[3/5] h-full max-h-[85vh]">
         {isLoading ? (
           <div className="w-full h-full glass-panel flex items-center justify-center">
             <div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></div>
           </div>
         ) : currentMovie ? (
-          <div className="relative w-full h-full overflow-hidden">
-            {/* Timer and Skip button */}
+          <div className="relative w-full h-full">
             <div className="absolute top-0 left-0 right-0 z-10 px-4 py-2 flex justify-between items-center">
               <Timer 
                 duration={GAME_DURATION} 
@@ -128,26 +134,22 @@ const GameContainer: React.FC = () => {
                 <SkipForward className="h-5 w-5" />
               </Button>
             </div>
-            
-            {/* Main movie image */}
-            <div className="w-full h-full">
-              <MovieImage 
-                imageUrl={currentMovie.imageUrl}
-                duration={GAME_DURATION}
-                onRevealComplete={handleRevealComplete}
-                isActive={isGameActive}
-              >
-                <GuessInput 
-                  onGuess={handleGuess}
-                  disabled={!isGameActive || isLoading}
-                  correctAnswer={isRoundComplete ? currentMovie?.title : undefined}
-                  isCorrect={isCorrectGuess}
-                  hasIncorrectGuess={hasIncorrectGuess}
-                  onNextRound={handleNextRound}
-                  hint={currentMovie?.hint}
-                />
-              </MovieImage>
-            </div>
+            <MovieImage 
+              imageUrl={currentMovie.imageUrl}
+              duration={GAME_DURATION}
+              onRevealComplete={handleRevealComplete}
+              isActive={isGameActive}
+            >
+              <GuessInput 
+                onGuess={handleGuess}
+                disabled={!isGameActive || isLoading}
+                correctAnswer={isRoundComplete ? currentMovie?.title : undefined}
+                isCorrect={isCorrectGuess}
+                hasIncorrectGuess={hasIncorrectGuess}
+                onNextRound={handleNextRound}
+                hint={currentMovie?.hint}
+              />
+            </MovieImage>
           </div>
         ) : null}
       </div>

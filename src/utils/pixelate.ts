@@ -67,10 +67,6 @@ export const applyPixelation = (
     0, 0, w, h,
     0, 0, canvas.width, canvas.height
   );
-  
-  // Clean up temporary canvas - ensure it doesn't stay in memory
-  tempCanvas.width = 0;
-  tempCanvas.height = 0;
 };
 
 // Helper function to properly draw an image contained within a canvas
@@ -125,11 +121,8 @@ export const createPixelationAnimation = (
   let animationFrameId: number | null = null;
   let startTime: number | null = null;
   let currentLevel = 1; // Start with maximum pixelation
-  let isAnimating = false;
 
   const animate = (timestamp: number) => {
-    if (!isAnimating) return;
-    
     if (startTime === null) {
       startTime = timestamp;
     }
@@ -143,48 +136,38 @@ export const createPixelationAnimation = (
     applyPixelation(imageElement, canvas, currentLevel);
 
     // Continue animation if not complete
-    if (elapsed < duration && isAnimating) {
+    if (elapsed < duration) {
       animationFrameId = requestAnimationFrame(animate);
     } else {
       // Animation complete
       currentLevel = 0;
       applyPixelation(imageElement, canvas, currentLevel);
-      stop();
       if (onComplete) onComplete();
     }
-  };
-  
-  const stop = () => {
-    isAnimating = false;
-    if (animationFrameId !== null) {
-      cancelAnimationFrame(animationFrameId);
-      animationFrameId = null;
-    }
-  };
-
-  const start = () => {
-    // Stop any existing animation
-    stop();
-    
-    // Reset animation state
-    startTime = null;
-    currentLevel = 1;
-    isAnimating = true;
-    
-    // Start new animation
-    animationFrameId = requestAnimationFrame(animate);
   };
 
   const forceComplete = () => {
     // Force pixelation level to 0 (fully unpixelated)
-    stop();
     currentLevel = 0;
     applyPixelation(imageElement, canvas, currentLevel);
   };
 
   return {
-    start,
-    stop,
+    start: () => {
+      // Stop any existing animation
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+      }
+      startTime = null;
+      currentLevel = 1;
+      animationFrameId = requestAnimationFrame(animate);
+    },
+    stop: () => {
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+    },
     getCurrentLevel: () => currentLevel,
     forceComplete
   };

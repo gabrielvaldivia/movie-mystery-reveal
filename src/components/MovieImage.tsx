@@ -1,6 +1,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { createPixelationAnimation } from '../utils/pixelate';
+import { AspectRatio } from './ui/aspect-ratio';
 
 interface MovieImageProps {
   imageUrl: string;
@@ -18,6 +19,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   children
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [animation, setAnimation] = useState<{
     start: () => void;
@@ -26,28 +28,22 @@ const MovieImage: React.FC<MovieImageProps> = ({
     forceComplete: () => void;
   } | null>(null);
 
-  // Use a single effect for image handling to prevent multiple image creations
   useEffect(() => {
-    // Always clean up previous animation before creating a new one
-    if (animation) {
-      animation.stop();
-    }
-
-    // Create image separately without adding it to DOM
     const image = new Image();
-    
-    // Configure image
+    image.src = imageUrl;
     image.crossOrigin = "anonymous";
-    image.style.display = "none"; // Ensure image is never visible
-    
-    const handleImageLoad = () => {
+    imageRef.current = image;
+
+    image.onload = () => {
       setIsLoaded(true);
       
       if (canvasRef.current) {
         const container = canvasRef.current.parentElement;
         if (container) {
-          canvasRef.current.width = container.clientWidth;
-          canvasRef.current.height = container.clientHeight;
+          const containerWidth = container.clientWidth;
+          const containerHeight = container.clientHeight;
+          canvasRef.current.width = containerWidth;
+          canvasRef.current.height = containerHeight;
         }
         
         const pixelAnimation = createPixelationAnimation(
@@ -58,52 +54,32 @@ const MovieImage: React.FC<MovieImageProps> = ({
         );
         
         setAnimation(pixelAnimation);
-        
-        // If active, start the animation right away
-        if (isActive) {
-          pixelAnimation.start();
-        } else {
-          pixelAnimation.forceComplete();
-        }
       }
     };
 
-    // Set up the onload handler
-    image.onload = handleImageLoad;
-    
-    // Set the src last to avoid race conditions
-    image.src = imageUrl;
-
-    // Clean up function
     return () => {
       if (animation) {
         animation.stop();
       }
-      
-      // Remove event listener
-      image.onload = null;
-      
-      // Explicitly remove the image src to help garbage collection
-      image.src = '';
     };
   }, [imageUrl, duration, onRevealComplete]);
 
-  // Handle active state changes
   useEffect(() => {
     if (animation && isLoaded) {
       if (isActive) {
         animation.start();
       } else {
         animation.stop();
-        animation.forceComplete();
+        if (!isActive) {
+          animation.forceComplete();
+        }
       }
     }
   }, [isActive, animation, isLoaded]);
 
-  // Handle resize events
   useEffect(() => {
     const handleResize = () => {
-      if (canvasRef.current) {
+      if (canvasRef.current && imageRef.current) {
         const container = canvasRef.current.parentElement;
         if (container) {
           const containerWidth = container.clientWidth;
@@ -118,32 +94,26 @@ const MovieImage: React.FC<MovieImageProps> = ({
             if (animation) {
               animation.stop();
               
-              // We don't need to create a new Image here
-              // Just recreate the animation with the existing canvas
-              if (canvasRef.current) {
-                // Create a new temporary image for this resize operation
-                const tempImage = new Image();
-                tempImage.crossOrigin = "anonymous";
-                tempImage.style.display = "none";
-                
-                tempImage.onload = () => {
-                  const newAnimation = createPixelationAnimation(
-                    tempImage,
-                    canvasRef.current!,
-                    duration,
-                    onRevealComplete
-                  );
-                  
-                  setAnimation(newAnimation);
-                  
-                  if (isActive) {
-                    newAnimation.start();
-                  } else {
-                    newAnimation.forceComplete();
-                  }
-                };
-                
-                tempImage.src = imageUrl;
+              if (isActive) {
+                const newAnimation = createPixelationAnimation(
+                  imageRef.current,
+                  canvasRef.current,
+                  duration,
+                  onRevealComplete
+                );
+                setAnimation(newAnimation);
+                newAnimation.start();
+              } else {
+                const newAnimation = createPixelationAnimation(
+                  imageRef.current,
+                  canvasRef.current,
+                  duration,
+                  onRevealComplete
+                );
+                setAnimation(newAnimation);
+                if (newAnimation) {
+                  newAnimation.forceComplete();
+                }
               }
             }
           }
@@ -153,10 +123,10 @@ const MovieImage: React.FC<MovieImageProps> = ({
 
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [animation, duration, onRevealComplete, isActive, imageUrl]);
+  }, [animation, duration, onRevealComplete, isActive]);
 
   return (
-    <div className="pixel-reveal-container glass-panel relative w-full h-full overflow-hidden">
+    <div className="pixel-reveal-container glass-panel relative w-full h-full">
       {!isLoaded && (
         <div className="absolute inset-0 flex items-center justify-center bg-secondary animate-pulse-subtle">
           <span className="text-muted-foreground">Loading image...</span>
@@ -165,6 +135,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
       <canvas 
         ref={canvasRef}
         className="w-full h-full object-contain transition-opacity duration-300"
+        style={{ objectFit: 'contain' }}
       />
       
       {children && (
