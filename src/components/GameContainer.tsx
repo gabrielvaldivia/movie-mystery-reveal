@@ -111,7 +111,7 @@ const GameContainer: React.FC = () => {
   
   return (
     <div className="w-full h-full flex items-center justify-center">
-      <div className="flex flex-col items-center w-full max-w-2xl aspect-[3/5] h-full max-h-[85vh]">
+      <div className="flex flex-col items-center w-full max-w-2xl aspect-[3/5]">
         {isLoading ? (
           <div className="w-full h-full glass-panel flex items-center justify-center">
             <div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></div>
