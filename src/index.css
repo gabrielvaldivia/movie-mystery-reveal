@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -80,7 +81,7 @@
 .pixel-reveal-container {
   position: relative;
   width: 100%;
-  aspect-ratio: 9/16;
+  height: 85vh;
   overflow: hidden;
   border-radius: var(--radius);
   transform: translateZ(0);

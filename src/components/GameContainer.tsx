@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import MovieImage from './MovieImage';
 import GuessInput from './GuessInput';
@@ -90,15 +91,15 @@ const GameContainer: React.FC = () => {
   };
   
   return (
-    <div className="w-full max-w-md mx-auto px-4 py-8">
-      <div className="flex flex-col items-center">
+    <div className="w-full h-full mx-auto">
+      <div className="flex flex-col items-center h-full">
         {isLoading ? (
-          <div className="w-full aspect-video glass-panel flex items-center justify-center">
+          <div className="w-full h-[85vh] glass-panel flex items-center justify-center">
             <div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></div>
           </div>
         ) : currentMovie ? (
-          <div className="relative">
-            <div className="absolute top-0 left-0 right-0 z-10">
+          <div className="relative w-full">
+            <div className="absolute top-0 left-0 right-0 z-10 px-4 py-2">
               <Timer 
                 duration={GAME_DURATION} 
                 onTimeUp={handleTimeUp} 
