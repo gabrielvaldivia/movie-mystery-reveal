@@ -31,6 +31,8 @@ export function useImageReveal({
     getCurrentLevel: () => number;
     forceComplete: () => void;
   } | null>(null);
+  const retryCount = useRef(0);
+  const maxRetries = 2;
 
   // Function to clean up timers and listeners
   const cleanup = () => {
@@ -67,15 +69,22 @@ export function useImageReveal({
     
     // Create a new image object
     const image = new Image();
-    image.src = `${imageUrl}?t=${Date.now()}`; // Add timestamp to prevent caching
+    // Add cache-busting and reduce retry count for repeated failures
+    image.src = `${imageUrl}?t=${Date.now()}&retry=${retryCount.current}`;
     image.crossOrigin = "anonymous";
     imageRef.current = image;
 
-    // Set a timeout for image loading (10 seconds)
+    // Set a timeout for image loading (8 seconds, reduced from 10)
     timeoutRef.current = window.setTimeout(() => {
       setLoadTimeout(true);
       console.log("Image loading timed out:", imageUrl);
-    }, 10000);
+      
+      // Try fallback loading if we haven't exceeded max retries
+      if (retryCount.current < maxRetries) {
+        retryCount.current++;
+        loadImage(); // Retry loading
+      }
+    }, 8000);
 
     // Simulate progress
     progressIntervalRef.current = window.setInterval(() => {
@@ -88,6 +97,7 @@ export function useImageReveal({
     // Handle successful image load
     image.onload = () => {
       cleanup();
+      retryCount.current = 0; // Reset retry counter on success
       
       console.log("Image loaded successfully:", imageUrl);
       setLoadProgress(100);
@@ -124,8 +134,15 @@ export function useImageReveal({
     // Handle image load error
     image.onerror = (error) => {
       cleanup();
-      setLoadError(true);
       console.error("Error loading image:", imageUrl, error);
+      
+      if (retryCount.current < maxRetries) {
+        retryCount.current++;
+        console.log(`Retrying image load (${retryCount.current}/${maxRetries}):`, imageUrl);
+        loadImage(); // Retry loading
+      } else {
+        setLoadError(true);
+      }
     };
   };
 
@@ -178,6 +195,7 @@ export function useImageReveal({
 
   // Load image when URL changes
   useEffect(() => {
+    retryCount.current = 0; // Reset retry counter on URL change
     loadImage();
     
     // Clean up on unmount or URL change
