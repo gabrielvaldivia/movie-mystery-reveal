@@ -28,6 +28,7 @@ export const createPixelationAnimation = (
   let elapsedBeforePause: number = 0;
   let currentLevel = 1; // Start with maximum pixelation
   let isAnimating = false;
+  let completionCalled = false;
 
   const animate = (timestamp: number) => {
     if (!isAnimating) return;
@@ -68,7 +69,12 @@ export const createPixelationAnimation = (
         console.error("Error in final animation frame:", error);
       }
       isAnimating = false;
-      if (onComplete) onComplete();
+      
+      // Only call completion once
+      if (onComplete && !completionCalled) {
+        completionCalled = true;
+        onComplete();
+      }
     }
   };
 
@@ -85,7 +91,12 @@ export const createPixelationAnimation = (
     } catch (error) {
       console.error("Error in force complete:", error);
     }
-    if (onComplete) onComplete();
+    
+    // Only call completion once
+    if (onComplete && !completionCalled) {
+      completionCalled = true;
+      onComplete();
+    }
   };
 
   return {
@@ -97,6 +108,7 @@ export const createPixelationAnimation = (
       if (currentLevel === 0) {
         currentLevel = 1;
         elapsedBeforePause = 0;
+        completionCalled = false;
       }
       
       // If we were paused, calculate elapsed time before pause
