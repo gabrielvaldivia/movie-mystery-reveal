@@ -10,7 +10,6 @@ interface MovieImageProps {
   duration: number; // in milliseconds
   onRevealComplete?: () => void;
   isActive: boolean;
-  isPaused?: boolean;
   children?: React.ReactNode;
   onImageLoaded?: () => void;
   onImageError?: () => void;
@@ -22,7 +21,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
   duration, 
   onRevealComplete,
   isActive,
-  isPaused = false,
   children,
   onImageLoaded,
   onImageError,
@@ -41,8 +39,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
     onRevealComplete,
     onImageLoaded,
     onImageError,
-    isActive,
-    isPaused
+    isActive
   });
 
   const handleRetryClick = () => {

@@ -12,7 +12,6 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
   const [timeRemaining, setTimeRemaining] = useState(duration);
   const timerRef = useRef<number | null>(null);
   const hasStartedRef = useRef<boolean>(false);
-  const lastRunningStateRef = useRef<boolean>(isRunning);
   
   // Reset timer when duration changes
   useEffect(() => {
@@ -58,9 +57,6 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
         });
       }, 100);
     }
-    
-    // Store the last running state for comparison
-    lastRunningStateRef.current = isRunning;
     
     // Return cleanup function
     return () => {

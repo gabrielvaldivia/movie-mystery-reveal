@@ -17,7 +17,6 @@ export function useGameState() {
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [timeExpired, setTimeExpired] = useState(false);
   const [imageLoadError, setImageLoadError] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
 
   useEffect(() => {
     const initGame = async () => {
@@ -53,7 +52,6 @@ export function useGameState() {
     setImageLoadError(false);
     setIsGameActive(false);  // Reset game active state
     setIsRoundComplete(false);  // Ensure round is marked as not complete
-    setIsPaused(false);  // Reset pause state
     
     try {
       setImageKey(Date.now());
@@ -76,7 +74,7 @@ export function useGameState() {
   };
 
   const handleGuess = (guess: string) => {
-    if (!currentMovie || !isGameActive || isPaused) return;
+    if (!currentMovie || !isGameActive) return;
     
     const normalizedGuess = guess.toLowerCase().trim();
     const normalizedTitle = currentMovie.title.toLowerCase().trim();
@@ -98,7 +96,7 @@ export function useGameState() {
   };
 
   const handleTimeUp = () => {
-    if (isGameActive && !isRoundComplete && !isPaused) {  // Only handle time up if game is active and not paused
+    if (isGameActive && !isRoundComplete) {  // Only handle time up if game is active
       setIsGameActive(false);
       setIsRoundComplete(true);
       setTimeExpired(true);
@@ -119,7 +117,7 @@ export function useGameState() {
   };
   
   const handleRevealComplete = () => {
-    if (isGameActive && !isRoundComplete && !isPaused) {  // Only handle reveal complete if game is active and not paused
+    if (isGameActive && !isRoundComplete) {  // Only handle reveal complete if game is active
       handleTimeUp();
     }
   };
@@ -137,7 +135,6 @@ export function useGameState() {
       setTimeExpired(false);
       setShowSuccessDialog(false);
       setIsCorrectGuess(false);
-      setIsPaused(false);  // Reset paused state
       
       // Force a small delay before starting the new round to ensure state updates
       await new Promise(resolve => setTimeout(resolve, 10));
@@ -145,10 +142,6 @@ export function useGameState() {
       // Start the new round
       await startNewRound();
     }
-  };
-  
-  const handlePauseToggle = () => {
-    setIsPaused(prev => !prev);
   };
 
   return {
@@ -165,7 +158,6 @@ export function useGameState() {
     loadingProgress,
     timeExpired,
     imageLoadError,
-    isPaused,
     handleGuess,
     handleTimeUp,
     handleImageLoaded,
@@ -173,6 +165,5 @@ export function useGameState() {
     handleRevealComplete,
     handleNextRound,
     handleSkip,
-    handlePauseToggle,
   };
 }
