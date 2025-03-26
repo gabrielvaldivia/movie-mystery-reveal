@@ -35,7 +35,7 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({
             />
           </div>
           <h2 className="text-2xl font-bold text-center">{movie.title}</h2>
-          <p className="text-muted-foreground text-center">{movie.year}</p>
+          <p className="text-muted-foreground text-center">{movie.releaseYear}</p>
           
           <Button 
             onClick={onNextRound} 
