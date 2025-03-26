@@ -13,6 +13,7 @@ interface MovieImageProps {
   children?: React.ReactNode;
   onImageLoaded?: () => void;
   onImageError?: () => void;
+  onRetry?: () => void;
 }
 
 const MovieImage: React.FC<MovieImageProps> = ({ 
@@ -22,31 +23,73 @@ const MovieImage: React.FC<MovieImageProps> = ({
   isActive,
   children,
   onImageLoaded,
-  onImageError
+  onImageError,
+  onRetry
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState(false);
+  const [timeoutError, setTimeoutError] = useState(false);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const animationRef = useRef<{ start: () => void; stop: () => void; forceComplete: () => void } | null>(null);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const loadingProgressRef = useRef<number>(0);
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
-  // Effect to handle image loading
-  useEffect(() => {
+  const loadImage = () => {
+    // Clear previous state
     setIsLoading(true);
     setIsLoaded(false);
     setLoadError(false);
+    setTimeoutError(false);
+    loadingProgressRef.current = 0;
+    setLoadingProgress(0);
     
-    // Clean up any previous animation
+    // Clean up any previous animation and timer
     if (animationRef.current) {
       animationRef.current.stop();
       animationRef.current = null;
     }
     
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+      timerRef.current = null;
+    }
+    
+    // Set a timeout to detect if image loading takes too long
+    timerRef.current = setTimeout(() => {
+      if (!isLoaded) {
+        setTimeoutError(true);
+        setIsLoading(false);
+        if (onImageError) onImageError();
+      }
+    }, 15000); // 15 seconds timeout
+    
+    // Simulate progress
+    const progressInterval = setInterval(() => {
+      if (loadingProgressRef.current < 90) {
+        loadingProgressRef.current += 5;
+        setLoadingProgress(loadingProgressRef.current);
+      } else {
+        clearInterval(progressInterval);
+      }
+    }, 300);
+    
     const image = new Image();
     image.crossOrigin = "anonymous";
     
     image.onload = () => {
+      // Clear intervals and timeouts
+      clearInterval(progressInterval);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+      
+      loadingProgressRef.current = 100;
+      setLoadingProgress(100);
+      
       if (!canvasRef.current) return;
       
       // Set up canvas dimensions
@@ -92,6 +135,12 @@ const MovieImage: React.FC<MovieImageProps> = ({
     };
     
     image.onerror = () => {
+      clearInterval(progressInterval);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+      
       console.error("Error loading image:", imageUrl);
       setLoadError(true);
       setIsLoading(false);
@@ -100,16 +149,24 @@ const MovieImage: React.FC<MovieImageProps> = ({
     
     // Set the image source
     image.src = imageUrl;
+  };
+  
+  // Effect to handle image loading
+  useEffect(() => {
+    if (!imageUrl) return;
+    
+    loadImage();
     
     // Cleanup function
     return () => {
-      image.onload = null;
-      image.onerror = null;
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
       if (animationRef.current) {
         animationRef.current.stop();
       }
     };
-  }, [imageUrl, duration, isActive, onImageLoaded, onRevealComplete, onImageError]);
+  }, [imageUrl, duration, onImageLoaded, onRevealComplete, onImageError]);
   
   // Handle isActive changes
   useEffect(() => {
@@ -168,6 +225,14 @@ const MovieImage: React.FC<MovieImageProps> = ({
     return () => window.removeEventListener('resize', handleResize);
   }, [duration, isActive, isLoaded, onRevealComplete]);
 
+  const handleRetry = () => {
+    if (onRetry) {
+      onRetry();
+    } else {
+      loadImage();
+    }
+  };
+
   return (
     <div className="pixel-reveal-container glass-panel no-rounded relative">
       {/* Canvas for the pixelation effect */}
@@ -176,10 +241,10 @@ const MovieImage: React.FC<MovieImageProps> = ({
       {/* Loading indicator component */}
       <ImageLoadingIndicator 
         isLoading={isLoading}
-        progress={isLoading ? 50 : 100}
+        progress={loadingProgress}
         error={loadError}
-        timeout={false}
-        onRetry={() => {}}
+        timeout={timeoutError}
+        onRetry={handleRetry}
       />
       
       {/* Children (like buttons or UI controls) */}
