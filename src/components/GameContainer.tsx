@@ -18,6 +18,7 @@ const GameContainer: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasIncorrectGuess, setHasIncorrectGuess] = useState(false);
   const [isImageLoaded, setIsImageLoaded] = useState(false);
+  const [imageKey, setImageKey] = useState(Date.now()); // Add a key to force re-mounting
   
   useEffect(() => {
     const initGame = async () => {
@@ -38,7 +39,11 @@ const GameContainer: React.FC = () => {
   const startNewRound = async () => {
     setIsLoading(true);
     setIsImageLoaded(false);
+    
     try {
+      // Generate a new image key to force re-mounting of MovieImage
+      setImageKey(Date.now());
+      
       const nextMovie = currentMovie 
         ? await getNextMovie(currentMovie.id) 
         : await getRandomMovie();
@@ -136,6 +141,7 @@ const GameContainer: React.FC = () => {
               </Button>
             </div>
             <MovieImage 
+              key={imageKey} // Force re-mount on new round
               imageUrl={currentMovie.imageUrl}
               duration={GAME_DURATION}
               onRevealComplete={handleRevealComplete}

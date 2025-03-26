@@ -21,7 +21,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   onImageLoaded
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
+  const imageRef = useRef<HTMLImageElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [animation, setAnimation] = useState<{
     start: () => void;
@@ -30,9 +30,19 @@ const MovieImage: React.FC<MovieImageProps> = ({
     forceComplete: () => void;
   } | null>(null);
 
+  // Reset loading state when imageUrl changes
   useEffect(() => {
+    setIsLoaded(false);
+    
+    // Clear any previous animation
+    if (animation) {
+      animation.stop();
+      setAnimation(null);
+    }
+    
+    // Create a new image object for each new imageUrl
     const image = new Image();
-    image.src = imageUrl;
+    image.src = `${imageUrl}?t=${Date.now()}`; // Add timestamp to prevent caching
     image.crossOrigin = "anonymous";
     imageRef.current = image;
 
@@ -65,6 +75,10 @@ const MovieImage: React.FC<MovieImageProps> = ({
     return () => {
       if (animation) {
         animation.stop();
+      }
+      // Clean up image reference
+      if (imageRef.current) {
+        imageRef.current.onload = null;
       }
     };
   }, [imageUrl, duration, onRevealComplete, onImageLoaded]);
