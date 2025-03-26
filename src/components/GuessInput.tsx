@@ -1,6 +1,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Send, RefreshCw } from 'lucide-react';
+import { Send, RefreshCw, HelpCircle } from 'lucide-react';
+import { Button } from './ui/button';
+import { Popover, PopoverTrigger, PopoverContent } from './ui/popover';
 
 interface GuessInputProps {
   onGuess: (guess: string) => void;
@@ -9,6 +11,7 @@ interface GuessInputProps {
   correctAnswer?: string;
   hasIncorrectGuess?: boolean;
   onNextRound?: () => void;
+  hint?: string;
 }
 
 const GuessInput: React.FC<GuessInputProps> = ({ 
@@ -17,7 +20,8 @@ const GuessInput: React.FC<GuessInputProps> = ({
   isCorrect, 
   correctAnswer,
   hasIncorrectGuess,
-  onNextRound
+  onNextRound,
+  hint
 }) => {
   const [guess, setGuess] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -74,27 +78,48 @@ const GuessInput: React.FC<GuessInputProps> = ({
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="w-full flex flex-col gap-2">
-          <div className="relative">
-            <input
-              ref={inputRef}
-              type="text"
-              value={guess}
-              onChange={(e) => setGuess(e.target.value)}
-              placeholder="Guess the movie..."
-              disabled={disabled}
-              className={`w-full py-3 px-4 pr-12 bg-white rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed transition-all ${
-                hasIncorrectGuess 
-                  ? 'border-destructive ring-2 ring-destructive/50 shake-animation' 
-                  : 'border-input'
-              }`}
-            />
-            <button
-              type="submit"
-              disabled={disabled || !guess.trim()}
-              className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-primary text-white opacity-90 hover:opacity-100 disabled:opacity-30 transition-opacity"
-            >
-              <Send className="h-4 w-4" />
-            </button>
+          <div className="relative flex items-center gap-2">
+            {hint && (
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button 
+                    type="button" 
+                    variant="outline" 
+                    size="icon" 
+                    className="flex-shrink-0"
+                    aria-label="Show hint"
+                  >
+                    <HelpCircle className="h-4 w-4" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-fit min-w-[200px] p-3">
+                  <p className="text-sm font-medium">Hint: {hint}</p>
+                </PopoverContent>
+              </Popover>
+            )}
+            
+            <div className="relative flex-grow">
+              <input
+                ref={inputRef}
+                type="text"
+                value={guess}
+                onChange={(e) => setGuess(e.target.value)}
+                placeholder="Guess the movie..."
+                disabled={disabled}
+                className={`w-full py-3 px-4 pr-12 bg-white rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent disabled:opacity-60 disabled:cursor-not-allowed transition-all ${
+                  hasIncorrectGuess 
+                    ? 'border-destructive ring-2 ring-destructive/50 shake-animation' 
+                    : 'border-input'
+                }`}
+              />
+              <button
+                type="submit"
+                disabled={disabled || !guess.trim()}
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-full bg-primary text-white opacity-90 hover:opacity-100 disabled:opacity-30 transition-opacity"
+              >
+                <Send className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </form>
       )}

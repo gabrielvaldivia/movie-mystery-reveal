@@ -94,11 +94,7 @@ const GameContainer: React.FC = () => {
     <div className="w-full max-w-md mx-auto px-4 py-8">
       <div className="flex flex-col items-center">
         <div className="w-full flex items-center justify-between mb-4">
-          {currentMovie?.hint && (
-            <div className="glass-panel px-3 py-1 rounded-full">
-              <span className="text-xs font-medium">Hint: {currentMovie.hint}</span>
-            </div>
-          )}
+          {/* Hint moved to GuessInput component */}
         </div>
         
         {isLoading ? (
@@ -139,6 +135,7 @@ const GameContainer: React.FC = () => {
             isCorrect={isCorrectGuess}
             hasIncorrectGuess={hasIncorrectGuess}
             onNextRound={handleNextRound}
+            hint={currentMovie?.hint}
           />
         </div>
       </div>
