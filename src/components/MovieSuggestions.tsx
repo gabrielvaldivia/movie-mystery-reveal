@@ -39,7 +39,6 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
                     key={movie.id}
                     onSelect={() => {
                       console.log(`Selected movie for prefill: ${movie.title}`);
-                      // Only prefill the input field, don't submit
                       onSelect(movie.title);
                     }}
                     className={`flex items-center py-2 px-3 cursor-pointer ${
