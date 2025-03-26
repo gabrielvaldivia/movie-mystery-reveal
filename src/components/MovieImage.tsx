@@ -1,8 +1,6 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { createPixelationAnimation } from '../utils/pixelate';
-import { AspectRatio } from './ui/aspect-ratio';
-import { Skeleton } from './ui/skeleton';
 
 interface MovieImageProps {
   imageUrl: string;
@@ -35,12 +33,16 @@ const MovieImage: React.FC<MovieImageProps> = ({
     imageRef.current = image;
 
     image.onload = () => {
+      setIsLoaded(true);
+      
       if (canvasRef.current) {
-        // Set canvas dimensions explicitly 
+        // Match canvas dimensions to container while maintaining aspect ratio
         const container = canvasRef.current.parentElement;
         if (container) {
-          canvasRef.current.width = container.clientWidth;
-          canvasRef.current.height = container.clientHeight;
+          const containerWidth = container.clientWidth;
+          const containerHeight = container.clientHeight;
+          canvasRef.current.width = containerWidth;
+          canvasRef.current.height = containerHeight;
         }
         
         // Create and store animation controller
@@ -52,13 +54,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
         );
         
         setAnimation(pixelAnimation);
-        setIsLoaded(true);
       }
-    };
-
-    image.onerror = (e) => {
-      console.error("Error loading image:", e);
-      setIsLoaded(false);
     };
 
     return () => {
@@ -76,7 +72,10 @@ const MovieImage: React.FC<MovieImageProps> = ({
       } else {
         animation.stop();
         // When round is over (isActive is false), force the image to be fully unpixelated
-        animation.forceComplete();
+        if (!isActive) {
+          // Only call forceComplete if it exists
+          animation.forceComplete();
+        }
       }
     }
   }, [isActive, animation, isLoaded]);
@@ -121,7 +120,9 @@ const MovieImage: React.FC<MovieImageProps> = ({
                 );
                 setAnimation(newAnimation);
                 // Only call forceComplete if it exists
-                newAnimation.forceComplete();
+                if (newAnimation) {
+                  newAnimation.forceComplete();
+                }
               }
             }
           }
@@ -134,23 +135,17 @@ const MovieImage: React.FC<MovieImageProps> = ({
   }, [animation, duration, onRevealComplete, isActive]);
 
   return (
-    <div className="pixel-reveal-container glass-panel w-full">
-      <AspectRatio ratio={2/3} className="overflow-hidden">
-        {!isLoaded ? (
-          <div className="absolute inset-0 flex items-center justify-center bg-secondary/50 animate-pulse">
-            <Skeleton className="w-full h-full absolute" />
-            <span className="text-muted-foreground relative z-10">Loading image...</span>
-          </div>
-        ) : null}
-        <canvas 
-          ref={canvasRef}
-          className="w-full h-full object-cover"
-          style={{ 
-            objectFit: 'cover',
-            visibility: isLoaded ? 'visible' : 'hidden'
-          }}
-        />
-      </AspectRatio>
+    <div className="pixel-reveal-container glass-panel">
+      {!isLoaded && (
+        <div className="absolute inset-0 flex items-center justify-center bg-secondary animate-pulse-subtle">
+          <span className="text-muted-foreground">Loading image...</span>
+        </div>
+      )}
+      <canvas 
+        ref={canvasRef}
+        className="w-full h-full object-cover transition-opacity duration-300"
+        style={{ objectFit: 'cover' }}
+      />
     </div>
   );
 };
