@@ -37,23 +37,23 @@ const GameContainer: React.FC = () => {
           <GameLoading loadingProgress={loadingProgress} />
         ) : currentMovie ? (
           <>
-            <div className="relative w-full h-full">
-              <GameHeader 
-                duration={GAME_DURATION}
-                onTimeUp={handleTimeUp}
-                isRunning={isGameActive && isImageLoaded && !showSuccessDialog}
-                onSkip={handleSkip}
-              />
-              
-              <MovieImage 
-                key={imageKey}
-                imageUrl={currentMovie.imageUrl}
-                duration={GAME_DURATION}
-                onRevealComplete={handleRevealComplete}
-                isActive={isGameActive && !showSuccessDialog}
-                onImageLoaded={handleImageLoaded}
-              >
-                {!showSuccessDialog && (
+            {!showSuccessDialog && (
+              <div className="relative w-full h-full">
+                <GameHeader 
+                  duration={GAME_DURATION}
+                  onTimeUp={handleTimeUp}
+                  isRunning={isGameActive && isImageLoaded && !showSuccessDialog}
+                  onSkip={handleSkip}
+                />
+                
+                <MovieImage 
+                  key={imageKey}
+                  imageUrl={currentMovie.imageUrl}
+                  duration={GAME_DURATION}
+                  onRevealComplete={handleRevealComplete}
+                  isActive={isGameActive && !showSuccessDialog}
+                  onImageLoaded={handleImageLoaded}
+                >
                   <GuessInput 
                     onGuess={handleGuess}
                     disabled={!isGameActive || isLoading || !isImageLoaded}
@@ -63,9 +63,9 @@ const GameContainer: React.FC = () => {
                     onNextRound={handleNextRound}
                     hint={currentMovie?.hint}
                   />
-                )}
-              </MovieImage>
-            </div>
+                </MovieImage>
+              </div>
+            )}
             
             <SuccessDialog 
               isOpen={showSuccessDialog}
