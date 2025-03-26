@@ -1,4 +1,3 @@
-
 /**
  * Utility to create a pixelation effect on an image
  * The pixelation level goes from 0 (no pixelation) to 1 (maximum pixelation)
@@ -115,17 +114,15 @@ export const createPixelationAnimation = (
   start: () => void, 
   stop: () => void, 
   getCurrentLevel: () => number,
-  forceComplete: () => void,
-  resume: (pausedTime: number) => void
+  forceComplete: () => void
 } => {
   let animationFrameId: number | null = null;
   let startTime: number | null = null;
   let currentLevel = 1; // Start with maximum pixelation
-  let pausedElapsedTime = 0; // Store elapsed time when paused
 
   const animate = (timestamp: number) => {
     if (startTime === null) {
-      startTime = timestamp - pausedElapsedTime; // Adjust for paused time
+      startTime = timestamp;
     }
 
     const elapsed = timestamp - startTime;
@@ -161,24 +158,6 @@ export const createPixelationAnimation = (
     }
   };
 
-  const stop = () => {
-    if (animationFrameId !== null) {
-      cancelAnimationFrame(animationFrameId);
-      animationFrameId = null;
-    }
-    // Store elapsed time for resuming later
-    if (startTime !== null) {
-      pausedElapsedTime = performance.now() - startTime;
-    }
-  };
-
-  const resume = (pausedTime: number = pausedElapsedTime) => {
-    // Set pausedElapsedTime for resuming animation
-    pausedElapsedTime = pausedTime;
-    startTime = null;
-    animationFrameId = requestAnimationFrame(animate);
-  };
-
   const forceComplete = () => {
     // Force pixelation level to 0 (fully unpixelated)
     currentLevel = 0;
@@ -196,13 +175,16 @@ export const createPixelationAnimation = (
         cancelAnimationFrame(animationFrameId);
       }
       startTime = null;
-      pausedElapsedTime = 0;
       currentLevel = 1;
       animationFrameId = requestAnimationFrame(animate);
     },
-    stop,
+    stop: () => {
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+    },
     getCurrentLevel: () => currentLevel,
-    forceComplete,
-    resume
+    forceComplete
   };
 };

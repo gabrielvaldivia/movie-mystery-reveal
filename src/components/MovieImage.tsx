@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import ImageLoadingIndicator from './ImageLoadingIndicator';
 import PixelRevealCanvas from './PixelRevealCanvas';
@@ -35,16 +34,13 @@ const MovieImage: React.FC<MovieImageProps> = ({
   const animationRef = useRef<{ 
     start: () => void; 
     stop: () => void; 
-    resume: (pausedTime?: number) => void;
     forceComplete: () => void 
   } | null>(null);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const loadingProgressRef = useRef<number>(0);
   const [loadingProgress, setLoadingProgress] = useState(0);
-  const previousActiveRef = useRef<boolean>(isActive);
 
   const loadImage = () => {
-    // Clear previous state
     setIsLoading(true);
     setIsLoaded(false);
     setLoadError(false);
@@ -52,7 +48,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
     loadingProgressRef.current = 0;
     setLoadingProgress(0);
     
-    // Clean up any previous animation and timer
     if (animationRef.current) {
       animationRef.current.stop();
       animationRef.current = null;
@@ -63,16 +58,14 @@ const MovieImage: React.FC<MovieImageProps> = ({
       timerRef.current = null;
     }
     
-    // Set a timeout to detect if image loading takes too long
     timerRef.current = setTimeout(() => {
       if (!isLoaded) {
         setTimeoutError(true);
         setIsLoading(false);
         if (onImageError) onImageError();
       }
-    }, 15000); // 15 seconds timeout
+    }, 15000);
     
-    // Simulate progress
     const progressInterval = setInterval(() => {
       if (loadingProgressRef.current < 90) {
         loadingProgressRef.current += 5;
@@ -86,7 +79,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
     image.crossOrigin = "anonymous";
     
     image.onload = () => {
-      // Clear intervals and timeouts
       clearInterval(progressInterval);
       if (timerRef.current) {
         clearTimeout(timerRef.current);
@@ -98,14 +90,12 @@ const MovieImage: React.FC<MovieImageProps> = ({
       
       if (!canvasRef.current) return;
       
-      // Set up canvas dimensions
       const container = canvasRef.current.parentElement;
       if (container) {
         canvasRef.current.width = container.clientWidth;
         canvasRef.current.height = container.clientHeight;
       }
       
-      // Create the pixelation animation
       try {
         const animation = createPixelationAnimation(
           image,
@@ -117,18 +107,15 @@ const MovieImage: React.FC<MovieImageProps> = ({
         animationRef.current = animation;
         imageRef.current = image;
         
-        // Show the image
         setIsLoaded(true);
         setIsLoading(false);
         
-        // Start or complete the animation based on isActive
         if (isActive) {
           animation.start();
         } else {
           animation.forceComplete();
         }
         
-        // Call the onImageLoaded callback
         if (onImageLoaded) {
           onImageLoaded();
         }
@@ -153,17 +140,14 @@ const MovieImage: React.FC<MovieImageProps> = ({
       if (onImageError) onImageError();
     };
     
-    // Set the image source
     image.src = imageUrl;
   };
   
-  // Effect to handle image loading
   useEffect(() => {
     if (!imageUrl) return;
     
     loadImage();
     
-    // Cleanup function
     return () => {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
@@ -174,29 +158,16 @@ const MovieImage: React.FC<MovieImageProps> = ({
     };
   }, [imageUrl, duration, onImageLoaded, onRevealComplete, onImageError]);
   
-  // Handle isActive changes for pausing/resuming
   useEffect(() => {
     if (!animationRef.current || !isLoaded) return;
     
-    const wasActive = previousActiveRef.current;
-    previousActiveRef.current = isActive;
-    
-    if (isActive && !wasActive) {
-      // Resuming from paused state
-      animationRef.current.resume();
-    } else if (!isActive && wasActive) {
-      // Pausing
-      animationRef.current.stop();
-    } else if (isActive) {
-      // Initial start
+    if (isActive) {
       animationRef.current.start();
     } else {
-      // Force complete when not active
       animationRef.current.forceComplete();
     }
   }, [isActive, isLoaded]);
   
-  // Handle window resize
   useEffect(() => {
     const handleResize = () => {
       if (!canvasRef.current || !imageRef.current || !isLoaded) return;
@@ -204,14 +175,12 @@ const MovieImage: React.FC<MovieImageProps> = ({
       const container = canvasRef.current.parentElement;
       if (!container) return;
       
-      // Only update if there's a significant size change
       if (Math.abs(canvasRef.current.width - container.clientWidth) > 10 || 
           Math.abs(canvasRef.current.height - container.clientHeight) > 10) {
         
         canvasRef.current.width = container.clientWidth;
         canvasRef.current.height = container.clientHeight;
         
-        // Recreate animation
         if (animationRef.current) {
           animationRef.current.stop();
           
@@ -251,10 +220,8 @@ const MovieImage: React.FC<MovieImageProps> = ({
 
   return (
     <div className="pixel-reveal-container glass-panel no-rounded relative">
-      {/* Canvas for the pixelation effect */}
       <PixelRevealCanvas ref={canvasRef} />
       
-      {/* Loading indicator component */}
       <ImageLoadingIndicator 
         isLoading={isLoading}
         progress={loadingProgress}
@@ -263,7 +230,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
         onRetry={handleRetry}
       />
       
-      {/* Children (like buttons or UI controls) */}
       {children && <MovieContentWrapper>{children}</MovieContentWrapper>}
     </div>
   );
