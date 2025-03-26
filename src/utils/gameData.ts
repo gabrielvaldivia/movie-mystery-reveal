@@ -1,3 +1,4 @@
+
 // Movie data with TMDB API integration
 
 export interface Movie {
@@ -10,16 +11,17 @@ export interface Movie {
 }
 
 // TMDB API configuration
+// Note: Even though this is marked as a public API key, it seems to be invalid or revoked
+// Using a different approach with predefined image URLs for reliability
 const TMDB_IMAGE_BASE_URL = "https://image.tmdb.org/t/p/w780"; // Medium size images
-const TMDB_BACKDROP_BASE_URL = "https://image.tmdb.org/t/p/w780"; // Using backdrops instead of posters
 
-// Top 100 movies collection with backdrop image URLs
+// Top 100 movies collection with backup image URLs
 export const moviesCollection: Movie[] = [
-  // Original 5 movies - updated with backdrop images
+  // Original 5 movies
   {
     id: "1",
     title: "Inception",
-    imageUrl: "https://image.tmdb.org/t/p/w780/s3TBrRGB1iav7gFOCNx3H31MoES.jpg", // Backdrop
+    imageUrl: "https://image.tmdb.org/t/p/w780/8IB2e4r4oVhHnANbnm7O3Tj6tF8.jpg",
     releaseYear: 2010,
     hint: "Dreams within dreams",
     tmdbId: 27205
@@ -27,7 +29,7 @@ export const moviesCollection: Movie[] = [
   {
     id: "2",
     title: "The Shawshank Redemption",
-    imageUrl: "https://image.tmdb.org/t/p/w780/kXfqcdQKsToO0OUXHcrrNCHDBzO.jpg", // Backdrop
+    imageUrl: "https://image.tmdb.org/t/p/w780/9O7gLzmreU0nGkIB6K3BsJbzvNv.jpg",
     releaseYear: 1994,
     hint: "Prison escape drama",
     tmdbId: 278
@@ -35,7 +37,7 @@ export const moviesCollection: Movie[] = [
   {
     id: "3",
     title: "Pulp Fiction",
-    imageUrl: "https://image.tmdb.org/t/p/w780/suaEOtk1N1sgg2QM528GlEFZu5s.jpg", // Backdrop
+    imageUrl: "https://image.tmdb.org/t/p/w780/d5iIlFn5s0ImszYzBPb8JPIfbXD.jpg",
     releaseYear: 1994,
     hint: "Non-linear storytelling",
     tmdbId: 680
@@ -43,7 +45,7 @@ export const moviesCollection: Movie[] = [
   {
     id: "4",
     title: "The Matrix",
-    imageUrl: "https://image.tmdb.org/t/p/w780/fNG7i7RqMErkcqhohV2a6cV1Ehy.jpg", // Backdrop
+    imageUrl: "https://image.tmdb.org/t/p/w780/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
     releaseYear: 1999,
     hint: "Reality is not what it seems",
     tmdbId: 603
@@ -51,16 +53,16 @@ export const moviesCollection: Movie[] = [
   {
     id: "5",
     title: "The Godfather",
-    imageUrl: "https://image.tmdb.org/t/p/w780/rSPw7tgCH9c6NqICZef4kZjFOQ5.jpg", // Backdrop
+    imageUrl: "https://image.tmdb.org/t/p/w780/3bhkrj58Vtu7enYsRolD1fZdja1.jpg",
     releaseYear: 1972,
     hint: "An offer you can't refuse",
     tmdbId: 238
   },
-  // First 25 movies already in the list - with backdrop images
+  // First 25 movies already in the list
   {
     id: "6",
     title: "The Dark Knight",
-    imageUrl: "https://image.tmdb.org/t/p/w780/nMKdUUepR0i5zn0y1T4CsSB5chy.jpg", // Backdrop
+    imageUrl: "https://image.tmdb.org/t/p/w780/qJ2tW6WMUDux911r6m7haRef0WH.jpg",
     releaseYear: 2008,
     hint: "Why so serious?",
     tmdbId: 155
@@ -68,7 +70,7 @@ export const moviesCollection: Movie[] = [
   {
     id: "7",
     title: "Schindler's List",
-    imageUrl: "https://image.tmdb.org/t/p/w780/loRmLlopszkGPd9WRkURY7gXMf0.jpg", // Backdrop
+    imageUrl: "https://image.tmdb.org/t/p/w780/sF1U4EUQS8YHUYjNl3pMGNIQyr0.jpg",
     releaseYear: 1993,
     hint: "The man who saved lives during the Holocaust",
     tmdbId: 424
@@ -76,7 +78,7 @@ export const moviesCollection: Movie[] = [
   {
     id: "8",
     title: "The Lord of the Rings: The Return of the King",
-    imageUrl: "https://image.tmdb.org/t/p/w780/lXhgCODAbBXL5buk9yEmTpOoOgR.jpg", // Backdrop
+    imageUrl: "https://image.tmdb.org/t/p/w780/rCzpDGLbOoPwLjy3OAm5NUPOTrC.jpg",
     releaseYear: 2003,
     hint: "The final chapter of a fantasy trilogy",
     tmdbId: 122
@@ -84,7 +86,7 @@ export const moviesCollection: Movie[] = [
   {
     id: "9",
     title: "Fight Club",
-    imageUrl: "https://image.tmdb.org/t/p/w780/hZkgoQYus5vegHoetLkCJzb17zJ.jpg", // Backdrop
+    imageUrl: "https://image.tmdb.org/t/p/w780/pB8BM7pdSp6B6Ih7QZ4DrQ3PmJK.jpg",
     releaseYear: 1999,
     hint: "First rule: don't talk about it",
     tmdbId: 550
@@ -92,7 +94,7 @@ export const moviesCollection: Movie[] = [
   {
     id: "10",
     title: "Forrest Gump",
-    imageUrl: "https://image.tmdb.org/t/p/w780/3h1JZGDhZ8nzxdgvkxha0qBqi05.jpg", // Backdrop
+    imageUrl: "https://image.tmdb.org/t/p/w780/arw2vcBveWOVZr6pxd9XTd1TdQa.jpg",
     releaseYear: 1994,
     hint: "Life is like a box of chocolates",
     tmdbId: 13
@@ -440,7 +442,7 @@ export const moviesCollection: Movie[] = [
     title: "2001: A Space Odyssey",
     imageUrl: "https://image.tmdb.org/t/p/w780/ve72VxNqjGM69Uky4WTo2bK6rfq.jpg",
     releaseYear: 1968,
-    hint: "I'm sorry Dave, I can't do that",
+    hint: "I'm sorry Dave, I'm afraid I can't do that",
     tmdbId: 62
   },
   {
