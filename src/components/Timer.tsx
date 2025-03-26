@@ -70,11 +70,13 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
   const progress = Math.max(0, (timeRemaining / duration) * 100);
   
   return (
-    <Progress 
-      value={progress} 
-      className="h-1 w-full rounded-full bg-transparent" 
-      indicatorClassName="bg-white rounded-full"
-    />
+    <div className="bg-black/30 rounded-full p-0.5">
+      <Progress 
+        value={progress} 
+        className="h-1 w-full rounded-full bg-transparent" 
+        indicatorClassName="bg-white rounded-full"
+      />
+    </div>
   );
 };
 
