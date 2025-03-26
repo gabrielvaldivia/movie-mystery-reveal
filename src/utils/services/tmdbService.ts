@@ -62,7 +62,8 @@ const generateObscureHint = (overview: string, title: string): string => {
     if (keywords.length > 0) {
       hint = `Themes include: ${keywords.join(', ')}`;
     } else {
-      hint = `A film from ${new Date(movie.release_date).getFullYear()}`;
+      // Fix: Use the provided title parameter instead of accessing movie.release_date
+      hint = `A film from ${title.split(' ')[0]}`; // Use first word of title as fallback
     }
   }
   
