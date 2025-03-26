@@ -123,7 +123,7 @@ export const createPixelationAnimation = (
   let currentLevel = 1; // Start with maximum pixelation
 
   const animate = (timestamp: number) => {
-    if (!startTime) {
+    if (startTime === null) {
       startTime = timestamp;
     }
 
@@ -158,10 +158,8 @@ export const createPixelationAnimation = (
       if (animationFrameId !== null) {
         cancelAnimationFrame(animationFrameId);
       }
-      // Reset variables
       startTime = null;
       currentLevel = 1;
-      // Start animation
       animationFrameId = requestAnimationFrame(animate);
     },
     stop: () => {
