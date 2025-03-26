@@ -28,9 +28,13 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
 
   // Handle the selection and submission
   const handleSelection = (title: string) => {
+    console.log("MovieSuggestions - handleSelection called with:", title);
     onSelect(title);
     // Submit the form immediately after setting the title
-    onSubmit();
+    setTimeout(() => {
+      console.log("MovieSuggestions - calling onSubmit after selection");
+      onSubmit();
+    }, 0);
   };
 
   return (

@@ -75,7 +75,7 @@ const GuessInput: React.FC<GuessInputProps> = ({
   };
 
   const handleSuggestionSelect = (title: string) => {
-    console.log("Selected suggestion:", title);
+    console.log("GuessInput - Selected suggestion:", title);
     setGuess(title);
   };
 
