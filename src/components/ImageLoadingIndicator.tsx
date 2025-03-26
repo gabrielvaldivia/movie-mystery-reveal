@@ -4,12 +4,18 @@ import { AlertCircle, RefreshCw } from 'lucide-react';
 import { Progress } from './ui/progress';
 import { Button } from './ui/button';
 
-interface ImageLoadingIndicatorProps {
+export type ImageLoadingStatus = {
   isLoading: boolean;
   progress: number;
   error: boolean;
   timeout: boolean;
+};
+
+interface ImageLoadingIndicatorProps extends ImageLoadingStatus {
   onRetry: () => void;
+  loadingMessage?: string;
+  errorMessage?: string;
+  timeoutMessage?: string;
 }
 
 const ImageLoadingIndicator: React.FC<ImageLoadingIndicatorProps> = ({
@@ -17,14 +23,17 @@ const ImageLoadingIndicator: React.FC<ImageLoadingIndicatorProps> = ({
   progress,
   error,
   timeout,
-  onRetry
+  onRetry,
+  loadingMessage = "Loading movie image...",
+  errorMessage = "Failed to load image",
+  timeoutMessage = "Image load timed out"
 }) => {
   if (error || timeout) {
     return (
       <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 backdrop-blur-sm z-10">
         <AlertCircle className="w-10 h-10 text-red-500 mb-2" />
         <p className="text-center text-white font-medium mb-4">
-          {timeout ? "Image load timed out" : "Failed to load image"}
+          {timeout ? timeoutMessage : errorMessage}
         </p>
         <Button 
           variant="outline" 
@@ -45,7 +54,7 @@ const ImageLoadingIndicator: React.FC<ImageLoadingIndicatorProps> = ({
         <div className="w-2/3 max-w-xs space-y-2">
           <Progress value={progress} className="h-1.5" />
           <p className="text-center text-xs text-muted-foreground">
-            Loading movie image...
+            {loadingMessage}
           </p>
         </div>
       </div>
