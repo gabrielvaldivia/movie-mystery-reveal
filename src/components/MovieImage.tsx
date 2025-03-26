@@ -2,6 +2,7 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { createPixelationAnimation } from '../utils/pixelate';
 import { AspectRatio } from './ui/aspect-ratio';
+import { Skeleton } from './ui/skeleton';
 
 interface MovieImageProps {
   imageUrl: string;
@@ -23,6 +24,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imageRef = useRef<HTMLImageElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [loadProgress, setLoadProgress] = useState(0);
   const [animation, setAnimation] = useState<{
     start: () => void;
     stop: () => void;
@@ -33,6 +35,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   // Reset loading state when imageUrl changes
   useEffect(() => {
     setIsLoaded(false);
+    setLoadProgress(0);
     
     // Clear any previous animation
     if (animation) {
@@ -46,7 +49,17 @@ const MovieImage: React.FC<MovieImageProps> = ({
     image.crossOrigin = "anonymous";
     imageRef.current = image;
 
+    // Simulate progress while waiting for image to load
+    const progressInterval = setInterval(() => {
+      setLoadProgress(prev => {
+        const newProgress = prev + (100 - prev) * 0.1;
+        return newProgress > 99 ? 99 : newProgress;
+      });
+    }, 200);
+
     image.onload = () => {
+      clearInterval(progressInterval);
+      setLoadProgress(100);
       setIsLoaded(true);
       
       if (canvasRef.current) {
@@ -73,6 +86,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
     };
 
     return () => {
+      clearInterval(progressInterval);
       if (animation) {
         animation.stop();
       }
@@ -147,8 +161,25 @@ const MovieImage: React.FC<MovieImageProps> = ({
   return (
     <div className="pixel-reveal-container glass-panel no-rounded relative">
       {!isLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-secondary animate-pulse-subtle">
-          <span className="text-muted-foreground">Loading image...</span>
+        <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary">
+          <div className="w-16 h-16 relative mb-4">
+            <div className="w-16 h-16 rounded-full border-4 border-primary border-opacity-20 absolute"></div>
+            <div 
+              className="w-16 h-16 rounded-full border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent absolute animate-spin"
+              style={{ animationDuration: '1.5s' }}
+            ></div>
+          </div>
+          <div className="w-full max-w-xs px-4">
+            <div className="h-2 bg-secondary-foreground/10 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-primary transition-all duration-300 ease-out"
+                style={{ width: `${loadProgress}%` }}
+              ></div>
+            </div>
+            <p className="text-center text-sm text-muted-foreground mt-2">
+              Loading image...
+            </p>
+          </div>
         </div>
       )}
       <canvas 

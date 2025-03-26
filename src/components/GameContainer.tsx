@@ -21,13 +21,25 @@ const GameContainer: React.FC = () => {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [imageKey, setImageKey] = useState(Date.now()); // Add a key to force re-mounting
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
+  const [loadingProgress, setLoadingProgress] = useState(0);
   
   useEffect(() => {
     const initGame = async () => {
       setIsLoading(true);
       try {
+        // Simulate progressive loading of all game assets
+        const progressInterval = setInterval(() => {
+          setLoadingProgress(prev => {
+            const newProgress = prev + (100 - prev) * 0.1;
+            return newProgress >= 99 ? 99 : newProgress;
+          });
+        }, 200);
+        
         await loadAllMovieImages();
         await startNewRound();
+        
+        clearInterval(progressInterval);
+        setLoadingProgress(100);
       } catch (error) {
         console.error("Error initializing game:", error);
       } finally {
@@ -121,8 +133,25 @@ const GameContainer: React.FC = () => {
     <div className="w-full h-full flex items-center justify-center">
       <div className="flex flex-col items-center w-full max-w-2xl aspect-[3/5] h-full max-h-[85vh]">
         {isLoading ? (
-          <div className="w-full h-full glass-panel flex items-center justify-center">
-            <div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></div>
+          <div className="w-full h-full glass-panel flex flex-col items-center justify-center gap-6">
+            <div className="w-16 h-16 relative">
+              <div className="w-16 h-16 rounded-full border-4 border-primary border-opacity-20 absolute"></div>
+              <div 
+                className="w-16 h-16 rounded-full border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent absolute animate-spin"
+                style={{ animationDuration: '1.5s' }}
+              ></div>
+            </div>
+            <div className="w-3/4 max-w-xs">
+              <div className="h-2 bg-secondary-foreground/10 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-primary transition-all duration-500 ease-out"
+                  style={{ width: `${loadingProgress}%` }}
+                ></div>
+              </div>
+              <p className="text-center text-sm text-muted-foreground mt-2">
+                Loading game assets...
+              </p>
+            </div>
           </div>
         ) : currentMovie ? (
           <>
