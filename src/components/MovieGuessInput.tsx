@@ -1,5 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
+import { ArrowUp } from 'lucide-react';
 import { Movie } from '@/utils/types/movieTypes';
 import { getMovieSuggestions } from '@/utils/services/gameService';
 import { Input } from './ui/input';
@@ -152,9 +153,9 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
           <button
             type="submit"
             disabled={disabled || !guess.trim()}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-auto px-2 h-7 flex items-center justify-center rounded-md bg-primary text-white opacity-90 hover:opacity-100 disabled:opacity-30 transition-opacity text-xs font-medium"
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-full bg-primary text-white opacity-90 hover:opacity-100 disabled:opacity-30 transition-opacity"
           >
-            Submit
+            <ArrowUp className="h-3 w-3" />
           </button>
         </div>
       </div>
