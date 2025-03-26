@@ -36,7 +36,11 @@ const GameContainer: React.FC = () => {
   } = useGameState();
   
   const handlePauseToggle = () => {
-    setIsPaused(!isPaused);
+    // Only toggle pause if the game is active
+    if (isGameActive && isImageLoaded && !showSuccessDialog && !isRoundComplete) {
+      setIsPaused(!isPaused);
+      console.log("Game paused:", !isPaused);
+    }
   };
   
   return (
@@ -51,9 +55,10 @@ const GameContainer: React.FC = () => {
                 <GameHeader 
                   duration={GAME_DURATION}
                   onTimeUp={handleTimeUp}
-                  isRunning={isGameActive && isImageLoaded && !showSuccessDialog && !isPaused}
+                  isRunning={isGameActive && isImageLoaded && !showSuccessDialog}
                   onSkip={handleSkip}
                   onPauseToggle={handlePauseToggle}
+                  isPaused={isPaused}
                 />
                 
                 <MovieImage 

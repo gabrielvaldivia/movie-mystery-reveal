@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Timer from './Timer';
 import { Button } from './ui/button';
 import { Pause, Play, SkipForward } from 'lucide-react';
@@ -10,6 +10,7 @@ interface GameHeaderProps {
   isRunning: boolean;
   onSkip: () => void;
   onPauseToggle?: () => void;
+  isPaused?: boolean;
 }
 
 const GameHeader: React.FC<GameHeaderProps> = ({ 
@@ -17,12 +18,10 @@ const GameHeader: React.FC<GameHeaderProps> = ({
   onTimeUp, 
   isRunning, 
   onSkip,
-  onPauseToggle
+  onPauseToggle,
+  isPaused = false
 }) => {
-  const [isPaused, setIsPaused] = useState(false);
-  
   const handlePauseToggle = () => {
-    setIsPaused(!isPaused);
     if (onPauseToggle) {
       onPauseToggle();
     }
