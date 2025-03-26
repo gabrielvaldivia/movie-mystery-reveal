@@ -2,26 +2,21 @@
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
-import { SkipForward, Clock } from 'lucide-react';
+import { SkipForward } from 'lucide-react';
 import { Movie } from '../utils/types/movieTypes';
 
 interface SuccessDialogProps {
   isOpen: boolean;
   movie: Movie | null;
   onNextRound: () => void;
-  timeTaken?: number; // Time taken in milliseconds
 }
 
 const SuccessDialog: React.FC<SuccessDialogProps> = ({ 
   isOpen, 
   movie, 
-  onNextRound,
-  timeTaken
+  onNextRound 
 }) => {
   if (!movie) return null;
-  
-  // Format time taken as seconds with one decimal place
-  const formattedTime = timeTaken ? (timeTaken / 1000).toFixed(1) : null;
   
   return (
     <Dialog open={isOpen} onOpenChange={() => {}}>
@@ -41,13 +36,6 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({
           </div>
           <h2 className="text-2xl font-bold text-center">{movie.title}</h2>
           <p className="text-muted-foreground text-center">{movie.releaseYear}</p>
-          
-          {formattedTime && (
-            <div className="flex items-center justify-center gap-2 text-primary">
-              <Clock className="h-4 w-4" />
-              <span className="font-medium">Guessed in {formattedTime}s</span>
-            </div>
-          )}
           
           <Button 
             onClick={onNextRound} 

@@ -21,8 +21,6 @@ const GameContainer: React.FC = () => {
   const [isImageLoaded, setIsImageLoaded] = useState(false);
   const [imageKey, setImageKey] = useState(Date.now()); // Add a key to force re-mounting
   const [showSuccessDialog, setShowSuccessDialog] = useState(false);
-  const [roundStartTime, setRoundStartTime] = useState<number | null>(null);
-  const [timeTaken, setTimeTaken] = useState<number | null>(null);
   
   useEffect(() => {
     const initGame = async () => {
@@ -44,7 +42,6 @@ const GameContainer: React.FC = () => {
     setIsLoading(true);
     setIsImageLoaded(false);
     setShowSuccessDialog(false);
-    setTimeTaken(null);
     
     try {
       // Generate a new image key to force re-mounting of MovieImage
@@ -68,9 +65,8 @@ const GameContainer: React.FC = () => {
   
   const handleImageLoaded = () => {
     setIsImageLoaded(true);
-    // Now that the image is loaded, we can start the game and record the start time
+    // Now that the image is loaded, we can start the game
     setIsGameActive(true);
-    setRoundStartTime(Date.now());
   };
   
   const handleTimeUp = () => {
@@ -95,15 +91,10 @@ const GameContainer: React.FC = () => {
     const isCorrect = normalizedGuess === normalizedTitle;
     
     if (isCorrect) {
-      // Calculate time taken to guess correctly
-      const endTime = Date.now();
-      const calculatedTimeTaken = roundStartTime ? endTime - roundStartTime : null;
-      
       setIsGameActive(false);
       setIsRoundComplete(true);
       setIsCorrectGuess(true);
       setScore(prev => prev + 100);
-      setTimeTaken(calculatedTimeTaken);
       setShowSuccessDialog(true);
     } else {
       setHasIncorrectGuess(true);
@@ -180,7 +171,6 @@ const GameContainer: React.FC = () => {
               isOpen={showSuccessDialog}
               movie={currentMovie}
               onNextRound={handleNextRound}
-              timeTaken={timeTaken || undefined}
             />
           </>
         ) : null}
