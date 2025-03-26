@@ -30,13 +30,8 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
   const handleSelection = (title: string) => {
     console.log("MovieSuggestions - handleSelection called with:", title);
     onSelect(title);
-    
-    // We need a longer timeout to ensure the input value is updated
-    // before we try to submit the form
-    setTimeout(() => {
-      console.log("MovieSuggestions - calling onSubmit after selection");
-      onSubmit();
-    }, 50);
+    // Call onSubmit directly after selection is set
+    onSubmit();
   };
 
   return (

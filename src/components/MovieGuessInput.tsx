@@ -59,7 +59,6 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
   const handleSuggestionSelect = (title: string) => {
     console.log("GuessInput - Selected suggestion:", title);
     setGuess(title);
-    // Don't immediately submit here, let MovieSuggestions handle it
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -81,7 +80,7 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
       e.preventDefault();
       if (suggestions[highlightedIndex] && suggestions[highlightedIndex].title) {
         handleSuggestionSelect(suggestions[highlightedIndex].title);
-        setTimeout(() => handleSubmit(), 50); // Add a delay here too
+        handleSubmit();
       }
     }
     else if (e.key === 'Escape') {
