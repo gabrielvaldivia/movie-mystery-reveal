@@ -110,7 +110,8 @@ const GameContainer: React.FC = () => {
             <div className="animate-spin h-10 w-10 border-4 border-primary border-t-transparent rounded-full"></div>
           </div>
         ) : currentMovie ? (
-          <div className="relative w-full h-full">
+          <div className="relative w-full h-full overflow-hidden">
+            {/* Timer and Skip button */}
             <div className="absolute top-0 left-0 right-0 z-10 px-4 py-2 flex justify-between items-center">
               <Timer 
                 duration={GAME_DURATION} 
@@ -127,22 +128,26 @@ const GameContainer: React.FC = () => {
                 <SkipForward className="h-5 w-5" />
               </Button>
             </div>
-            <MovieImage 
-              imageUrl={currentMovie.imageUrl}
-              duration={GAME_DURATION}
-              onRevealComplete={handleRevealComplete}
-              isActive={isGameActive}
-            >
-              <GuessInput 
-                onGuess={handleGuess}
-                disabled={!isGameActive || isLoading}
-                correctAnswer={isRoundComplete ? currentMovie?.title : undefined}
-                isCorrect={isCorrectGuess}
-                hasIncorrectGuess={hasIncorrectGuess}
-                onNextRound={handleNextRound}
-                hint={currentMovie?.hint}
-              />
-            </MovieImage>
+            
+            {/* Main movie image */}
+            <div className="w-full h-full">
+              <MovieImage 
+                imageUrl={currentMovie.imageUrl}
+                duration={GAME_DURATION}
+                onRevealComplete={handleRevealComplete}
+                isActive={isGameActive}
+              >
+                <GuessInput 
+                  onGuess={handleGuess}
+                  disabled={!isGameActive || isLoading}
+                  correctAnswer={isRoundComplete ? currentMovie?.title : undefined}
+                  isCorrect={isCorrectGuess}
+                  hasIncorrectGuess={hasIncorrectGuess}
+                  onNextRound={handleNextRound}
+                  hint={currentMovie?.hint}
+                />
+              </MovieImage>
+            </div>
           </div>
         ) : null}
       </div>

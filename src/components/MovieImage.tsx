@@ -1,7 +1,6 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 import { createPixelationAnimation } from '../utils/pixelate';
-import { AspectRatio } from './ui/aspect-ratio';
 
 interface MovieImageProps {
   imageUrl: string;
@@ -19,7 +18,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   children
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const imageRef = useRef<HTMLImageElement>(null);
+  const imageRef = useRef<HTMLImageElement | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [animation, setAnimation] = useState<{
     start: () => void;
@@ -29,9 +28,16 @@ const MovieImage: React.FC<MovieImageProps> = ({
   } | null>(null);
 
   useEffect(() => {
+    // Clear any previous image reference
+    if (imageRef.current) {
+      imageRef.current = null;
+    }
+    
+    // Create a new image with proper settings
     const image = new Image();
     image.src = imageUrl;
     image.crossOrigin = "anonymous";
+    image.style.display = 'none'; // Ensure the image itself is not visible
     imageRef.current = image;
 
     image.onload = () => {
@@ -40,10 +46,8 @@ const MovieImage: React.FC<MovieImageProps> = ({
       if (canvasRef.current) {
         const container = canvasRef.current.parentElement;
         if (container) {
-          const containerWidth = container.clientWidth;
-          const containerHeight = container.clientHeight;
-          canvasRef.current.width = containerWidth;
-          canvasRef.current.height = containerHeight;
+          canvasRef.current.width = container.clientWidth;
+          canvasRef.current.height = container.clientHeight;
         }
         
         const pixelAnimation = createPixelationAnimation(
@@ -135,7 +139,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
       <canvas 
         ref={canvasRef}
         className="w-full h-full object-contain transition-opacity duration-300"
-        style={{ objectFit: 'contain' }}
       />
       
       {children && (
