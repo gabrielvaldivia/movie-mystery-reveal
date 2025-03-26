@@ -6,7 +6,6 @@ import Timer from './Timer';
 import { getRandomMovie, Movie, getNextMovie, loadAllMovieImages } from '../utils/gameData';
 import { Button } from './ui/button';
 import { SkipForward } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
 
 const GAME_DURATION = 30000; // 30 seconds
 
@@ -18,7 +17,6 @@ const GameContainer: React.FC = () => {
   const [isCorrectGuess, setIsCorrectGuess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasIncorrectGuess, setHasIncorrectGuess] = useState(false);
-  const { toast } = useToast();
   
   useEffect(() => {
     const initGame = async () => {
@@ -81,13 +79,6 @@ const GameContainer: React.FC = () => {
       setIsRoundComplete(true);
       setIsCorrectGuess(true);
       setScore(prev => prev + 100);
-      
-      // Show toast instead of overlay
-      toast({
-        title: "Correct!",
-        description: currentMovie.title,
-        className: "bg-green-100 border-green-300"
-      });
     } else {
       setHasIncorrectGuess(true);
       setTimeout(() => {
