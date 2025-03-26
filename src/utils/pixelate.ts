@@ -10,11 +10,15 @@ export const applyPixelation = (
   pixelationLevel: number // 0 to 1, where 1 is most pixelated
 ): void => {
   if (!imageElement.complete) {
+    console.log("Image not complete yet, cannot pixelate");
     return;
   }
 
   const ctx = canvas.getContext("2d");
-  if (!ctx) return;
+  if (!ctx) {
+    console.error("Could not get 2D context from canvas");
+    return;
+  }
 
   // Clear the canvas
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -30,7 +34,39 @@ export const applyPixelation = (
 
   // If pixelation level is very low, just draw the image normally
   if (pixelSize <= 1) {
-    // Calculate dimensions to center and cover the canvas
+    try {
+      // Calculate dimensions to center and cover the canvas
+      const { width: imgWidth, height: imgHeight } = imageElement;
+      const imgAspect = imgWidth / imgHeight;
+      const canvasAspect = canvas.width / canvas.height;
+      
+      let drawWidth, drawHeight, offsetX = 0, offsetY = 0;
+      
+      if (imgAspect > canvasAspect) {
+        // Image is wider than canvas (relative to height)
+        drawHeight = canvas.height;
+        drawWidth = drawHeight * imgAspect;
+        offsetX = (canvas.width - drawWidth) / 2;
+      } else {
+        // Image is taller than canvas (relative to width)
+        drawWidth = canvas.width;
+        drawHeight = drawWidth / imgAspect;
+        offsetY = (canvas.height - drawHeight) / 2;
+      }
+      
+      ctx.drawImage(imageElement, offsetX, offsetY, drawWidth, drawHeight);
+    } catch (error) {
+      console.error("Error drawing non-pixelated image:", error);
+    }
+    return;
+  }
+
+  try {
+    // Calculate the size of the pixelated image
+    const w = Math.ceil(canvas.width / pixelSize);
+    const h = Math.ceil(canvas.height / pixelSize);
+
+    // First, draw the image properly scaled to fill the canvas
     const { width: imgWidth, height: imgHeight } = imageElement;
     const imgAspect = imgWidth / imgHeight;
     const canvasAspect = canvas.width / canvas.height;
@@ -49,61 +85,37 @@ export const applyPixelation = (
       offsetY = (canvas.height - drawHeight) / 2;
     }
     
-    ctx.drawImage(imageElement, offsetX, offsetY, drawWidth, drawHeight);
-    return;
+    // Clear and draw original image at full size first (we'll pixelate from this)
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    const tempCtx = tempCanvas.getContext('2d');
+    if (!tempCtx) return;
+    
+    tempCtx.drawImage(imageElement, offsetX, offsetY, drawWidth, drawHeight);
+    
+    // Step 1: Draw the scaled image at a smaller size
+    ctx.drawImage(tempCanvas, 0, 0, w, h);
+
+    // Step 2: Save the small image data
+    const smallImageData = ctx.getImageData(0, 0, w, h);
+    
+    // Step 3: Clear the canvas
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    // Step 4: Turn off image smoothing for a blocky look
+    ctx.imageSmoothingEnabled = false;
+    
+    // Step 5: Draw the small image back to the canvas at full size
+    ctx.putImageData(smallImageData, 0, 0);
+    ctx.drawImage(
+      canvas, 
+      0, 0, w, h,
+      0, 0, canvas.width, canvas.height
+    );
+  } catch (error) {
+    console.error("Error applying pixelation effect:", error);
   }
-
-  // Calculate the size of the pixelated image
-  const w = Math.ceil(canvas.width / pixelSize);
-  const h = Math.ceil(canvas.height / pixelSize);
-
-  // First, draw the image properly scaled to fill the canvas
-  const { width: imgWidth, height: imgHeight } = imageElement;
-  const imgAspect = imgWidth / imgHeight;
-  const canvasAspect = canvas.width / canvas.height;
-  
-  let drawWidth, drawHeight, offsetX = 0, offsetY = 0;
-  
-  if (imgAspect > canvasAspect) {
-    // Image is wider than canvas (relative to height)
-    drawHeight = canvas.height;
-    drawWidth = drawHeight * imgAspect;
-    offsetX = (canvas.width - drawWidth) / 2;
-  } else {
-    // Image is taller than canvas (relative to width)
-    drawWidth = canvas.width;
-    drawHeight = drawWidth / imgAspect;
-    offsetY = (canvas.height - drawHeight) / 2;
-  }
-  
-  // Clear and draw original image at full size first (we'll pixelate from this)
-  const tempCanvas = document.createElement('canvas');
-  tempCanvas.width = canvas.width;
-  tempCanvas.height = canvas.height;
-  const tempCtx = tempCanvas.getContext('2d');
-  if (!tempCtx) return;
-  
-  tempCtx.drawImage(imageElement, offsetX, offsetY, drawWidth, drawHeight);
-  
-  // Step 1: Draw the scaled image at a smaller size
-  ctx.drawImage(tempCanvas, 0, 0, w, h);
-
-  // Step 2: Save the small image data
-  const smallImageData = ctx.getImageData(0, 0, w, h);
-  
-  // Step 3: Clear the canvas
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
-  // Step 4: Turn off image smoothing for a blocky look
-  ctx.imageSmoothingEnabled = false;
-  
-  // Step 5: Draw the small image back to the canvas at full size
-  ctx.putImageData(smallImageData, 0, 0);
-  ctx.drawImage(
-    canvas, 
-    0, 0, w, h,
-    0, 0, canvas.width, canvas.height
-  );
 };
 
 // Utility function to create timed pixelation animation
@@ -133,7 +145,17 @@ export const createPixelationAnimation = (
     currentLevel = Math.max(0, 1 - elapsed / duration);
 
     // Apply the pixelation effect
-    applyPixelation(imageElement, canvas, currentLevel);
+    try {
+      applyPixelation(imageElement, canvas, currentLevel);
+    } catch (error) {
+      console.error("Animation frame error:", error);
+      if (animationFrameId !== null) {
+        cancelAnimationFrame(animationFrameId);
+        animationFrameId = null;
+      }
+      currentLevel = 0;
+      return;
+    }
 
     // Continue animation if not complete
     if (elapsed < duration) {
@@ -141,7 +163,11 @@ export const createPixelationAnimation = (
     } else {
       // Animation complete
       currentLevel = 0;
-      applyPixelation(imageElement, canvas, currentLevel);
+      try {
+        applyPixelation(imageElement, canvas, currentLevel);
+      } catch (error) {
+        console.error("Error in final animation frame:", error);
+      }
       if (onComplete) onComplete();
     }
   };
@@ -149,7 +175,11 @@ export const createPixelationAnimation = (
   const forceComplete = () => {
     // Force pixelation level to 0 (fully unpixelated)
     currentLevel = 0;
-    applyPixelation(imageElement, canvas, currentLevel);
+    try {
+      applyPixelation(imageElement, canvas, currentLevel);
+    } catch (error) {
+      console.error("Error in force complete:", error);
+    }
   };
 
   return {
