@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import ImageLoadingIndicator from './ImageLoadingIndicator';
 import PixelRevealCanvas from './PixelRevealCanvas';
@@ -171,10 +172,12 @@ const MovieImage: React.FC<MovieImageProps> = ({
   }, [imageUrl, duration, onImageLoaded, onRevealComplete, onImageError]);
   
   useEffect(() => {
+    // Don't restart the animation when only the pause state changes
     if (!animationRef.current || !isLoaded) return;
     
     if (isActive && !isPaused) {
-      animationRef.current.start();
+      // Only need to resume if it was previously paused
+      animationRef.current.resume();
     } else if (isActive && isPaused) {
       animationRef.current.pause();
     } else {
@@ -182,15 +185,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
     }
   }, [isActive, isLoaded, isPaused]);
   
-  useEffect(() => {
-    if (animationRef.current && isLoaded) {
-      if (isPaused) {
-        animationRef.current.pause();
-      } else {
-        animationRef.current.resume();
-      }
-    }
-  }, [isPaused, isLoaded]);
+  // The useEffect below is no longer needed as we handle pause/resume in the effect above
   
   useEffect(() => {
     const handleResize = () => {

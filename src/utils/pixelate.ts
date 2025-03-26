@@ -202,15 +202,20 @@ export const createPixelationAnimation = (
 
   return {
     start: () => {
-      // Stop any existing animation
+      // Reset animation state but preserve current pixelation level if paused
       if (animationFrameId !== null) {
         cancelAnimationFrame(animationFrameId);
       }
+      
+      // Only reset everything if not previously paused
+      if (!isPaused) {
+        startTime = null;
+        pauseTime = null;
+        elapsedBeforePause = 0;
+        currentLevel = 1;
+      }
+      
       isPaused = false;
-      startTime = null;
-      pauseTime = null;
-      elapsedBeforePause = 0;
-      currentLevel = 1;
       animationFrameId = requestAnimationFrame(animate);
     },
     stop: () => {
