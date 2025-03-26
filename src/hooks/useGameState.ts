@@ -126,7 +126,6 @@ export function useGameState() {
   const handleSkip = async () => {
     if (isGameActive) {
       setIsGameActive(false);
-      setIsRoundComplete(true);
       await startNewRound();
     }
   };
