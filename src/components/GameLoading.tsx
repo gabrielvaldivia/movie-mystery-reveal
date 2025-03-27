@@ -1,5 +1,8 @@
 
 import React from 'react';
+import { Skeleton } from './ui/skeleton';
+import { Progress } from './ui/progress';
+import { FilmIcon } from 'lucide-react';
 
 interface GameLoadingProps {
   loadingProgress: number;
@@ -7,24 +10,22 @@ interface GameLoadingProps {
 
 const GameLoading: React.FC<GameLoadingProps> = ({ loadingProgress }) => {
   return (
-    <div className="w-full h-full glass-panel flex flex-col items-center justify-center gap-6">
-      <div className="w-16 h-16 relative">
-        <div className="w-16 h-16 rounded-full border-4 border-primary border-opacity-20 absolute"></div>
-        <div 
-          className="w-16 h-16 rounded-full border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent absolute animate-spin"
-          style={{ animationDuration: '1.5s' }}
-        ></div>
+    <div className="w-full h-full flex flex-col items-center justify-center gap-8 p-6 bg-gradient-to-b from-background/90 to-background">
+      <div className="animate-pulse">
+        <FilmIcon size={48} className="text-primary opacity-80" />
       </div>
-      <div className="w-3/4 max-w-xs">
-        <div className="h-2 bg-secondary-foreground/10 rounded-full overflow-hidden">
-          <div 
-            className="h-full bg-primary transition-all duration-500 ease-out"
-            style={{ width: `${loadingProgress}%` }}
-          ></div>
-        </div>
-        <p className="text-center text-sm text-muted-foreground mt-2">
-          Loading game assets...
+      
+      <div className="w-3/4 max-w-xs space-y-4">
+        <Progress value={loadingProgress} className="h-2" />
+        <p className="text-center text-sm text-muted-foreground">
+          Loading game assets... {Math.round(loadingProgress)}%
         </p>
+      </div>
+      
+      <div className="w-full max-w-sm space-y-3 mt-8">
+        <Skeleton className="h-4 w-full" />
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-4 w-1/2" />
       </div>
     </div>
   );

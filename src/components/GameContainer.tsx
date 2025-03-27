@@ -38,6 +38,7 @@ const GameContainer: React.FC = () => {
   } = useGameState();
   
   const handleStartGame = () => {
+    resetGame(); // Ensure game state is reset before starting a new game
     setShowStartScreen(false);
   };
   
