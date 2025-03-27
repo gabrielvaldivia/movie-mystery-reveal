@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Movie } from '../utils/types/movieTypes';
 import { getRandomMovie, getNextMovie } from '../utils/gameData';
 
@@ -16,39 +16,41 @@ export function useGameState() {
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [timeExpired, setTimeExpired] = useState(false);
   const [imageLoadError, setImageLoadError] = useState(false);
-  const [gameInitialized, setGameInitialized] = useState(false);
-  const [imageLoadTimeout, setImageLoadTimeout] = useState<NodeJS.Timeout | null>(null);
-  const [progressInterval, setProgressInterval] = useState<NodeJS.Timeout | null>(null);
 
-  const startNewRound = useCallback(async () => {
+  useEffect(() => {
+    const initGame = async () => {
+      setIsLoading(true);
+      try {
+        const progressInterval = setInterval(() => {
+          setLoadingProgress(prev => {
+            const newProgress = prev + (100 - prev) * 0.1;
+            return newProgress >= 99 ? 99 : newProgress;
+          });
+        }, 200);
+        
+        await startNewRound();
+        
+        clearInterval(progressInterval);
+        setLoadingProgress(100);
+      } catch (error) {
+        console.error("Error initializing game:", error);
+        setLoadingProgress(100);
+        setIsLoading(false);
+        setImageLoadError(true);
+      }
+    };
+    
+    initGame();
+  }, []);
+  
+  const startNewRound = async () => {
     setIsLoading(true);
     setIsImageLoaded(false);
     setShowSuccessDialog(false);
     setTimeExpired(false);
     setImageLoadError(false);
-    setIsGameActive(false);
-    setIsRoundComplete(false);
-    setLoadingProgress(10); // Start with some initial progress for immediate feedback
-    
-    if (imageLoadTimeout) {
-      clearTimeout(imageLoadTimeout);
-    }
-    
-    if (progressInterval) {
-      clearInterval(progressInterval);
-    }
-    
-    // Setup a more dynamic progress animation
-    const interval = setInterval(() => {
-      setLoadingProgress(prev => {
-        // Add a random increment to make it feel more natural
-        const increment = Math.random() * 4 + 1;
-        const newValue = prev + increment;
-        return newValue >= 90 ? 90 : newValue; // Cap at 90% until actual load completes
-      });
-    }, 200);
-    
-    setProgressInterval(interval);
+    setIsGameActive(false);  // Reset game active state
+    setIsRoundComplete(false);  // Ensure round is marked as not complete
     
     try {
       setImageKey(Date.now());
@@ -62,85 +64,15 @@ export function useGameState() {
       setCurrentMovie(nextMovie);
       setIsCorrectGuess(false);
       setHasIncorrectGuess(false);
-      
-      const timeout = setTimeout(() => {
-        console.log("Image load timeout triggered - forcing game start");
-        if (progressInterval) {
-          clearInterval(progressInterval);
-        }
-        setIsLoading(false);
-        setIsImageLoaded(true);
-        setIsGameActive(true);
-        setLoadingProgress(100);
-      }, 10000);
-      
-      setImageLoadTimeout(timeout);
-      
     } catch (error) {
       console.error("Error starting new round:", error);
-      if (progressInterval) {
-        clearInterval(progressInterval);
-      }
       setImageLoadError(true);
+    } finally {
       setIsLoading(false);
-      setLoadingProgress(100);
     }
-  }, [currentMovie, imageLoadTimeout, progressInterval]);
+  };
 
-  useEffect(() => {
-    if (!gameInitialized) {
-      const initGame = async () => {
-        setIsLoading(true);
-        setLoadingProgress(0);
-        
-        // Add a tiny delay to ensure the loading screen appears with initial progress
-        setTimeout(() => {
-          setLoadingProgress(5);
-        }, 100);
-        
-        try {
-          // Initialize game with progressively updating loading indicator
-          const progressInterval = setInterval(() => {
-            setLoadingProgress(prev => {
-              const newProgress = prev + (Math.random() * 3 + 1);
-              return newProgress >= 80 ? 80 : newProgress; // Cap at 80% until actual game loads
-            });
-          }, 200);
-          
-          await startNewRound();
-          
-          clearInterval(progressInterval);
-          setGameInitialized(true);
-        } catch (error) {
-          console.error("Error initializing game:", error);
-          setLoadingProgress(100);
-          setIsLoading(false);
-          setImageLoadError(true);
-        }
-      };
-      
-      initGame();
-    }
-    
-    return () => {
-      if (imageLoadTimeout) {
-        clearTimeout(imageLoadTimeout);
-      }
-      if (progressInterval) {
-        clearInterval(progressInterval);
-      }
-    };
-  }, [gameInitialized, startNewRound, imageLoadTimeout, progressInterval]);
-
-  const resetGame = useCallback(() => {
-    if (imageLoadTimeout) {
-      clearTimeout(imageLoadTimeout);
-    }
-    
-    if (progressInterval) {
-      clearInterval(progressInterval);
-    }
-    
+  const resetGame = () => {
     setCurrentMovie(null);
     setIsGameActive(false);
     setIsRoundComplete(false);
@@ -154,8 +86,7 @@ export function useGameState() {
     setLoadingProgress(0);
     setTimeExpired(false);
     setImageLoadError(false);
-    setGameInitialized(false);
-  }, [imageLoadTimeout, progressInterval]);
+  };
 
   const handleGuess = (guess: string) => {
     if (!currentMovie || !isGameActive) return;
@@ -180,7 +111,7 @@ export function useGameState() {
   };
 
   const handleTimeUp = () => {
-    if (isGameActive && !isRoundComplete) {
+    if (isGameActive && !isRoundComplete) {  // Only handle time up if game is active
       setIsGameActive(false);
       setIsRoundComplete(true);
       setTimeExpired(true);
@@ -189,45 +120,19 @@ export function useGameState() {
   };
 
   const handleImageLoaded = () => {
-    console.log("Image loaded successfully - activating game");
-    
-    if (imageLoadTimeout) {
-      clearTimeout(imageLoadTimeout);
-      setImageLoadTimeout(null);
-    }
-    
-    if (progressInterval) {
-      clearInterval(progressInterval);
-    }
-    
     setIsImageLoaded(true);
-    setLoadingProgress(100);
-    setIsLoading(false);
-    setIsGameActive(true);
+    setIsGameActive(true);  // Now set game active once image is loaded
   };
   
   const handleImageError = () => {
-    console.error("Error loading image - attempting to load next movie");
-    
-    if (imageLoadTimeout) {
-      clearTimeout(imageLoadTimeout);
-      setImageLoadTimeout(null);
-    }
-    
-    if (progressInterval) {
-      clearInterval(progressInterval);
-    }
-    
     setImageLoadError(true);
-    setIsLoading(false);
-    setLoadingProgress(100);
     setTimeout(() => {
       startNewRound();
     }, 2000);
   };
   
   const handleRevealComplete = () => {
-    if (isGameActive && !isRoundComplete) {
+    if (isGameActive && !isRoundComplete) {  // Only handle reveal complete if game is active
       handleTimeUp();
     }
   };
@@ -239,14 +144,17 @@ export function useGameState() {
   
   const handleSkip = async () => {
     if (isGameActive) {
+      // Reset all state variables related to game completion and dialogs
       setIsGameActive(false);
       setIsRoundComplete(false);
       setTimeExpired(false);
       setShowSuccessDialog(false);
       setIsCorrectGuess(false);
       
+      // Force a small delay before starting the new round to ensure state updates
       await new Promise(resolve => setTimeout(resolve, 10));
       
+      // Start the new round
       await startNewRound();
     }
   };

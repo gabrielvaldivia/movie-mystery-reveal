@@ -1,25 +1,29 @@
 
 import React from 'react';
-import { Progress } from './ui/progress';
-import { FilmIcon } from 'lucide-react';
 
 interface GameLoadingProps {
   loadingProgress: number;
 }
 
 const GameLoading: React.FC<GameLoadingProps> = ({ loadingProgress }) => {
-  // No dynamic message, just static text
   return (
-    <div className="w-full h-full flex flex-col items-center justify-center gap-8 p-6 bg-background">
-      <FilmIcon size={48} className="text-primary" />
-      
-      <div className="w-3/4 max-w-xs space-y-4">
-        <Progress 
-          value={loadingProgress} 
-          className="h-2"
-        />
-        <p className="text-center text-sm text-muted-foreground">
-          Loading... {Math.round(loadingProgress)}%
+    <div className="w-full h-full glass-panel flex flex-col items-center justify-center gap-6">
+      <div className="w-16 h-16 relative">
+        <div className="w-16 h-16 rounded-full border-4 border-primary border-opacity-20 absolute"></div>
+        <div 
+          className="w-16 h-16 rounded-full border-4 border-t-primary border-r-transparent border-b-transparent border-l-transparent absolute animate-spin"
+          style={{ animationDuration: '1.5s' }}
+        ></div>
+      </div>
+      <div className="w-3/4 max-w-xs">
+        <div className="h-2 bg-secondary-foreground/10 rounded-full overflow-hidden">
+          <div 
+            className="h-full bg-primary transition-all duration-500 ease-out"
+            style={{ width: `${loadingProgress}%` }}
+          ></div>
+        </div>
+        <p className="text-center text-sm text-muted-foreground mt-2">
+          Loading game assets...
         </p>
       </div>
     </div>

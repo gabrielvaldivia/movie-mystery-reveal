@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 interface UseLoadingProgressProps {
   isLoading: boolean;
@@ -8,33 +8,59 @@ interface UseLoadingProgressProps {
 
 export function useLoadingProgress({ 
   isLoading, 
-  duration = 3000 // Not really used anymore, just a placeholder
+  duration = 3000 
 }: UseLoadingProgressProps) {
   const [loadingProgress, setLoadingProgress] = useState(0);
+  const loadingProgressRef = useRef<number>(0);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (isLoading) {
       // Reset progress when loading starts
+      loadingProgressRef.current = 0;
       setLoadingProgress(0);
       
-      // Just three fixed steps, no complex animations
-      const step1 = setTimeout(() => setLoadingProgress(33), 300);
-      const step2 = setTimeout(() => setLoadingProgress(66), 600);
-      const step3 = setTimeout(() => setLoadingProgress(100), 900);
-      
-      return () => {
-        clearTimeout(step1);
-        clearTimeout(step2);
-        clearTimeout(step3);
-      };
+      // Set up progress simulation
+      progressIntervalRef.current = setInterval(() => {
+        if (loadingProgressRef.current < 90) {
+          loadingProgressRef.current += 5;
+          setLoadingProgress(loadingProgressRef.current);
+        } else {
+          if (progressIntervalRef.current) {
+            clearInterval(progressIntervalRef.current);
+            progressIntervalRef.current = null;
+          }
+        }
+      }, duration / 20); // Divide duration to get appropriate interval steps
     } else {
-      // Jump to 100% when loading completes
-      setLoadingProgress(100);
+      // Clean up interval if loading stops
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+      
+      // If loading completed successfully, set progress to 100%
+      if (loadingProgressRef.current > 0) {
+        loadingProgressRef.current = 100;
+        setLoadingProgress(100);
+      }
     }
-  }, [isLoading]);
+    
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+        progressIntervalRef.current = null;
+      }
+    };
+  }, [isLoading, duration]);
+
+  const resetProgress = () => {
+    loadingProgressRef.current = 0;
+    setLoadingProgress(0);
+  };
 
   return {
     loadingProgress,
-    resetProgress: () => setLoadingProgress(0)
+    resetProgress
   };
 }

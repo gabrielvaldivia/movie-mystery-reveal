@@ -38,7 +38,6 @@ const GameContainer: React.FC = () => {
   } = useGameState();
   
   const handleStartGame = () => {
-    resetGame(); // Ensure game state is reset before starting a new game
     setShowStartScreen(false);
   };
   
@@ -82,7 +81,6 @@ const GameContainer: React.FC = () => {
                   isActive={isGameActive && !showSuccessDialog}
                   onImageLoaded={handleImageLoaded}
                   onImageError={handleImageError}
-                  skipLoadingIndicator={true} // Skip showing the loading indicator since we're handling it in GameContainer
                 >
                   <GuessInput 
                     onGuess={handleGuess}

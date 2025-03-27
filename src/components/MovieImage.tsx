@@ -15,7 +15,6 @@ interface MovieImageProps {
   onImageLoaded?: () => void;
   onImageError?: () => void;
   onRetry?: () => void;
-  skipLoadingIndicator?: boolean; // New prop to skip the loading indicator
 }
 
 const MovieImage: React.FC<MovieImageProps> = ({ 
@@ -26,8 +25,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   children,
   onImageLoaded,
   onImageError,
-  onRetry,
-  skipLoadingIndicator = false // Default to false for backward compatibility
+  onRetry
 }) => {
   const isMobile = useIsMobile();
   const {
@@ -47,7 +45,6 @@ const MovieImage: React.FC<MovieImageProps> = ({
   });
 
   const handleRetryClick = () => {
-    console.log("Retry clicked");
     if (onRetry) {
       onRetry();
     } else {
@@ -59,15 +56,13 @@ const MovieImage: React.FC<MovieImageProps> = ({
     <div className={`pixel-reveal-container glass-panel no-rounded relative ${isMobile ? 'h-full w-full' : ''}`}>
       <PixelRevealCanvas ref={canvasRef} />
       
-      {!skipLoadingIndicator && (
-        <ImageLoadingIndicator 
-          isLoading={isLoading}
-          progress={loadingProgress}
-          error={loadError}
-          timeout={timeoutError}
-          onRetry={handleRetryClick}
-        />
-      )}
+      <ImageLoadingIndicator 
+        isLoading={isLoading}
+        progress={loadingProgress}
+        error={loadError}
+        timeout={timeoutError}
+        onRetry={handleRetryClick}
+      />
       
       {children && <MovieContentWrapper>{children}</MovieContentWrapper>}
     </div>

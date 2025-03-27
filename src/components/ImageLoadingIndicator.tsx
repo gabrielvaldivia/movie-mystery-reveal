@@ -50,11 +50,11 @@ const ImageLoadingIndicator: React.FC<ImageLoadingIndicatorProps> = ({
 
   if (isLoading) {
     return (
-      <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary/80 backdrop-blur-sm z-10">
-        <div className="w-2/3 max-w-xs space-y-3">
-          <Progress value={progress} className="h-2" />
-          <p className="text-center text-sm text-foreground font-medium">
-            {loadingMessage} {Math.round(progress)}%
+      <div className="absolute inset-0 flex flex-col items-center justify-center bg-secondary/80 backdrop-blur-sm">
+        <div className="w-2/3 max-w-xs space-y-2">
+          <Progress value={progress} className="h-1.5" />
+          <p className="text-center text-xs text-muted-foreground">
+            {loadingMessage}
           </p>
         </div>
       </div>
