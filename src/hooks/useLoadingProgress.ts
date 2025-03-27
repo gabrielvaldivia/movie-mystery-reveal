@@ -8,7 +8,7 @@ interface UseLoadingProgressProps {
 
 export function useLoadingProgress({ 
   isLoading, 
-  duration = 3000 // Shorter duration
+  duration = 3000 // Not really used anymore, just a placeholder
 }: UseLoadingProgressProps) {
   const [loadingProgress, setLoadingProgress] = useState(0);
 
@@ -17,10 +17,10 @@ export function useLoadingProgress({
       // Reset progress when loading starts
       setLoadingProgress(0);
       
-      // Simple linear progress - just 4 steps
-      const step1 = setTimeout(() => setLoadingProgress(25), 200);
-      const step2 = setTimeout(() => setLoadingProgress(50), 500);
-      const step3 = setTimeout(() => setLoadingProgress(75), 1000);
+      // Just three fixed steps, no complex animations
+      const step1 = setTimeout(() => setLoadingProgress(33), 300);
+      const step2 = setTimeout(() => setLoadingProgress(66), 600);
+      const step3 = setTimeout(() => setLoadingProgress(100), 900);
       
       return () => {
         clearTimeout(step1);
@@ -31,14 +31,10 @@ export function useLoadingProgress({
       // Jump to 100% when loading completes
       setLoadingProgress(100);
     }
-  }, [isLoading, duration]);
-
-  const resetProgress = () => {
-    setLoadingProgress(0);
-  };
+  }, [isLoading]);
 
   return {
     loadingProgress,
-    resetProgress
+    resetProgress: () => setLoadingProgress(0)
   };
 }

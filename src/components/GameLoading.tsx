@@ -8,9 +8,7 @@ interface GameLoadingProps {
 }
 
 const GameLoading: React.FC<GameLoadingProps> = ({ loadingProgress }) => {
-  // Simple static message instead of dynamic updates
-  const message = "Loading game...";
-
+  // No dynamic message, just static text
   return (
     <div className="w-full h-full flex flex-col items-center justify-center gap-8 p-6 bg-background">
       <FilmIcon size={48} className="text-primary" />
@@ -21,7 +19,7 @@ const GameLoading: React.FC<GameLoadingProps> = ({ loadingProgress }) => {
           className="h-2"
         />
         <p className="text-center text-sm text-muted-foreground">
-          {message} {Math.round(loadingProgress)}%
+          Loading... {Math.round(loadingProgress)}%
         </p>
       </div>
     </div>

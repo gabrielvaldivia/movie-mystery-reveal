@@ -17,20 +17,9 @@ export function useImageLoader({
   const [loadError, setLoadError] = useState(false);
   const [timeoutError, setTimeoutError] = useState(false);
   const imageRef = useRef<HTMLImageElement | null>(null);
-  const [loadingProgress, setLoadingProgress] = useState(0);
   
-  // Much simpler progress logic with fewer intervals and computations
-  useEffect(() => {
-    if (isLoading) {
-      setLoadingProgress(25);
-      const timer = setTimeout(() => {
-        setLoadingProgress(75);
-      }, 500);
-      return () => clearTimeout(timer);
-    } else {
-      setLoadingProgress(100);
-    }
-  }, [isLoading]);
+  // Fixed progress with only a single state update
+  const loadingProgress = isLoading ? 50 : 100;
   
   const loadImage = () => {
     setIsLoading(true);
@@ -38,14 +27,14 @@ export function useImageLoader({
     setLoadError(false);
     setTimeoutError(false);
     
-    // Simple timeout of 2.5 seconds max
+    // Short timeout of 2 seconds max
     const timeoutId = setTimeout(() => {
       if (!isLoaded) {
         setTimeoutError(true);
         setIsLoading(false);
         if (onImageError) onImageError();
       }
-    }, 2500);
+    }, 2000);
     
     const image = new Image();
     
@@ -66,8 +55,8 @@ export function useImageLoader({
       if (onImageError) onImageError();
     };
     
-    // Simple cache buster
-    image.src = `${imageUrl}?cb=${Date.now()}`;
+    // No cache busting to avoid extra requests
+    image.src = imageUrl;
   };
 
   useEffect(() => {
@@ -78,10 +67,6 @@ export function useImageLoader({
     return () => {};
   }, [imageUrl]);
 
-  const handleRetry = () => {
-    loadImage();
-  };
-
   return {
     imageRef,
     isLoaded,
@@ -89,6 +74,6 @@ export function useImageLoader({
     loadError,
     timeoutError,
     loadingProgress,
-    handleRetry
+    handleRetry: loadImage
   };
 }
