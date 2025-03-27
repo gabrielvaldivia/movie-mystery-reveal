@@ -1,5 +1,5 @@
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 interface UseLoadingProgressProps {
   isLoading: boolean;
@@ -8,68 +8,32 @@ interface UseLoadingProgressProps {
 
 export function useLoadingProgress({ 
   isLoading, 
-  duration = 1500 // Reduce default duration to 1.5 seconds
+  duration = 3000 // Shorter duration
 }: UseLoadingProgressProps) {
   const [loadingProgress, setLoadingProgress] = useState(0);
-  const loadingProgressRef = useRef<number>(0);
-  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     if (isLoading) {
       // Reset progress when loading starts
-      loadingProgressRef.current = 0;
       setLoadingProgress(0);
       
-      // Immediate visual feedback with a larger initial progress
-      setTimeout(() => {
-        loadingProgressRef.current = 20;
-        setLoadingProgress(20);
-      }, 50); // Faster initial feedback
+      // Simple linear progress - just 4 steps
+      const step1 = setTimeout(() => setLoadingProgress(25), 200);
+      const step2 = setTimeout(() => setLoadingProgress(50), 500);
+      const step3 = setTimeout(() => setLoadingProgress(75), 1000);
       
-      // Set up progress simulation with more frequent updates
-      progressIntervalRef.current = setInterval(() => {
-        if (loadingProgressRef.current < 85) {
-          // Larger increments for faster progress
-          const increment = Math.random() * 8 + 5;
-          loadingProgressRef.current += increment;
-          setLoadingProgress(loadingProgressRef.current);
-        } else {
-          // Faster progression at the end
-          if (loadingProgressRef.current < 95) {
-            loadingProgressRef.current += 1;
-            setLoadingProgress(loadingProgressRef.current);
-          } else {
-            if (progressIntervalRef.current) {
-              clearInterval(progressIntervalRef.current);
-              progressIntervalRef.current = null;
-            }
-          }
-        }
-      }, duration / 60); // Even more frequent updates for smoother animation
+      return () => {
+        clearTimeout(step1);
+        clearTimeout(step2);
+        clearTimeout(step3);
+      };
     } else {
-      // Clean up interval if loading stops
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-        progressIntervalRef.current = null;
-      }
-      
       // Jump to 100% when loading completes
-      if (loadingProgressRef.current > 0) {
-        loadingProgressRef.current = 100;
-        setLoadingProgress(100);
-      }
+      setLoadingProgress(100);
     }
-    
-    return () => {
-      if (progressIntervalRef.current) {
-        clearInterval(progressIntervalRef.current);
-        progressIntervalRef.current = null;
-      }
-    };
   }, [isLoading, duration]);
 
   const resetProgress = () => {
-    loadingProgressRef.current = 0;
     setLoadingProgress(0);
   };
 
