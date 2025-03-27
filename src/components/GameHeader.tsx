@@ -25,14 +25,14 @@ const GameHeader: React.FC<GameHeaderProps> = ({
         variant="ghost" 
         size="icon" 
         onClick={onClose}
-        className="bg-black/30 text-white hover:bg-black/50 hover:text-white transition-colors rounded-full p-0 flex items-center justify-center"
+        className="text-white hover:bg-white/20 transition-colors rounded-full p-0 flex items-center justify-center"
         aria-label="Close game"
         style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
       >
         <X className="h-5 w-5" />
       </Button>
       
-      <div className="w-full mx-6">
+      <div className="w-full mx-8">
         <Timer 
           duration={duration} 
           onTimeUp={onTimeUp} 
@@ -44,7 +44,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
         variant="ghost" 
         size="icon" 
         onClick={onSkip}
-        className="bg-black/30 text-white hover:bg-black/50 hover:text-white transition-colors rounded-full p-0 flex items-center justify-center"
+        className="text-white hover:bg-white/20 transition-colors rounded-full p-0 flex items-center justify-center"
         aria-label="Skip this movie"
         style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
       >
