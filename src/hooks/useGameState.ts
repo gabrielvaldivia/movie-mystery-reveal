@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { Movie } from '../utils/types/movieTypes';
 import { getRandomMovie, getNextMovie } from '../utils/gameData';
@@ -53,7 +52,6 @@ export function useGameState() {
     }
   }, [currentMovie, gameDuration]);
 
-  // Initialize game on first load only
   useEffect(() => {
     if (!gameInitialized) {
       const initGame = async () => {
@@ -99,19 +97,19 @@ export function useGameState() {
     setLoadingProgress(0);
     setTimeExpired(false);
     setImageLoadError(false);
-    setGameInitialized(false); // Reset initialized state to trigger a fresh load
+    setGameInitialized(false);
   }, []);
 
-  // Update time remaining
   const updateTimeRemaining = useCallback((time: number) => {
     setTimeRemaining(time);
   }, []);
 
   const calculateScore = (remainingTime: number) => {
-    // Calculate score out of 100 based on remaining time
-    // If all time remains, score is 100. If no time remains, score is 0.
-    const percentage = remainingTime / gameDuration;
-    return Math.round(percentage * 100);
+    const timePercentage = remainingTime / gameDuration;
+    
+    const adjustedPercentage = Math.pow(timePercentage, 1.5);
+    
+    return Math.round(adjustedPercentage * 100);
   };
 
   const handleGuess = (guess: string) => {
@@ -124,6 +122,7 @@ export function useGameState() {
     
     if (isCorrect) {
       const roundScore = calculateScore(timeRemaining);
+      console.log(`Time remaining: ${timeRemaining}ms, Score calculation: ${roundScore}/100`);
       setCurrentRoundScore(roundScore);
       setIsGameActive(false);
       setIsRoundComplete(true);
@@ -143,7 +142,7 @@ export function useGameState() {
       setIsGameActive(false);
       setIsRoundComplete(true);
       setTimeExpired(true);
-      setCurrentRoundScore(0); // Zero score when time expires
+      setCurrentRoundScore(0);
       setShowSuccessDialog(true);
     }
   };

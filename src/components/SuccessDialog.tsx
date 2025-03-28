@@ -52,6 +52,9 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({
               <p className="font-medium">Total score:</p>
               <p className="font-bold">{totalScore}</p>
             </div>
+            <p className="text-xs text-muted-foreground text-center mt-2">
+              Score is based on how quickly you answered. Faster answers earn higher scores!
+            </p>
           </div>
         )}
         
