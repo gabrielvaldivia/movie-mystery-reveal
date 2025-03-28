@@ -26,6 +26,9 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
 
   // Ensure suggestions is always an array
   const safeSuggestions = Array.isArray(suggestions) ? suggestions : [];
+  
+  // Limit to 5 suggestions
+  const limitedSuggestions = safeSuggestions.slice(0, 5);
 
   return (
     <div className="w-full overflow-hidden bg-white dark:bg-gray-800 rounded-md border shadow-lg z-50">
@@ -39,9 +42,9 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
           ) : (
             <>
               <CommandEmpty>No movies found</CommandEmpty>
-              {safeSuggestions.length > 0 && (
+              {limitedSuggestions.length > 0 && (
                 <CommandGroup>
-                  {safeSuggestions.map((movie, index) => (
+                  {limitedSuggestions.map((movie, index) => (
                     <CommandItem
                       key={movie.id}
                       onSelect={() => {
