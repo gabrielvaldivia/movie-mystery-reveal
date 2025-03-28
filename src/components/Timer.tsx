@@ -12,11 +12,13 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
   const [timeRemaining, setTimeRemaining] = useState(duration);
   const timerRef = useRef<number | null>(null);
   const hasStartedRef = useRef<boolean>(false);
+  const lastTickTimeRef = useRef<number | null>(null);
   
   // Reset timer when duration changes
   useEffect(() => {
     setTimeRemaining(duration);
     hasStartedRef.current = false;
+    lastTickTimeRef.current = null;
   }, [duration]);
   
   // Clear interval on unmount
@@ -39,10 +41,17 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
     // Start timer if running and we have time left
     if (isRunning && timeRemaining > 0) {
       hasStartedRef.current = true;
+      lastTickTimeRef.current = Date.now();
       
       timerRef.current = window.setInterval(() => {
+        const now = Date.now();
+        const elapsed = lastTickTimeRef.current ? now - lastTickTimeRef.current : 100;
+        lastTickTimeRef.current = now;
+        
         setTimeRemaining((prev) => {
-          if (prev <= 100) {
+          const newTime = Math.max(0, prev - elapsed);
+          
+          if (newTime <= 0) {
             if (timerRef.current) {
               clearInterval(timerRef.current);
               timerRef.current = null;
@@ -53,9 +62,13 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
             }
             return 0;
           }
-          return prev - 100;
+          return newTime;
         });
       }, 100);
+    } else if (!isRunning) {
+      // If we're paused, update the last tick time to now so we don't count
+      // the paused time when we resume
+      lastTickTimeRef.current = null;
     }
     
     // Return cleanup function

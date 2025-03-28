@@ -47,76 +47,51 @@ export function usePixelationAnimation({
     }
   }, [isPaused, isLoaded]);
 
-  useEffect(() => {
-    if (!animationRef.current || !isLoaded || !imageRef.current || !canvasRef.current) return;
-    
-    console.log("Animation state changed. isActive:", isActive);
-    
-    if (isActive) {
-      console.log("Starting animation");
-      animationRef.current.start();
-      
-      // If we need to start in paused state, do it with a slight delay
-      // to ensure the animation has properly started
-      if (isPaused) {
-        console.log("Pausing newly started animation");
-        setTimeout(() => {
-          if (animationRef.current) {
-            animationRef.current.pause();
-            setInternalIsPaused(true);
-          }
-        }, 20); // Increased delay for better reliability
-      }
-    } else {
-      console.log("Forcing animation complete");
-      animationRef.current.forceComplete();
-    }
-  }, [isActive, isLoaded, isPaused]);
-  
-  // This effect creates the animation when the image loads
+  // Effect to create and control animation based on active state
   useEffect(() => {
     if (!isLoaded || !imageRef.current || !canvasRef.current) return;
     
-    const container = canvasRef.current.parentElement;
-    if (!container) return;
+    console.log("Animation state changed. isActive:", isActive, "isPaused:", isPaused);
     
-    canvasRef.current.width = container.clientWidth;
-    canvasRef.current.height = container.clientHeight;
-    
-    try {
-      const animation = createPixelationAnimation(
-        imageRef.current,
-        canvasRef.current,
-        duration,
-        onRevealComplete
-      );
-      
-      animationRef.current = animation;
-      
-      if (isActive) {
-        animation.start();
-        // If we should be paused from the beginning
-        if (isPaused) {
-          setTimeout(() => {
-            if (animation) {
-              animation.pause();
-              setInternalIsPaused(true);
-            }
-          }, 20); // Increased delay for better reliability
-        }
-      } else {
-        animation.forceComplete();
+    // Create animation if it doesn't exist yet
+    if (!animationRef.current) {
+      try {
+        const container = canvasRef.current.parentElement;
+        if (!container) return;
+        
+        canvasRef.current.width = container.clientWidth;
+        canvasRef.current.height = container.clientHeight;
+        
+        const animation = createPixelationAnimation(
+          imageRef.current,
+          canvasRef.current,
+          duration,
+          onRevealComplete
+        );
+        
+        animationRef.current = animation;
+      } catch (error) {
+        console.error("Error creating animation:", error);
+        return;
       }
-    } catch (error) {
-      console.error("Error creating animation:", error);
     }
     
-    return () => {
-      if (animationRef.current) {
-        animationRef.current.stop();
+    if (isActive && animationRef.current) {
+      if (animationRef.current.isPaused() && !isPaused) {
+        console.log("Resuming animation");
+        animationRef.current.resume();
+      } else if (!animationRef.current.isPaused() && isPaused) {
+        console.log("Pausing animation");
+        animationRef.current.pause();
+      } else if (!animationRef.current.isPaused() && !isPaused) {
+        console.log("Starting animation");
+        animationRef.current.start();
       }
-    };
-  }, [duration, isLoaded, isActive, onRevealComplete, isPaused]);
+    } else if (!isActive && animationRef.current) {
+      console.log("Forcing animation complete");
+      animationRef.current.forceComplete();
+    }
+  }, [isActive, isLoaded, isPaused, duration, onRevealComplete]);
   
   // Handle window resize - recreate animation at new canvas size
   useEffect(() => {
@@ -150,12 +125,8 @@ export function usePixelationAnimation({
             if (isActive) {
               animation.start();
               if (wasPaused || isPaused) {
-                setTimeout(() => {
-                  if (animation) {
-                    animation.pause();
-                    setInternalIsPaused(true);
-                  }
-                }, 20); // Increased delay for better reliability
+                animation.pause();
+                setInternalIsPaused(true);
               }
             } else {
               animation.forceComplete();
@@ -170,6 +141,15 @@ export function usePixelationAnimation({
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, [duration, isActive, isLoaded, onRevealComplete, isPaused]);
+  
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (animationRef.current) {
+        animationRef.current.stop();
+      }
+    };
+  }, []);
 
   const togglePause = () => {
     if (!animationRef.current) return;

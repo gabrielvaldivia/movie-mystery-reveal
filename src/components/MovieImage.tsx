@@ -63,9 +63,18 @@ const MovieImage: React.FC<MovieImageProps> = ({
   const effectivePause = isPaused !== undefined ? isPaused : internalIsPaused;
   const effectiveTogglePause = onTogglePause || internalTogglePause;
 
+  // Add a pause overlay if paused
+  const pauseOverlay = effectivePause ? (
+    <div className="absolute inset-0 bg-black/30 flex items-center justify-center z-10">
+      <div className="text-white text-4xl font-bold">PAUSED</div>
+    </div>
+  ) : null;
+
   return (
     <div className={`pixel-reveal-container glass-panel no-rounded relative ${isMobile ? 'h-full w-full' : ''}`}>
       <PixelRevealCanvas ref={canvasRef} />
+      
+      {pauseOverlay}
       
       <ImageLoadingIndicator 
         isLoading={isLoading}

@@ -31,10 +31,11 @@ export const createPixelationAnimation = (
   let elapsedBeforePause: number = 0;
   let currentLevel = 1; // Start with maximum pixelation
   let paused = false;
+  let animationStopped = false;
 
   const animate = (timestamp: number) => {
     // Critical: If paused, don't continue animation
-    if (paused) {
+    if (paused || animationStopped) {
       return;
     }
     
@@ -72,12 +73,18 @@ export const createPixelationAnimation = (
       } catch (error) {
         console.error("Error in final animation frame:", error);
       }
-      if (onComplete) onComplete();
+      // Only call onComplete if animation wasn't stopped or paused
+      if (onComplete && !animationStopped && !paused) {
+        console.log("Animation complete - triggering onComplete");
+        onComplete();
+      } else {
+        console.log("Animation complete but not triggering onComplete - stopped:", animationStopped, "paused:", paused);
+      }
     }
   };
 
   const pause = () => {
-    if (paused || !animationFrameId) return;
+    if (paused || !animationFrameId || animationStopped) return;
     
     // Set paused state BEFORE canceling the animation frame
     paused = true;
@@ -104,7 +111,7 @@ export const createPixelationAnimation = (
   };
   
   const resume = () => {
-    if (!paused) return;
+    if (!paused || animationStopped) return;
     
     paused = false;
     startTime = performance.now();
@@ -120,14 +127,31 @@ export const createPixelationAnimation = (
       cancelAnimationFrame(animationFrameId);
       animationFrameId = null;
     }
-    currentLevel = 0;
+
+    // Set as stopped before clearing pixelation
+    animationStopped = true;
     paused = false;
+    
+    currentLevel = 0;
     try {
       applyPixelation(imageElement, canvas, currentLevel);
     } catch (error) {
       console.error("Error in force complete:", error);
     }
-    if (onComplete) onComplete();
+    
+    if (onComplete) {
+      console.log("Force complete - triggering onComplete");
+      onComplete();
+    }
+  };
+
+  const stop = () => {
+    if (animationFrameId !== null) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
+    animationStopped = true;
+    paused = false;
   };
 
   return {
@@ -142,17 +166,12 @@ export const createPixelationAnimation = (
       elapsedBeforePause = 0;
       currentLevel = 1;
       paused = false;
+      animationStopped = false;
       
       animationFrameId = requestAnimationFrame(animate);
       console.log("Animation started");
     },
-    stop: () => {
-      if (animationFrameId !== null) {
-        cancelAnimationFrame(animationFrameId);
-        animationFrameId = null;
-      }
-      paused = false;
-    },
+    stop,
     pause,
     resume,
     isPaused: () => paused,
