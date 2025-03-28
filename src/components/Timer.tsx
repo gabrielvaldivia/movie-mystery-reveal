@@ -60,7 +60,8 @@ const Timer: React.FC<TimerProps> = ({
         lastTickTimeRef.current = now;
         
         setTimeRemaining((prev) => {
-          const newTime = Math.max(0, prev - elapsed);
+          // Force a minimum time decrease of at least 50ms per tick for visual feedback
+          const newTime = Math.max(0, prev - Math.max(elapsed, 50));
           
           // Report time update to parent
           if (onTimeUpdate) {
@@ -80,7 +81,7 @@ const Timer: React.FC<TimerProps> = ({
           }
           return newTime;
         });
-      }, 100); // Update timer every 100ms for smoother animation
+      }, 50); // Update timer every 50ms for smoother animation
     } else if (!isRunning) {
       // If we're paused, update the last tick time to now so we don't count
       // the paused time when we resume
@@ -96,15 +97,17 @@ const Timer: React.FC<TimerProps> = ({
     };
   }, [isRunning, onTimeUp, onTimeUpdate, timeRemaining]);
   
-  // Calculate progress percentage - FIXED: was using duration instead of timeRemaining
-  const progress = Math.max(0, (timeRemaining / duration) * 100);
+  // Calculate progress percentage
+  const progressPercentage = Math.max(0, Math.min(100, (timeRemaining / duration) * 100));
   
   return (
-    <Progress 
-      value={progress} 
-      className="h-1 w-full rounded-none bg-transparent" 
-      indicatorClassName="bg-white"
-    />
+    <div className="w-full">
+      <Progress 
+        value={progressPercentage} 
+        className="h-1 w-full rounded-none bg-transparent" 
+        indicatorClassName="bg-white transition-all"
+      />
+    </div>
   );
 };
 

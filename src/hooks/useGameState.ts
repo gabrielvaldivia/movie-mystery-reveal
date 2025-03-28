@@ -106,7 +106,8 @@ export function useGameState() {
   }, [gameDuration]);
 
   const calculateScore = (remainingTime: number) => {
-    const timePercentage = remainingTime / gameDuration;
+    const validTime = Math.max(0, Math.min(remainingTime, gameDuration));
+    const timePercentage = validTime / gameDuration;
     
     const adjustedPercentage = Math.pow(timePercentage, 2.0);
     
