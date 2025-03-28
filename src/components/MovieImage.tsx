@@ -64,7 +64,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
   const effectiveTogglePause = onTogglePause || internalTogglePause;
 
   return (
-    <div className={`pixel-reveal-container glass-panel no-rounded relative ${isMobile ? 'h-full w-full' : ''}`}>
+    <div className="pixel-reveal-container relative w-full h-full p-0 m-0 overflow-hidden">
       <PixelRevealCanvas ref={canvasRef} />
       
       <ImageLoadingIndicator 
