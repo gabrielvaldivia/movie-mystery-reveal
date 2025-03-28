@@ -2,9 +2,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { Movie } from '@/utils/types/movieTypes';
-import { getMovieSuggestions } from '@/utils/services/gameService';
 import { Input } from './ui/input';
 import MovieSuggestions from './MovieSuggestions';
+import { searchMovies } from '@/utils/services/tmdbService';
 
 interface MovieGuessInputProps {
   onGuess: (guess: string) => void;
@@ -25,6 +25,7 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
   const [suggestions, setSuggestions] = useState<Movie[]>([]);
   const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [isLoading, setIsLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   
   const handleSubmit = (e?: React.FormEvent) => {
@@ -41,19 +42,23 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setGuess(value);
     
     if (value.trim().length >= 2) {
+      setIsLoading(true);
       try {
-        const movieSuggestions = getMovieSuggestions(value);
+        // Use searchMovies from tmdbService to get real movie suggestions
+        const movieSuggestions = await searchMovies(value);
         setSuggestions(Array.isArray(movieSuggestions) ? movieSuggestions : []);
         setIsSuggestionsOpen(movieSuggestions && movieSuggestions.length > 0);
       } catch (error) {
         console.error('Error getting movie suggestions:', error);
         setSuggestions([]);
         setIsSuggestionsOpen(false);
+      } finally {
+        setIsLoading(false);
       }
     } else {
       setSuggestions([]);
@@ -147,6 +152,7 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
                 isOpen={isSuggestionsOpen}
                 onSelect={handleSuggestionSelect}
                 highlightedIndex={highlightedIndex}
+                isLoading={isLoading}
               />
             </div>
           )}
