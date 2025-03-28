@@ -13,6 +13,7 @@ const GAME_DURATION = 30000; // 30 seconds
 
 const GameContainer: React.FC = () => {
   const [showStartScreen, setShowStartScreen] = useState(true);
+  const [isPaused, setIsPaused] = useState(false);
   const isMobile = useIsMobile();
   const {
     currentMovie,
@@ -47,6 +48,10 @@ const GameContainer: React.FC = () => {
     resetGame();
   };
   
+  const handleTogglePause = () => {
+    setIsPaused(prev => !prev);
+  };
+  
   if (showStartScreen) {
     return (
       <div className={`w-full ${isMobile ? 'h-full absolute inset-0' : 'h-full'} flex items-center justify-center`}>
@@ -72,6 +77,8 @@ const GameContainer: React.FC = () => {
                   isRunning={isGameActive && isImageLoaded && !showSuccessDialog}
                   onSkip={handleSkip}
                   onClose={handleCloseGame}
+                  isPaused={isPaused}
+                  onTogglePause={handleTogglePause}
                 />
                 
                 <MovieImage 
@@ -82,6 +89,8 @@ const GameContainer: React.FC = () => {
                   isActive={isGameActive && !showSuccessDialog}
                   onImageLoaded={handleImageLoaded}
                   onImageError={handleImageError}
+                  isPaused={isPaused}
+                  onTogglePause={handleTogglePause}
                 >
                   <GuessInput 
                     onGuess={handleGuess}

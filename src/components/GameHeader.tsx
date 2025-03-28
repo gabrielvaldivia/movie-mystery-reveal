@@ -66,7 +66,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
           aria-label="Skip this movie"
           style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
         >
-          <SkipForward className="h-5 w-5" fill="currentColor" />
+          <SkipForward className="h-5 w-5" />
         </Button>
       </div>
     </div>
