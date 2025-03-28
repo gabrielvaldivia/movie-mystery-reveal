@@ -67,9 +67,11 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
     setGuess(movie.title);
     setIsSuggestionsOpen(false);
     
+    // Automatically submit the selected suggestion
     setTimeout(() => {
-      if (inputRef.current) {
-        inputRef.current.focus();
+      if (!disabled) {
+        console.log("Auto-submitting selected suggestion:", movie.title);
+        onGuess(movie.title);
       }
     }, 50);
   };
@@ -127,8 +129,6 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-
-  // Removed the auto-focus effect that was previously here
   
   useEffect(() => {
     if (inputRef.current && inputRef.current.value !== guess) {
