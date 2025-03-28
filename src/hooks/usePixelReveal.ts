@@ -35,7 +35,11 @@ export function usePixelReveal({
   });
 
   // Use the pixelation animation hook
-  const { canvasRef } = usePixelationAnimation({
+  const { 
+    canvasRef, 
+    isPaused,
+    togglePause
+  } = usePixelationAnimation({
     imageRef,
     duration,
     onRevealComplete,
@@ -50,6 +54,8 @@ export function usePixelReveal({
     loadError,
     timeoutError,
     loadingProgress,
-    handleRetry
+    handleRetry,
+    isPaused,
+    togglePause
   };
 }

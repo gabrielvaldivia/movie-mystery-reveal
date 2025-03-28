@@ -15,6 +15,8 @@ interface MovieImageProps {
   onImageLoaded?: () => void;
   onImageError?: () => void;
   onRetry?: () => void;
+  isPaused?: boolean;
+  onTogglePause?: () => void;
 }
 
 const MovieImage: React.FC<MovieImageProps> = ({ 
@@ -25,7 +27,9 @@ const MovieImage: React.FC<MovieImageProps> = ({
   children,
   onImageLoaded,
   onImageError,
-  onRetry
+  onRetry,
+  isPaused,
+  onTogglePause
 }) => {
   const isMobile = useIsMobile();
   const {
@@ -34,7 +38,9 @@ const MovieImage: React.FC<MovieImageProps> = ({
     loadError,
     timeoutError,
     loadingProgress,
-    handleRetry
+    handleRetry,
+    isPaused: internalIsPaused,
+    togglePause: internalTogglePause
   } = usePixelReveal({
     imageUrl,
     duration,
@@ -51,6 +57,9 @@ const MovieImage: React.FC<MovieImageProps> = ({
       handleRetry();
     }
   };
+
+  const effectivePause = isPaused !== undefined ? isPaused : internalIsPaused;
+  const effectiveTogglePause = onTogglePause || internalTogglePause;
 
   return (
     <div className={`pixel-reveal-container glass-panel no-rounded relative ${isMobile ? 'h-full w-full' : ''}`}>

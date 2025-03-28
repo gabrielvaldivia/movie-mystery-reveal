@@ -1,5 +1,5 @@
 
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import { createPixelationAnimation } from '../utils/pixelation';
 
 interface UsePixelationAnimationProps {
@@ -18,9 +18,13 @@ export function usePixelationAnimation({
   isLoaded
 }: UsePixelationAnimationProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [isPaused, setIsPaused] = useState(false);
   const animationRef = useRef<{ 
     start: () => void; 
-    stop: () => void; 
+    stop: () => void;
+    pause: () => void;
+    resume: () => void;
+    isPaused: () => boolean;
     forceComplete: () => void 
   } | null>(null);
 
@@ -115,8 +119,22 @@ export function usePixelationAnimation({
     return () => window.removeEventListener('resize', handleResize);
   }, [duration, isActive, isLoaded, onRevealComplete]);
 
+  const togglePause = () => {
+    if (!animationRef.current) return;
+    
+    if (isPaused) {
+      animationRef.current.resume();
+      setIsPaused(false);
+    } else {
+      animationRef.current.pause();
+      setIsPaused(true);
+    }
+  };
+
   return {
     canvasRef,
-    animationRef
+    animationRef,
+    isPaused,
+    togglePause
   };
 }

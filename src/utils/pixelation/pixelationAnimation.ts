@@ -20,18 +20,27 @@ export const createPixelationAnimation = (
 ): { 
   start: () => void, 
   stop: () => void, 
+  pause: () => void,
+  resume: () => void,
+  isPaused: () => boolean,
   forceComplete: () => void
 } => {
   let animationFrameId: number | null = null;
   let startTime: number | null = null;
+  let pauseTime: number | null = null;
+  let elapsedBeforePause: number = 0;
   let currentLevel = 1; // Start with maximum pixelation
+  let paused = false;
 
   const animate = (timestamp: number) => {
+    if (paused) return;
+    
     if (startTime === null) {
       startTime = timestamp;
     }
 
-    const elapsed = timestamp - startTime;
+    // Calculate elapsed time, accounting for any paused time
+    const elapsed = elapsedBeforePause + (timestamp - startTime);
     
     // Calculate current pixelation level (1 to 0 over duration)
     currentLevel = Math.max(0, 1 - elapsed / duration);
@@ -64,6 +73,34 @@ export const createPixelationAnimation = (
     }
   };
 
+  const pause = () => {
+    if (paused || !animationFrameId) return;
+    
+    paused = true;
+    pauseTime = performance.now();
+    
+    if (animationFrameId !== null) {
+      cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
+    
+    if (startTime !== null) {
+      elapsedBeforePause += pauseTime - startTime;
+    }
+    
+    console.log("Animation paused");
+  };
+  
+  const resume = () => {
+    if (!paused) return;
+    
+    paused = false;
+    startTime = performance.now();
+    
+    animationFrameId = requestAnimationFrame(animate);
+    console.log("Animation resumed");
+  };
+
   const forceComplete = () => {
     // Force pixelation level to 0 (fully unpixelated)
     if (animationFrameId !== null) {
@@ -71,6 +108,7 @@ export const createPixelationAnimation = (
       animationFrameId = null;
     }
     currentLevel = 0;
+    paused = false;
     try {
       applyPixelation(imageElement, canvas, currentLevel);
     } catch (error) {
@@ -87,7 +125,10 @@ export const createPixelationAnimation = (
       }
       
       startTime = null;
+      pauseTime = null;
+      elapsedBeforePause = 0;
       currentLevel = 1;
+      paused = false;
       
       animationFrameId = requestAnimationFrame(animate);
       console.log("Animation started");
@@ -97,7 +138,11 @@ export const createPixelationAnimation = (
         cancelAnimationFrame(animationFrameId);
         animationFrameId = null;
       }
+      paused = false;
     },
+    pause,
+    resume,
+    isPaused: () => paused,
     forceComplete
   };
 };
