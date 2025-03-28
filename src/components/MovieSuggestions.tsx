@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Movie } from '@/utils/types/movieTypes';
-import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList, CommandLoading } from './ui/command';
+import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from './ui/command';
 import { Loader2 } from 'lucide-react';
 
 interface MovieSuggestionsProps {
@@ -28,16 +28,14 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
   const safeSuggestions = Array.isArray(suggestions) ? suggestions : [];
 
   return (
-    <div className="w-full overflow-hidden bg-white dark:bg-gray-800 rounded-md border shadow-lg">
+    <div className="w-full overflow-hidden bg-white dark:bg-gray-800 rounded-md border shadow-lg z-50">
       <Command className="w-full">
         <CommandList>
           {isLoading ? (
-            <CommandLoading>
-              <div className="flex items-center justify-center py-6">
-                <Loader2 className="h-4 w-4 animate-spin text-primary mr-2" />
-                <span>Loading suggestions...</span>
-              </div>
-            </CommandLoading>
+            <div className="flex items-center justify-center py-6">
+              <Loader2 className="h-4 w-4 animate-spin text-primary mr-2" />
+              <span>Loading suggestions...</span>
+            </div>
           ) : (
             <>
               <CommandEmpty>No movies found</CommandEmpty>
