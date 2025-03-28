@@ -128,11 +128,7 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
     };
   }, []);
 
-  useEffect(() => {
-    if (!disabled && inputRef.current) {
-      inputRef.current.focus();
-    }
-  }, [disabled]);
+  // Removed the auto-focus effect that was previously here
   
   useEffect(() => {
     if (inputRef.current && inputRef.current.value !== guess) {
