@@ -144,7 +144,7 @@ const Timer: React.FC<TimerProps> = ({
       <Progress 
         value={progressValue} 
         className="h-6 w-full rounded-md bg-black/30" 
-        indicatorClassName="bg-primary transition-none animate-pulse" 
+        indicatorClassName="bg-primary transition-none" 
       />
     </div>
   );

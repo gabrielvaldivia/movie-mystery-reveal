@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { Movie } from '../utils/types/movieTypes';
 import { getRandomMovie, getNextMovie } from '../utils/gameData';
@@ -109,10 +110,16 @@ export function useGameState() {
     const validTime = Math.max(0, Math.min(remainingTime, gameDuration));
     const timePercentage = validTime / gameDuration;
     
+    // Debug the score calculation
+    console.log(`Score debug - Raw remaining time: ${remainingTime}`);
+    console.log(`Score debug - Valid time: ${validTime}`);
+    console.log(`Score debug - Time percentage: ${timePercentage.toFixed(4)}`);
+    
     const adjustedPercentage = Math.pow(timePercentage, 2.0);
+    console.log(`Score debug - Adjusted percentage: ${adjustedPercentage.toFixed(4)}`);
     
     const finalScore = Math.round(adjustedPercentage * 100);
-    console.log(`Score calculation: ${timePercentage.toFixed(2)} → ${adjustedPercentage.toFixed(2)} → ${finalScore}`);
+    console.log(`Score debug - Final score: ${finalScore}`);
     
     return finalScore;
   };
@@ -126,6 +133,10 @@ export function useGameState() {
     const isCorrect = normalizedGuess === normalizedTitle;
     
     if (isCorrect) {
+      // Add debug info about the time remaining when correct
+      console.log(`CORRECT GUESS - Current timeRemaining: ${timeRemaining}`);
+      console.log(`CORRECT GUESS - gameDuration: ${gameDuration}`);
+      
       const currentTime = timeRemaining;
       const roundScore = calculateScore(currentTime);
       console.log(`Time remaining: ${currentTime}ms / ${gameDuration}ms (${Math.round((currentTime/gameDuration)*100)}%), Score: ${roundScore}/100`);
