@@ -29,7 +29,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
         variant="ghost" 
         size="icon" 
         onClick={onClose}
-        className="text-white transition-colors rounded-full p-0 flex items-center justify-center hover:bg-transparent"
+        className="text-white rounded-full p-0 flex items-center justify-center hover:bg-transparent hover:text-white"
         aria-label="Close game"
         style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
       >
@@ -50,7 +50,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
             variant="ghost" 
             size="icon" 
             onClick={onTogglePause}
-            className="text-white transition-colors rounded-full p-0 flex items-center justify-center hover:bg-transparent"
+            className="text-white rounded-full p-0 flex items-center justify-center hover:bg-transparent hover:text-white"
             aria-label={isPaused ? "Resume pixelation" : "Pause pixelation"}
             style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
           >
@@ -62,7 +62,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
           variant="ghost" 
           size="icon" 
           onClick={onSkip}
-          className="text-white transition-colors rounded-full p-0 flex items-center justify-center hover:bg-transparent"
+          className="text-white rounded-full p-0 flex items-center justify-center hover:bg-transparent hover:text-white"
           aria-label="Skip this movie"
           style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
         >
