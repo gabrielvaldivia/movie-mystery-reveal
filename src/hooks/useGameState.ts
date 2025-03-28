@@ -8,7 +8,6 @@ export function useGameState() {
   const [isGameActive, setIsGameActive] = useState(false);
   const [isRoundComplete, setIsRoundComplete] = useState(false);
   const [score, setScore] = useState(0);
-  const [currentRoundScore, setCurrentRoundScore] = useState(0);
   const [isCorrectGuess, setIsCorrectGuess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasIncorrectGuess, setHasIncorrectGuess] = useState(false);
@@ -19,8 +18,6 @@ export function useGameState() {
   const [timeExpired, setTimeExpired] = useState(false);
   const [imageLoadError, setImageLoadError] = useState(false);
   const [gameInitialized, setGameInitialized] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(0);
-  const [gameDuration, setGameDuration] = useState(30000); // 30 seconds
 
   const startNewRound = useCallback(async () => {
     setIsLoading(true);
@@ -30,8 +27,6 @@ export function useGameState() {
     setImageLoadError(false);
     setIsGameActive(false);
     setIsRoundComplete(false);
-    setCurrentRoundScore(0);
-    setTimeRemaining(gameDuration);
     
     try {
       setImageKey(Date.now());
@@ -51,8 +46,9 @@ export function useGameState() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentMovie, gameDuration]);
+  }, [currentMovie]);
 
+  // Initialize game on first load only
   useEffect(() => {
     if (!gameInitialized) {
       const initGame = async () => {
@@ -88,7 +84,6 @@ export function useGameState() {
     setIsGameActive(false);
     setIsRoundComplete(false);
     setScore(0);
-    setCurrentRoundScore(0);
     setIsCorrectGuess(false);
     setIsLoading(true);
     setHasIncorrectGuess(false);
@@ -98,31 +93,8 @@ export function useGameState() {
     setLoadingProgress(0);
     setTimeExpired(false);
     setImageLoadError(false);
-    setGameInitialized(false);
+    setGameInitialized(false); // Reset initialized state to trigger a fresh load
   }, []);
-
-  const updateTimeRemaining = useCallback((time: number) => {
-    console.log(`Time updated: ${time}ms / ${gameDuration}ms`);
-    setTimeRemaining(time);
-  }, [gameDuration]);
-
-  const calculateScore = (remainingTime: number) => {
-    const validTime = Math.max(0, Math.min(remainingTime, gameDuration));
-    const timePercentage = validTime / gameDuration;
-    
-    // Debug the score calculation
-    console.log(`Score debug - Raw remaining time: ${remainingTime}`);
-    console.log(`Score debug - Valid time: ${validTime}`);
-    console.log(`Score debug - Time percentage: ${timePercentage.toFixed(4)}`);
-    
-    const adjustedPercentage = Math.pow(timePercentage, 2.0);
-    console.log(`Score debug - Adjusted percentage: ${adjustedPercentage.toFixed(4)}`);
-    
-    const finalScore = Math.round(adjustedPercentage * 100);
-    console.log(`Score debug - Final score: ${finalScore}`);
-    
-    return finalScore;
-  };
 
   const handleGuess = (guess: string) => {
     if (!currentMovie || !isGameActive) return;
@@ -133,19 +105,10 @@ export function useGameState() {
     const isCorrect = normalizedGuess === normalizedTitle;
     
     if (isCorrect) {
-      // Add debug info about the time remaining when correct
-      console.log(`CORRECT GUESS - Current timeRemaining: ${timeRemaining}`);
-      console.log(`CORRECT GUESS - gameDuration: ${gameDuration}`);
-      
-      const currentTime = timeRemaining;
-      const roundScore = calculateScore(currentTime);
-      console.log(`Time remaining: ${currentTime}ms / ${gameDuration}ms (${Math.round((currentTime/gameDuration)*100)}%), Score: ${roundScore}/100`);
-      
-      setCurrentRoundScore(roundScore);
       setIsGameActive(false);
       setIsRoundComplete(true);
       setIsCorrectGuess(true);
-      setScore(prev => prev + roundScore);
+      setScore(prev => prev + 100);
       setShowSuccessDialog(true);
     } else {
       setHasIncorrectGuess(true);
@@ -160,7 +123,6 @@ export function useGameState() {
       setIsGameActive(false);
       setIsRoundComplete(true);
       setTimeExpired(true);
-      setCurrentRoundScore(0);
       setShowSuccessDialog(true);
     }
   };
@@ -168,7 +130,6 @@ export function useGameState() {
   const handleImageLoaded = () => {
     setIsImageLoaded(true);
     setIsGameActive(true);
-    setTimeRemaining(gameDuration);
   };
   
   const handleImageError = () => {
@@ -185,6 +146,7 @@ export function useGameState() {
   };
   
   const handleNextRound = async () => {
+    setScore(0);
     await startNewRound();
   };
   
@@ -207,7 +169,6 @@ export function useGameState() {
     isGameActive,
     isRoundComplete,
     score,
-    currentRoundScore,
     isCorrectGuess,
     isLoading,
     hasIncorrectGuess,
@@ -225,8 +186,5 @@ export function useGameState() {
     handleNextRound,
     handleSkip,
     resetGame,
-    updateTimeRemaining,
-    timeRemaining,
-    gameDuration
   };
 }
