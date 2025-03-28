@@ -19,21 +19,16 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
   highlightedIndex,
   isLoading = false,
 }) => {
-  // Don't render anything if not open
   if (!isOpen) {
     return null;
   }
 
-  // Ensure suggestions is always an array
   const safeSuggestions = Array.isArray(suggestions) ? suggestions : [];
-  
-  // Limit to 5 suggestions
   const limitedSuggestions = safeSuggestions.slice(0, 5);
 
   const handleSelect = (movie: Movie) => {
     console.log(`Movie suggestion clicked: ${movie.title}`);
-    // Make sure we call onSelect synchronously
-    onSelect(movie);
+    onSelect(movie); // Direct call without any delay
   };
 
   return (

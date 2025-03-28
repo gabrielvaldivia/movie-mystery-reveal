@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+
+import React, { useState, useRef } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { Movie } from '@/utils/types/movieTypes';
 import { Input } from './ui/input';
@@ -25,7 +26,6 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
   const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [isLoading, setIsLoading] = useState(false);
-  const [isSelectingFromSuggestions, setIsSelectingFromSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   
   const handleSubmit = (e?: React.FormEvent) => {
@@ -36,7 +36,7 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
     if (guess.trim() && !disabled) {
       console.log("Submitting guess from form:", guess.trim());
       onGuess(guess.trim());
-      setGuess(""); // Clear input after submission
+      setGuess(""); 
       setSuggestions([]);
       setIsSuggestionsOpen(false);
     }
@@ -67,25 +67,15 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
   };
 
   const handleSuggestionSelect = (movie: Movie) => {
-    console.log("Selected movie:", movie.title);
-    
-    setIsSelectingFromSuggestions(true);
+    console.log("Selected movie for submission:", movie.title);
     setGuess(movie.title);
     setSuggestions([]);
     setIsSuggestionsOpen(false);
     
+    // Immediately submit the guess
     if (!disabled) {
-      console.log("Submitting selected suggestion:", movie.title);
       onGuess(movie.title);
     }
-    
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-    
-    setTimeout(() => {
-      setIsSelectingFromSuggestions(false);
-    }, 200);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -122,40 +112,20 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
       onInputFocus();
     }
     
-    if (guess.trim().length >= 2) {
-      setIsSuggestionsOpen(suggestions.length > 0);
+    if (guess.trim().length >= 2 && suggestions.length > 0) {
+      setIsSuggestionsOpen(true);
     }
   };
 
   const handleBlur = () => {
-    if (!isSelectingFromSuggestions) {
-      setTimeout(() => {
-        if (onInputBlur) {
-          onInputBlur();
-        }
-        setIsSuggestionsOpen(false);
-      }, 150);
-    }
-  };
-
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (inputRef.current && !inputRef.current.contains(e.target as Node)) {
-        setIsSuggestionsOpen(false);
+    // Small delay to allow click events to complete first
+    setTimeout(() => {
+      if (onInputBlur) {
+        onInputBlur();
       }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-  
-  useEffect(() => {
-    if (inputRef.current && inputRef.current.value !== guess) {
-      inputRef.current.value = guess;
-    }
-  }, [guess]);
+      setIsSuggestionsOpen(false);
+    }, 200);
+  };
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
