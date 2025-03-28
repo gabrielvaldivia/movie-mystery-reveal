@@ -47,7 +47,8 @@ const MovieImage: React.FC<MovieImageProps> = ({
     onRevealComplete,
     onImageLoaded,
     onImageError,
-    isActive
+    isActive,
+    isPaused // Pass down the isPaused prop
   });
 
   const handleRetryClick = () => {

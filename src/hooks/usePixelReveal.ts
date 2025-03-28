@@ -36,7 +36,7 @@ export function usePixelReveal({
     onImageError
   });
 
-  // Use the pixelation animation hook
+  // Use the pixelation animation hook with isPaused prop
   const { 
     canvasRef, 
     isPaused: internalIsPaused,
@@ -47,7 +47,7 @@ export function usePixelReveal({
     onRevealComplete,
     isActive,
     isLoaded,
-    isPaused
+    isPaused // Pass the external isPaused state
   });
 
   return {

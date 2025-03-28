@@ -1,3 +1,4 @@
+
 import { useRef, useEffect, useState } from 'react';
 import { createPixelationAnimation } from '../utils/pixelation';
 
@@ -29,17 +30,19 @@ export function usePixelationAnimation({
     forceComplete: () => void 
   } | null>(null);
 
+  // This effect handles external pause state changes
   useEffect(() => {
     if (!animationRef.current || !isLoaded) return;
+    
+    // Synchronize internal state with external state
+    setInternalIsPaused(isPaused);
     
     if (isPaused && !animationRef.current.isPaused()) {
       console.log("Pausing animation from external state");
       animationRef.current.pause();
-      setInternalIsPaused(true);
     } else if (!isPaused && animationRef.current.isPaused()) {
       console.log("Resuming animation from external state");
       animationRef.current.resume();
-      setInternalIsPaused(false);
     }
   }, [isPaused, isLoaded]);
 
@@ -89,7 +92,10 @@ export function usePixelationAnimation({
       if (isActive) {
         animation.start();
         if (isPaused) {
-          setTimeout(() => animation.pause(), 10);
+          setTimeout(() => {
+            animation.pause();
+            setInternalIsPaused(true);
+          }, 10);
         }
       } else {
         animation.forceComplete();
@@ -119,6 +125,7 @@ export function usePixelationAnimation({
         canvasRef.current.height = container.clientHeight;
         
         if (animationRef.current) {
+          const wasPaused = animationRef.current.isPaused();
           animationRef.current.stop();
           
           try {
@@ -133,8 +140,11 @@ export function usePixelationAnimation({
             
             if (isActive) {
               animation.start();
-              if (isPaused) {
-                setTimeout(() => animation.pause(), 10);
+              if (wasPaused || isPaused) {
+                setTimeout(() => {
+                  animation.pause();
+                  setInternalIsPaused(true);
+                }, 10);
               }
             } else {
               animation.forceComplete();

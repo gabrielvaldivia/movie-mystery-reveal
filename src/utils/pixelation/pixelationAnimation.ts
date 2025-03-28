@@ -33,7 +33,10 @@ export const createPixelationAnimation = (
   let paused = false;
 
   const animate = (timestamp: number) => {
-    if (paused) return;
+    if (paused) {
+      // If we're paused, don't continue the animation
+      return;
+    }
     
     if (startTime === null) {
       startTime = timestamp;
@@ -97,6 +100,7 @@ export const createPixelationAnimation = (
     paused = false;
     startTime = performance.now();
     
+    // Restart the animation loop
     animationFrameId = requestAnimationFrame(animate);
     console.log("Animation resumed from level:", currentLevel);
   };
