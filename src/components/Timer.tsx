@@ -36,7 +36,7 @@ const Timer: React.FC<TimerProps> = ({
   useEffect(() => {
     return () => {
       if (timerRef.current) {
-        clearInterval(timerRef.current);
+        window.clearInterval(timerRef.current);
       }
     };
   }, []);
@@ -45,7 +45,7 @@ const Timer: React.FC<TimerProps> = ({
   useEffect(() => {
     // Clear any existing interval first
     if (timerRef.current) {
-      clearInterval(timerRef.current);
+      window.clearInterval(timerRef.current);
       timerRef.current = null;
     }
     
@@ -69,7 +69,7 @@ const Timer: React.FC<TimerProps> = ({
           
           if (newTime <= 0) {
             if (timerRef.current) {
-              clearInterval(timerRef.current);
+              window.clearInterval(timerRef.current);
               timerRef.current = null;
             }
             // Only trigger time up if the timer has actually been running
@@ -80,7 +80,7 @@ const Timer: React.FC<TimerProps> = ({
           }
           return newTime;
         });
-      }, 100);
+      }, 100); // Update timer every 100ms for smoother animation
     } else if (!isRunning) {
       // If we're paused, update the last tick time to now so we don't count
       // the paused time when we resume
@@ -90,12 +90,13 @@ const Timer: React.FC<TimerProps> = ({
     // Return cleanup function
     return () => {
       if (timerRef.current) {
-        clearInterval(timerRef.current);
+        window.clearInterval(timerRef.current);
         timerRef.current = null;
       }
     };
   }, [isRunning, onTimeUp, onTimeUpdate, timeRemaining]);
   
+  // Calculate progress percentage - FIXED: was using duration instead of timeRemaining
   const progress = Math.max(0, (timeRemaining / duration) * 100);
   
   return (

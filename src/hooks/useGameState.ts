@@ -101,15 +101,19 @@ export function useGameState() {
   }, []);
 
   const updateTimeRemaining = useCallback((time: number) => {
+    console.log(`Time updated: ${time}ms / ${gameDuration}ms`);
     setTimeRemaining(time);
-  }, []);
+  }, [gameDuration]);
 
   const calculateScore = (remainingTime: number) => {
     const timePercentage = remainingTime / gameDuration;
     
-    const adjustedPercentage = Math.pow(timePercentage, 1.5);
+    const adjustedPercentage = Math.pow(timePercentage, 2.0);
     
-    return Math.round(adjustedPercentage * 100);
+    const finalScore = Math.round(adjustedPercentage * 100);
+    console.log(`Score calculation: ${timePercentage.toFixed(2)} → ${adjustedPercentage.toFixed(2)} → ${finalScore}`);
+    
+    return finalScore;
   };
 
   const handleGuess = (guess: string) => {
@@ -121,8 +125,10 @@ export function useGameState() {
     const isCorrect = normalizedGuess === normalizedTitle;
     
     if (isCorrect) {
-      const roundScore = calculateScore(timeRemaining);
-      console.log(`Time remaining: ${timeRemaining}ms, Score calculation: ${roundScore}/100`);
+      const currentTime = timeRemaining;
+      const roundScore = calculateScore(currentTime);
+      console.log(`Time remaining: ${currentTime}ms / ${gameDuration}ms (${Math.round((currentTime/gameDuration)*100)}%), Score: ${roundScore}/100`);
+      
       setCurrentRoundScore(roundScore);
       setIsGameActive(false);
       setIsRoundComplete(true);
