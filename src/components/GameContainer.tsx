@@ -77,8 +77,8 @@ const GameContainer: React.FC = () => {
   
   if (showStartScreen) {
     return (
-      <div className={`w-full ${isMobile ? 'h-full absolute inset-0' : 'h-full'} flex items-center justify-center`}>
-        <div className={`flex flex-col items-center w-full max-w-2xl ${isMobile ? 'h-full max-h-none' : 'aspect-[3/5] h-full max-h-screen'}`}>
+      <div className={`w-full ${isMobile ? 'h-full absolute inset-0 overflow-hidden' : 'h-full overflow-hidden'} flex items-center justify-center m-0 p-0`}>
+        <div className={`flex flex-col items-center w-full max-w-2xl ${isMobile ? 'h-full max-h-none' : 'aspect-[3/5] h-full max-h-screen'} m-0 p-0`}>
           <StartScreen onStartGame={handleStartGame} />
         </div>
       </div>
@@ -86,14 +86,14 @@ const GameContainer: React.FC = () => {
   }
   
   return (
-    <div className={`w-full ${isMobile ? 'h-full absolute inset-0' : 'h-full'} flex items-center justify-center`}>
-      <div className={`flex flex-col items-center w-full max-w-2xl ${isMobile ? 'h-full max-h-none' : 'aspect-[3/5] h-full max-h-screen'}`}>
+    <div className={`w-full ${isMobile ? 'h-full absolute inset-0 overflow-hidden' : 'h-full overflow-hidden'} flex items-center justify-center m-0 p-0`}>
+      <div className={`flex flex-col items-center w-full max-w-2xl ${isMobile ? 'h-full max-h-none' : 'aspect-[3/5] h-full max-h-screen'} m-0 p-0`}>
         {isLoading ? (
           <GameLoading loadingProgress={loadingProgress} />
         ) : currentMovie ? (
           <>
             {!showSuccessDialog && (
-              <div className="relative w-full h-full">
+              <div className="relative w-full h-full m-0 p-0 overflow-hidden">
                 <GameHeader 
                   duration={GAME_DURATION}
                   onTimeUp={handleTimeUp}
