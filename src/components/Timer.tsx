@@ -38,7 +38,7 @@ const Timer: React.FC<TimerProps> = ({
   useEffect(() => {
     return () => {
       if (timerRef.current) {
-        window.clearInterval(timerRef.current);
+        cancelAnimationFrame(timerRef.current);
       }
     };
   }, []);
@@ -47,7 +47,7 @@ const Timer: React.FC<TimerProps> = ({
   useEffect(() => {
     // Clear any existing interval first
     if (timerRef.current) {
-      window.clearInterval(timerRef.current);
+      cancelAnimationFrame(timerRef.current);
       timerRef.current = null;
     }
     
@@ -65,9 +65,17 @@ const Timer: React.FC<TimerProps> = ({
           // Force a minimum time decrease of at least 50ms per tick for visual feedback
           const newTime = Math.max(0, prev - Math.max(elapsed, 50));
           
-          // Calculate and update progress separately
+          // Calculate progress percentage
           const newProgress = Math.max(0, Math.min(100, (newTime / duration) * 100));
-          setProgressValue(newProgress);
+          
+          // Set progress with a slightly delayed state update for visibility
+          setProgressValue(prevProgress => {
+            // Ensure the progress visibly changes even for small updates
+            const diffThreshold = 0.5; // Minimum change threshold
+            return Math.abs(prevProgress - newProgress) < diffThreshold 
+              ? prevProgress - diffThreshold 
+              : newProgress;
+          });
           
           // Report time update to parent
           if (onTimeUpdate) {
@@ -122,8 +130,8 @@ const Timer: React.FC<TimerProps> = ({
     <div className="w-full">
       <Progress 
         value={progressValue} 
-        className="h-3 w-full rounded-none bg-black/20" 
-        indicatorClassName="bg-white transition-none" 
+        className="h-4 w-full rounded-md bg-gray-700/40" 
+        indicatorClassName="bg-white/90 transition-none animate-pulse-subtle" 
       />
     </div>
   );
