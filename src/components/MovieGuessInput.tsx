@@ -1,5 +1,5 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { Movie } from '@/utils/types/movieTypes';
 import { Input } from './ui/input';
@@ -118,14 +118,30 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
   };
 
   const handleBlur = () => {
-    // Small delay to allow click events to complete first
+    // Clear the input field when it loses focus
     setTimeout(() => {
       if (onInputBlur) {
         onInputBlur();
       }
       setIsSuggestionsOpen(false);
+      setGuess("");
     }, 200);
   };
+
+  // Add effect to handle clicking outside
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (inputRef.current && !inputRef.current.contains(e.target as Node)) {
+        setGuess("");
+        setIsSuggestionsOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <form onSubmit={handleSubmit} className="w-full">
