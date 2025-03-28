@@ -34,9 +34,10 @@ export function usePixelationAnimation({
   useEffect(() => {
     if (!animationRef.current || !isLoaded) return;
     
-    // Synchronize internal state with external state
+    // First update internal state to match external state
     setInternalIsPaused(isPaused);
     
+    // Then apply the pause/resume action based on the new state
     if (isPaused && !animationRef.current.isPaused()) {
       console.log("Pausing animation from external state");
       animationRef.current.pause();
@@ -55,6 +56,8 @@ export function usePixelationAnimation({
       console.log("Starting animation");
       animationRef.current.start();
       
+      // If we need to start in paused state, do it with a slight delay
+      // to ensure the animation has properly started
       if (isPaused) {
         console.log("Pausing newly started animation");
         setTimeout(() => {
@@ -62,7 +65,7 @@ export function usePixelationAnimation({
             animationRef.current.pause();
             setInternalIsPaused(true);
           }
-        }, 10);
+        }, 20); // Increased delay for better reliability
       }
     } else {
       console.log("Forcing animation complete");
@@ -70,6 +73,7 @@ export function usePixelationAnimation({
     }
   }, [isActive, isLoaded, isPaused]);
   
+  // This effect creates the animation when the image loads
   useEffect(() => {
     if (!isLoaded || !imageRef.current || !canvasRef.current) return;
     
@@ -91,11 +95,14 @@ export function usePixelationAnimation({
       
       if (isActive) {
         animation.start();
+        // If we should be paused from the beginning
         if (isPaused) {
           setTimeout(() => {
-            animation.pause();
-            setInternalIsPaused(true);
-          }, 10);
+            if (animation) {
+              animation.pause();
+              setInternalIsPaused(true);
+            }
+          }, 20); // Increased delay for better reliability
         }
       } else {
         animation.forceComplete();
@@ -111,6 +118,7 @@ export function usePixelationAnimation({
     };
   }, [duration, isLoaded, isActive, onRevealComplete, isPaused]);
   
+  // Handle window resize - recreate animation at new canvas size
   useEffect(() => {
     const handleResize = () => {
       if (!canvasRef.current || !imageRef.current || !isLoaded) return;
@@ -125,6 +133,7 @@ export function usePixelationAnimation({
         canvasRef.current.height = container.clientHeight;
         
         if (animationRef.current) {
+          // Remember if we were paused before recreating
           const wasPaused = animationRef.current.isPaused();
           animationRef.current.stop();
           
@@ -142,9 +151,11 @@ export function usePixelationAnimation({
               animation.start();
               if (wasPaused || isPaused) {
                 setTimeout(() => {
-                  animation.pause();
-                  setInternalIsPaused(true);
-                }, 10);
+                  if (animation) {
+                    animation.pause();
+                    setInternalIsPaused(true);
+                  }
+                }, 20); // Increased delay for better reliability
               }
             } else {
               animation.forceComplete();

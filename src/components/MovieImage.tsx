@@ -59,6 +59,7 @@ const MovieImage: React.FC<MovieImageProps> = ({
     }
   };
 
+  // Use external pause state/functions if provided, otherwise use internal ones
   const effectivePause = isPaused !== undefined ? isPaused : internalIsPaused;
   const effectiveTogglePause = onTogglePause || internalTogglePause;
 

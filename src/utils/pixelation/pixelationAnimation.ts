@@ -33,8 +33,8 @@ export const createPixelationAnimation = (
   let paused = false;
 
   const animate = (timestamp: number) => {
+    // Critical: If paused, don't continue animation
     if (paused) {
-      // If we're paused, don't continue the animation
       return;
     }
     
@@ -79,9 +79,11 @@ export const createPixelationAnimation = (
   const pause = () => {
     if (paused || !animationFrameId) return;
     
+    // Set paused state BEFORE canceling the animation frame
     paused = true;
     pauseTime = performance.now();
     
+    // Crucial: Cancel the animation frame to actually stop the animation
     if (animationFrameId !== null) {
       cancelAnimationFrame(animationFrameId);
       animationFrameId = null;
@@ -89,6 +91,13 @@ export const createPixelationAnimation = (
     
     if (startTime !== null) {
       elapsedBeforePause += pauseTime - startTime;
+    }
+    
+    // Important: Re-apply the current level to ensure it stays visible
+    try {
+      applyPixelation(imageElement, canvas, currentLevel);
+    } catch (error) {
+      console.error("Error freezing pixelation level:", error);
     }
     
     console.log("Animation paused at level:", currentLevel);

@@ -41,15 +41,28 @@ const GameContainer: React.FC = () => {
   const handleStartGame = () => {
     resetGame(); // Ensure game state is reset before starting a new game
     setShowStartScreen(false);
+    setIsPaused(false); // Ensure game starts unpaused
   };
   
   const handleCloseGame = () => {
     setShowStartScreen(true);
     resetGame();
+    setIsPaused(false); // Reset pause state when game closes
   };
   
   const handleTogglePause = () => {
     setIsPaused(prev => !prev);
+  };
+  
+  // Reset pause state when moving to next round or skipping
+  const handleNextRoundWithReset = () => {
+    setIsPaused(false);
+    handleNextRound();
+  };
+  
+  const handleSkipWithReset = () => {
+    setIsPaused(false);
+    handleSkip();
   };
   
   if (showStartScreen) {
@@ -75,7 +88,7 @@ const GameContainer: React.FC = () => {
                   duration={GAME_DURATION}
                   onTimeUp={handleTimeUp}
                   isRunning={isGameActive && isImageLoaded && !showSuccessDialog}
-                  onSkip={handleSkip}
+                  onSkip={handleSkipWithReset}
                   onClose={handleCloseGame}
                   isPaused={isPaused}
                   onTogglePause={handleTogglePause}
@@ -94,11 +107,11 @@ const GameContainer: React.FC = () => {
                 >
                   <GuessInput 
                     onGuess={handleGuess}
-                    disabled={!isGameActive || isLoading || !isImageLoaded}
+                    disabled={!isGameActive || isLoading || !isImageLoaded || isPaused}
                     correctAnswer={isRoundComplete ? currentMovie?.title : undefined}
                     isCorrect={isCorrectGuess}
                     hasIncorrectGuess={hasIncorrectGuess}
-                    onNextRound={handleNextRound}
+                    onNextRound={handleNextRoundWithReset}
                   />
                 </MovieImage>
               </div>
@@ -107,7 +120,7 @@ const GameContainer: React.FC = () => {
             <SuccessDialog 
               isOpen={showSuccessDialog}
               movie={currentMovie}
-              onNextRound={handleNextRound}
+              onNextRound={handleNextRoundWithReset}
               timeExpired={timeExpired}
             />
           </>
@@ -123,7 +136,7 @@ const GameContainer: React.FC = () => {
               }
             </p>
             <button 
-              onClick={handleNextRound}
+              onClick={handleNextRoundWithReset}
               className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
             >
               Try Again
