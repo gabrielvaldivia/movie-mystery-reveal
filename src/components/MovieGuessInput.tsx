@@ -26,6 +26,7 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
   const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSelectingFromSuggestions, setIsSelectingFromSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   
   const handleSubmit = (e?: React.FormEvent) => {
@@ -69,15 +70,21 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
 
   const handleSuggestionSelect = (movie: Movie) => {
     console.log("Selected movie:", movie.title);
+    setIsSelectingFromSuggestions(true);
     setGuess(movie.title);
     setSuggestions([]);
     setIsSuggestionsOpen(false);
     
-    // Directly submit the selected suggestion without using setTimeout
+    // Directly submit the selected suggestion
     if (!disabled) {
       console.log("Submitting selected suggestion:", movie.title);
       onGuess(movie.title);
     }
+    
+    // Reset the selection flag after a short delay
+    setTimeout(() => {
+      setIsSelectingFromSuggestions(false);
+    }, 200);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -113,15 +120,23 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
     if (onInputFocus) {
       onInputFocus();
     }
+    
+    // If there's a value and it's ≥ 2 characters, show suggestions again
+    if (guess.trim().length >= 2) {
+      setIsSuggestionsOpen(suggestions.length > 0);
+    }
   };
 
   const handleBlur = () => {
-    // Small delay to allow click events to process before hiding suggestions
-    setTimeout(() => {
-      if (onInputBlur) {
-        onInputBlur();
-      }
-    }, 100);
+    // Only trigger the blur event if we're not in the process of selecting a suggestion
+    if (!isSelectingFromSuggestions) {
+      setTimeout(() => {
+        if (onInputBlur) {
+          onInputBlur();
+        }
+        setIsSuggestionsOpen(false);
+      }, 150);
+    }
   };
 
   useEffect(() => {

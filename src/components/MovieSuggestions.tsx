@@ -30,6 +30,11 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
   // Limit to 5 suggestions
   const limitedSuggestions = safeSuggestions.slice(0, 5);
 
+  const handleSelect = (movie: Movie) => {
+    console.log(`Movie suggestion clicked: ${movie.title}`);
+    onSelect(movie);
+  };
+
   return (
     <div className="w-full overflow-hidden bg-white dark:bg-gray-800 rounded-md border shadow-lg z-50">
       <Command className="w-full">
@@ -47,10 +52,7 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
                   {limitedSuggestions.map((movie, index) => (
                     <CommandItem
                       key={movie.id}
-                      onSelect={() => {
-                        console.log(`Selected movie from dropdown: ${movie.title}`);
-                        onSelect(movie);
-                      }}
+                      onSelect={() => handleSelect(movie)}
                       className={`flex items-center py-2 px-3 cursor-pointer ${
                         index === highlightedIndex ? 'bg-accent' : ''
                       }`}
