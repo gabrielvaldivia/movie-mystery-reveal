@@ -10,6 +10,8 @@ interface GuessInputProps {
   correctAnswer?: string;
   hasIncorrectGuess?: boolean;
   onNextRound?: () => void;
+  onInputFocus?: () => void;
+  onInputBlur?: () => void;
 }
 
 const GuessInput: React.FC<GuessInputProps> = ({
@@ -19,6 +21,8 @@ const GuessInput: React.FC<GuessInputProps> = ({
   correctAnswer,
   hasIncorrectGuess,
   onNextRound,
+  onInputFocus,
+  onInputBlur
 }) => {
   // Focus the next round button when correct answer is shown
   useEffect(() => {
@@ -49,7 +53,9 @@ const GuessInput: React.FC<GuessInputProps> = ({
             <MovieGuessInput 
               onGuess={handleGuess} 
               disabled={disabled} 
-              hasIncorrectGuess={hasIncorrectGuess} 
+              hasIncorrectGuess={hasIncorrectGuess}
+              onInputFocus={onInputFocus}
+              onInputBlur={onInputBlur}
             />
           </div>
         </div>

@@ -10,12 +10,16 @@ interface MovieGuessInputProps {
   onGuess: (guess: string) => void;
   disabled: boolean;
   hasIncorrectGuess?: boolean;
+  onInputFocus?: () => void;
+  onInputBlur?: () => void;
 }
 
 const MovieGuessInput: React.FC<MovieGuessInputProps> = ({ 
   onGuess, 
   disabled, 
-  hasIncorrectGuess 
+  hasIncorrectGuess,
+  onInputFocus,
+  onInputBlur
 }) => {
   const [guess, setGuess] = useState("");
   const [suggestions, setSuggestions] = useState<Movie[]>([]);
@@ -93,6 +97,21 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
     }
     else if (e.key === 'Escape') {
       setIsSuggestionsOpen(false);
+      if (inputRef.current) {
+        inputRef.current.blur();
+      }
+    }
+  };
+
+  const handleFocus = () => {
+    if (onInputFocus) {
+      onInputFocus();
+    }
+  };
+
+  const handleBlur = () => {
+    if (onInputBlur) {
+      onInputBlur();
     }
   };
 
@@ -142,6 +161,8 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
             value={guess}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             placeholder="Guess the movie..."
             disabled={disabled}
             className={`w-full py-2 px-3 pr-10 bg-white/90 focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed transition-all ${

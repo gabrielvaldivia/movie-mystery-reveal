@@ -54,6 +54,16 @@ const GameContainer: React.FC = () => {
     setIsPaused(prev => !prev);
   };
   
+  // Pause the game when the input is focused
+  const handleInputFocus = () => {
+    setIsPaused(true);
+  };
+  
+  // Resume the game when the input is blurred
+  const handleInputBlur = () => {
+    setIsPaused(false);
+  };
+  
   // Reset pause state when moving to next round or skipping
   const handleNextRoundWithReset = () => {
     setIsPaused(false);
@@ -112,6 +122,8 @@ const GameContainer: React.FC = () => {
                     isCorrect={isCorrectGuess}
                     hasIncorrectGuess={hasIncorrectGuess}
                     onNextRound={handleNextRoundWithReset}
+                    onInputFocus={handleInputFocus}
+                    onInputBlur={handleInputBlur}
                   />
                 </MovieImage>
               </div>
