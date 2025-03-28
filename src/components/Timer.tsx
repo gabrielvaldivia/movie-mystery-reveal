@@ -80,14 +80,17 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
     };
   }, [isRunning, onTimeUp, timeRemaining]);
   
+  // Calculate progress as a percentage from 0 to 100
   const progress = Math.max(0, (timeRemaining / duration) * 100);
   
   return (
-    <Progress 
-      value={progress} 
-      className="h-1 w-full rounded-none bg-transparent" 
-      indicatorClassName="bg-white"
-    />
+    <div className="w-full">
+      <Progress 
+        value={progress} 
+        className="h-3 w-full rounded-none bg-gray-700" 
+        indicatorClassName="bg-white"
+      />
+    </div>
   );
 };
 
