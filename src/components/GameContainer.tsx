@@ -28,6 +28,8 @@ const GameContainer: React.FC = () => {
     isCorrectGuess,
     isRoundComplete,
     imageLoadError,
+    score,
+    currentRoundScore,
     handleGuess,
     handleTimeUp,
     handleImageLoaded,
@@ -35,7 +37,8 @@ const GameContainer: React.FC = () => {
     handleRevealComplete,
     handleNextRound,
     handleSkip,
-    resetGame
+    resetGame,
+    updateTimeRemaining
   } = useGameState();
   
   const handleStartGame = () => {
@@ -74,6 +77,11 @@ const GameContainer: React.FC = () => {
     setIsPaused(false);
     handleSkip();
   };
+
+  // Handle time updates from the timer
+  const handleTimeUpdate = (timeRemaining: number) => {
+    updateTimeRemaining(timeRemaining);
+  };
   
   if (showStartScreen) {
     return (
@@ -102,6 +110,7 @@ const GameContainer: React.FC = () => {
                   onClose={handleCloseGame}
                   isPaused={isPaused}
                   onTogglePause={handleTogglePause}
+                  onTimeUpdate={handleTimeUpdate}
                 />
                 
                 <MovieImage 
@@ -134,6 +143,8 @@ const GameContainer: React.FC = () => {
               movie={currentMovie}
               onNextRound={handleNextRoundWithReset}
               timeExpired={timeExpired}
+              score={currentRoundScore}
+              totalScore={score}
             />
           </>
         ) : (

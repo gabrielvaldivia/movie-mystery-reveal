@@ -8,13 +8,17 @@ interface SuccessDialogProps {
   movie: Movie | null;
   onNextRound: () => void;
   timeExpired?: boolean;
+  score?: number; 
+  totalScore?: number;
 }
 
 const SuccessDialog: React.FC<SuccessDialogProps> = ({ 
   isOpen, 
   movie, 
   onNextRound,
-  timeExpired = false
+  timeExpired = false,
+  score = 0,
+  totalScore = 0
 }) => {
   if (!isOpen || !movie) return null;
   
@@ -37,6 +41,19 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({
           <h2 className="text-2xl font-bold text-center">{movie.title}</h2>
           <p className="text-muted-foreground text-center">{movie.releaseYear}</p>
         </div>
+
+        {!timeExpired && (
+          <div className="flex flex-col items-center space-y-1 w-full bg-secondary/50 rounded-lg p-4">
+            <div className="flex justify-between w-full">
+              <p className="font-medium">This round:</p>
+              <p className="font-bold">{score} / 100</p>
+            </div>
+            <div className="flex justify-between w-full">
+              <p className="font-medium">Total score:</p>
+              <p className="font-bold">{totalScore}</p>
+            </div>
+          </div>
+        )}
         
         <Button 
           onClick={onNextRound} 

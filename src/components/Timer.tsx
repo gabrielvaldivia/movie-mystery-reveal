@@ -6,9 +6,15 @@ interface TimerProps {
   duration: number;
   onTimeUp: () => void;
   isRunning: boolean;
+  onTimeUpdate?: (timeRemaining: number) => void;
 }
 
-const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
+const Timer: React.FC<TimerProps> = ({ 
+  duration, 
+  onTimeUp, 
+  isRunning,
+  onTimeUpdate 
+}) => {
   const [timeRemaining, setTimeRemaining] = useState(duration);
   const timerRef = useRef<number | null>(null);
   const hasStartedRef = useRef<boolean>(false);
@@ -19,7 +25,12 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
     setTimeRemaining(duration);
     hasStartedRef.current = false;
     lastTickTimeRef.current = null;
-  }, [duration]);
+    
+    // Report initial time
+    if (onTimeUpdate) {
+      onTimeUpdate(duration);
+    }
+  }, [duration, onTimeUpdate]);
   
   // Clear interval on unmount
   useEffect(() => {
@@ -51,6 +62,11 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
         setTimeRemaining((prev) => {
           const newTime = Math.max(0, prev - elapsed);
           
+          // Report time update to parent
+          if (onTimeUpdate) {
+            onTimeUpdate(newTime);
+          }
+          
           if (newTime <= 0) {
             if (timerRef.current) {
               clearInterval(timerRef.current);
@@ -78,7 +94,7 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
         timerRef.current = null;
       }
     };
-  }, [isRunning, onTimeUp, timeRemaining]);
+  }, [isRunning, onTimeUp, onTimeUpdate, timeRemaining]);
   
   const progress = Math.max(0, (timeRemaining / duration) * 100);
   
