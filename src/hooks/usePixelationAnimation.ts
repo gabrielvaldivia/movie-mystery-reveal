@@ -29,6 +29,7 @@ export function usePixelationAnimation({
     isPaused: () => boolean;
     forceComplete: () => void 
   } | null>(null);
+  const animationStartedRef = useRef(false);
 
   // This effect handles external pause state changes
   useEffect(() => {
@@ -83,13 +84,15 @@ export function usePixelationAnimation({
       } else if (!animationRef.current.isPaused() && isPaused) {
         console.log("Pausing animation");
         animationRef.current.pause();
-      } else if (!animationRef.current.isPaused() && !isPaused) {
+      } else if (!animationRef.current.isPaused() && !isPaused && !animationStartedRef.current) {
         console.log("Starting animation");
         animationRef.current.start();
+        animationStartedRef.current = true;
       }
     } else if (!isActive && animationRef.current) {
       console.log("Forcing animation complete");
       animationRef.current.forceComplete();
+      animationStartedRef.current = false;
     }
   }, [isActive, isLoaded, isPaused, duration, onRevealComplete]);
   
@@ -124,12 +127,14 @@ export function usePixelationAnimation({
             
             if (isActive) {
               animation.start();
+              animationStartedRef.current = true;
               if (wasPaused || isPaused) {
                 animation.pause();
                 setInternalIsPaused(true);
               }
             } else {
               animation.forceComplete();
+              animationStartedRef.current = false;
             }
           } catch (error) {
             console.error("Error recreating animation on resize:", error);
@@ -148,6 +153,7 @@ export function usePixelationAnimation({
       if (animationRef.current) {
         animationRef.current.stop();
       }
+      animationStartedRef.current = false;
     };
   }, []);
 
