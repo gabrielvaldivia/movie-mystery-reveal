@@ -1,4 +1,3 @@
-
 import { useRef, useEffect, useState } from 'react';
 import { createPixelationAnimation } from '../utils/pixelation';
 
@@ -8,6 +7,7 @@ interface UsePixelationAnimationProps {
   onRevealComplete?: () => void;
   isActive: boolean;
   isLoaded: boolean;
+  isPaused?: boolean;
 }
 
 export function usePixelationAnimation({
@@ -15,10 +15,11 @@ export function usePixelationAnimation({
   duration,
   onRevealComplete,
   isActive,
-  isLoaded
+  isLoaded,
+  isPaused = false
 }: UsePixelationAnimationProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [isPaused, setIsPaused] = useState(false);
+  const [internalIsPaused, setInternalIsPaused] = useState(false);
   const animationRef = useRef<{ 
     start: () => void; 
     stop: () => void;
@@ -29,6 +30,20 @@ export function usePixelationAnimation({
   } | null>(null);
 
   useEffect(() => {
+    if (!animationRef.current || !isLoaded) return;
+    
+    if (isPaused && !animationRef.current.isPaused()) {
+      console.log("Pausing animation from external state");
+      animationRef.current.pause();
+      setInternalIsPaused(true);
+    } else if (!isPaused && animationRef.current.isPaused()) {
+      console.log("Resuming animation from external state");
+      animationRef.current.resume();
+      setInternalIsPaused(false);
+    }
+  }, [isPaused, isLoaded]);
+
+  useEffect(() => {
     if (!animationRef.current || !isLoaded || !imageRef.current || !canvasRef.current) return;
     
     console.log("Animation state changed. isActive:", isActive);
@@ -36,11 +51,21 @@ export function usePixelationAnimation({
     if (isActive) {
       console.log("Starting animation");
       animationRef.current.start();
+      
+      if (isPaused) {
+        console.log("Pausing newly started animation");
+        setTimeout(() => {
+          if (animationRef.current) {
+            animationRef.current.pause();
+            setInternalIsPaused(true);
+          }
+        }, 10);
+      }
     } else {
       console.log("Forcing animation complete");
       animationRef.current.forceComplete();
     }
-  }, [isActive, isLoaded]);
+  }, [isActive, isLoaded, isPaused]);
   
   useEffect(() => {
     if (!isLoaded || !imageRef.current || !canvasRef.current) return;
@@ -63,6 +88,9 @@ export function usePixelationAnimation({
       
       if (isActive) {
         animation.start();
+        if (isPaused) {
+          setTimeout(() => animation.pause(), 10);
+        }
       } else {
         animation.forceComplete();
       }
@@ -75,7 +103,7 @@ export function usePixelationAnimation({
         animationRef.current.stop();
       }
     };
-  }, [duration, isLoaded, isActive, onRevealComplete]);
+  }, [duration, isLoaded, isActive, onRevealComplete, isPaused]);
   
   useEffect(() => {
     const handleResize = () => {
@@ -105,6 +133,9 @@ export function usePixelationAnimation({
             
             if (isActive) {
               animation.start();
+              if (isPaused) {
+                setTimeout(() => animation.pause(), 10);
+              }
             } else {
               animation.forceComplete();
             }
@@ -117,24 +148,25 @@ export function usePixelationAnimation({
     
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [duration, isActive, isLoaded, onRevealComplete]);
+  }, [duration, isActive, isLoaded, onRevealComplete, isPaused]);
 
   const togglePause = () => {
     if (!animationRef.current) return;
     
-    if (isPaused) {
-      animationRef.current.resume();
-      setIsPaused(false);
-    } else {
+    const newPausedState = !internalIsPaused;
+    setInternalIsPaused(newPausedState);
+    
+    if (newPausedState) {
       animationRef.current.pause();
-      setIsPaused(true);
+    } else {
+      animationRef.current.resume();
     }
   };
 
   return {
     canvasRef,
     animationRef,
-    isPaused,
+    isPaused: internalIsPaused,
     togglePause
   };
 }

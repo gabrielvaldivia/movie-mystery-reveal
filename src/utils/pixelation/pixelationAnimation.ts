@@ -88,7 +88,7 @@ export const createPixelationAnimation = (
       elapsedBeforePause += pauseTime - startTime;
     }
     
-    console.log("Animation paused");
+    console.log("Animation paused at level:", currentLevel);
   };
   
   const resume = () => {
@@ -98,7 +98,7 @@ export const createPixelationAnimation = (
     startTime = performance.now();
     
     animationFrameId = requestAnimationFrame(animate);
-    console.log("Animation resumed");
+    console.log("Animation resumed from level:", currentLevel);
   };
 
   const forceComplete = () => {
