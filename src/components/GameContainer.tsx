@@ -6,6 +6,7 @@ import SuccessDialog from './SuccessDialog';
 import GameLoading from './GameLoading';
 import GameHeader from './GameHeader';
 import StartScreen from './StartScreen';
+import FlicktionaryGame from './FlicktionaryGame';
 import { useGameState } from '../hooks/useGameState';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -14,6 +15,7 @@ const GAME_DURATION = 30000; // 30 seconds
 const GameContainer: React.FC = () => {
   const [showStartScreen, setShowStartScreen] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
+  const [gameType, setGameType] = useState<'movie' | 'flicktionary'>('movie');
   const isMobile = useIsMobile();
   const {
     currentMovie,
@@ -42,6 +44,11 @@ const GameContainer: React.FC = () => {
     resetGame(); // Ensure game state is reset before starting a new game
     setShowStartScreen(false);
     setIsPaused(false); // Ensure game starts unpaused
+  };
+  
+  const handleSelectGame = (type: 'movie' | 'flicktionary') => {
+    setGameType(type);
+    handleStartGame();
   };
   
   const handleCloseGame = () => {
@@ -79,7 +86,10 @@ const GameContainer: React.FC = () => {
     return (
       <div className={`w-full ${isMobile ? 'h-full absolute inset-0 overflow-hidden' : 'h-full overflow-hidden'} flex items-center justify-center m-0 p-0`}>
         <div className={`flex flex-col items-center w-full max-w-2xl ${isMobile ? 'h-full max-h-none' : 'aspect-[3/5] h-full max-h-screen'} m-0 p-0`}>
-          <StartScreen onStartGame={handleStartGame} />
+          <StartScreen 
+            onStartGame={handleStartGame} 
+            onSelectGame={handleSelectGame}
+          />
         </div>
       </div>
     );
@@ -88,7 +98,9 @@ const GameContainer: React.FC = () => {
   return (
     <div className={`w-full ${isMobile ? 'h-full absolute inset-0 overflow-hidden' : 'h-full overflow-hidden'} flex items-center justify-center m-0 p-0`}>
       <div className={`flex flex-col items-center w-full max-w-2xl ${isMobile ? 'h-full max-h-none' : 'aspect-[3/5] h-full max-h-screen'} m-0 p-0`}>
-        {isLoading ? (
+        {gameType === 'flicktionary' ? (
+          <FlicktionaryGame onClose={handleCloseGame} />
+        ) : isLoading ? (
           <GameLoading loadingProgress={loadingProgress} />
         ) : currentMovie ? (
           <>
