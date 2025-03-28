@@ -56,18 +56,18 @@ const Timer: React.FC<TimerProps> = ({
       hasStartedRef.current = true;
       lastTickTimeRef.current = Date.now();
       
-      timerRef.current = window.setInterval(() => {
+      const tick = () => {
         const now = Date.now();
         const elapsed = lastTickTimeRef.current ? now - lastTickTimeRef.current : 100;
         lastTickTimeRef.current = now;
         
-        setTimeRemaining((prev) => {
+        setTimeRemaining(prev => {
           // Force a minimum time decrease of at least 50ms per tick for visual feedback
           const newTime = Math.max(0, prev - Math.max(elapsed, 50));
           
           // Calculate and update progress separately
-          const newProgressValue = Math.max(0, Math.min(100, (newTime / duration) * 100));
-          setProgressValue(newProgressValue);
+          const newProgress = Math.max(0, Math.min(100, (newTime / duration) * 100));
+          setProgressValue(newProgress);
           
           // Report time update to parent
           if (onTimeUpdate) {
@@ -75,10 +75,9 @@ const Timer: React.FC<TimerProps> = ({
           }
           
           if (newTime <= 0) {
-            if (timerRef.current) {
-              window.clearInterval(timerRef.current);
-              timerRef.current = null;
-            }
+            cancelAnimationFrame(timerRef.current as number);
+            timerRef.current = null;
+            
             // Only trigger time up if the timer has actually been running
             if (hasStartedRef.current) {
               setTimeout(() => onTimeUp(), 0);
@@ -87,21 +86,35 @@ const Timer: React.FC<TimerProps> = ({
           }
           return newTime;
         });
-      }, 16); // Update timer every 16ms (approximately 60fps) for smoother animation
+        
+        // Continue the animation frame if still running
+        if (isRunning) {
+          timerRef.current = requestAnimationFrame(tick);
+        }
+      };
+      
+      // Start the animation frame loop for smoother animation
+      timerRef.current = requestAnimationFrame(tick);
     } else if (!isRunning) {
       // If we're paused, update the last tick time to now so we don't count
       // the paused time when we resume
       lastTickTimeRef.current = null;
+      
+      // Cancel any running animation frame
+      if (timerRef.current) {
+        cancelAnimationFrame(timerRef.current as number);
+        timerRef.current = null;
+      }
     }
     
     // Return cleanup function
     return () => {
       if (timerRef.current) {
-        window.clearInterval(timerRef.current);
+        cancelAnimationFrame(timerRef.current as number);
         timerRef.current = null;
       }
     };
-  }, [isRunning, onTimeUp, onTimeUpdate, timeRemaining, duration]);
+  }, [isRunning, onTimeUp, onTimeUpdate, duration]);
   
   console.log(`Timer progress: ${progressValue.toFixed(1)}% (${timeRemaining}ms / ${duration}ms)`);
   
@@ -109,8 +122,8 @@ const Timer: React.FC<TimerProps> = ({
     <div className="w-full">
       <Progress 
         value={progressValue} 
-        className="h-2 w-full rounded-none bg-black/20" 
-        indicatorClassName="bg-white transition-none" // Remove transition to make updates more visible
+        className="h-3 w-full rounded-none bg-black/20" 
+        indicatorClassName="bg-white transition-none" 
       />
     </div>
   );
