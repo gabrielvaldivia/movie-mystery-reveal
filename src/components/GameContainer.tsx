@@ -117,7 +117,7 @@ const GameContainer: React.FC = () => {
                 >
                   <GuessInput 
                     onGuess={handleGuess}
-                    disabled={!isGameActive || isLoading || !isImageLoaded || isPaused}
+                    disabled={!isGameActive || isLoading || !isImageLoaded}
                     correctAnswer={isRoundComplete ? currentMovie?.title : undefined}
                     isCorrect={isCorrectGuess}
                     hasIncorrectGuess={hasIncorrectGuess}

@@ -52,7 +52,7 @@ const GuessInput: React.FC<GuessInputProps> = ({
           <div className="flex-grow">
             <MovieGuessInput 
               onGuess={handleGuess} 
-              disabled={disabled} 
+              disabled={disabled && !correctAnswer} 
               hasIncorrectGuess={hasIncorrectGuess}
               onInputFocus={onInputFocus}
               onInputBlur={onInputBlur}
