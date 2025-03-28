@@ -70,15 +70,14 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
   const handleSuggestionSelect = (movie: Movie) => {
     console.log("Selected movie:", movie.title);
     setGuess(movie.title);
+    setSuggestions([]);
     setIsSuggestionsOpen(false);
     
-    // Automatically submit the selected suggestion
-    setTimeout(() => {
-      if (!disabled) {
-        console.log("Auto-submitting selected suggestion:", movie.title);
-        onGuess(movie.title);
-      }
-    }, 50);
+    // Directly submit the selected suggestion without using setTimeout
+    if (!disabled) {
+      console.log("Submitting selected suggestion:", movie.title);
+      onGuess(movie.title);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -117,9 +116,12 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
   };
 
   const handleBlur = () => {
-    if (onInputBlur) {
-      onInputBlur();
-    }
+    // Small delay to allow click events to process before hiding suggestions
+    setTimeout(() => {
+      if (onInputBlur) {
+        onInputBlur();
+      }
+    }, 100);
   };
 
   useEffect(() => {
