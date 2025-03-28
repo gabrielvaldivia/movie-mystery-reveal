@@ -16,6 +16,7 @@ const Timer: React.FC<TimerProps> = ({
   onTimeUpdate 
 }) => {
   const [timeRemaining, setTimeRemaining] = useState(duration);
+  const [progressValue, setProgressValue] = useState(100); // Separate state for progress
   const timerRef = useRef<number | null>(null);
   const hasStartedRef = useRef<boolean>(false);
   const lastTickTimeRef = useRef<number | null>(null);
@@ -23,6 +24,7 @@ const Timer: React.FC<TimerProps> = ({
   // Reset timer when duration changes
   useEffect(() => {
     setTimeRemaining(duration);
+    setProgressValue(100);
     hasStartedRef.current = false;
     lastTickTimeRef.current = null;
     
@@ -63,6 +65,10 @@ const Timer: React.FC<TimerProps> = ({
           // Force a minimum time decrease of at least 50ms per tick for visual feedback
           const newTime = Math.max(0, prev - Math.max(elapsed, 50));
           
+          // Calculate and update progress separately
+          const newProgressValue = Math.max(0, Math.min(100, (newTime / duration) * 100));
+          setProgressValue(newProgressValue);
+          
           // Report time update to parent
           if (onTimeUpdate) {
             onTimeUpdate(newTime);
@@ -81,7 +87,7 @@ const Timer: React.FC<TimerProps> = ({
           }
           return newTime;
         });
-      }, 50); // Update timer every 50ms for smoother animation
+      }, 16); // Update timer every 16ms (approximately 60fps) for smoother animation
     } else if (!isRunning) {
       // If we're paused, update the last tick time to now so we don't count
       // the paused time when we resume
@@ -95,17 +101,16 @@ const Timer: React.FC<TimerProps> = ({
         timerRef.current = null;
       }
     };
-  }, [isRunning, onTimeUp, onTimeUpdate, timeRemaining]);
+  }, [isRunning, onTimeUp, onTimeUpdate, timeRemaining, duration]);
   
-  // Calculate progress percentage
-  const progressPercentage = Math.max(0, Math.min(100, (timeRemaining / duration) * 100));
+  console.log(`Timer progress: ${progressValue.toFixed(1)}% (${timeRemaining}ms / ${duration}ms)`);
   
   return (
     <div className="w-full">
       <Progress 
-        value={progressPercentage} 
-        className="h-1 w-full rounded-none bg-transparent" 
-        indicatorClassName="bg-white transition-all"
+        value={progressValue} 
+        className="h-2 w-full rounded-none bg-black/20" 
+        indicatorClassName="bg-white transition-none" // Remove transition to make updates more visible
       />
     </div>
   );
