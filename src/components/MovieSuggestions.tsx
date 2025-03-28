@@ -32,7 +32,13 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
   };
 
   return (
-    <div className="w-full overflow-hidden bg-white dark:bg-gray-800 rounded-md border shadow-lg z-50">
+    <div 
+      className="w-full overflow-hidden bg-white dark:bg-gray-800 rounded-md border shadow-lg z-50"
+      onMouseDown={(e) => {
+        // Prevent the blur event on the input field
+        e.preventDefault();
+      }}
+    >
       <Command className="w-full">
         <CommandList>
           {isLoading ? (

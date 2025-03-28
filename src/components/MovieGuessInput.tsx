@@ -26,7 +26,9 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
   const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [isLoading, setIsLoading] = useState(false);
+  const [isInteractingWithSuggestions, setIsInteractingWithSuggestions] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const suggestionsRef = useRef<HTMLDivElement>(null);
   
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) {
@@ -118,28 +120,44 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
   };
 
   const handleBlur = () => {
-    // Clear the input field when it loses focus
-    setTimeout(() => {
-      if (onInputBlur) {
-        onInputBlur();
-      }
-      setIsSuggestionsOpen(false);
-      setGuess("");
-    }, 200);
+    // Don't clear input if user is interacting with suggestions
+    if (!isInteractingWithSuggestions) {
+      setTimeout(() => {
+        if (onInputBlur) {
+          onInputBlur();
+        }
+        setIsSuggestionsOpen(false);
+        setGuess("");
+      }, 200);
+    }
   };
 
-  // Add effect to handle clicking outside
+  // Set up mouse event listeners for dropdown
   useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (inputRef.current && !inputRef.current.contains(e.target as Node)) {
+    const handleMouseDown = (e: MouseEvent) => {
+      // Check if the click is inside the suggestions dropdown
+      if (suggestionsRef.current && suggestionsRef.current.contains(e.target as Node)) {
+        setIsInteractingWithSuggestions(true);
+      } else if (inputRef.current && !inputRef.current.contains(e.target as Node)) {
+        setIsInteractingWithSuggestions(false);
         setGuess("");
         setIsSuggestionsOpen(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    // Reset the interacting state on mouseup anywhere in the document
+    const handleMouseUp = () => {
+      setTimeout(() => {
+        setIsInteractingWithSuggestions(false);
+      }, 100);
+    };
+
+    document.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('mouseup', handleMouseUp);
+    
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('mousedown', handleMouseDown);
+      document.removeEventListener('mouseup', handleMouseUp);
     };
   }, []);
 
@@ -148,7 +166,10 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
       <div className="relative flex items-center gap-2">
         <div className="relative flex-grow">
           {isSuggestionsOpen && (
-            <div className="absolute bottom-full left-0 right-0 mb-1 z-50">
+            <div 
+              ref={suggestionsRef}
+              className="absolute bottom-full left-0 right-0 mb-1 z-50"
+            >
               <MovieSuggestions 
                 suggestions={suggestions}
                 isOpen={isSuggestionsOpen}
