@@ -32,6 +32,7 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
 
   const handleSelect = (movie: Movie) => {
     console.log(`Movie suggestion clicked: ${movie.title}`);
+    // Make sure we call onSelect synchronously
     onSelect(movie);
   };
 
@@ -56,6 +57,7 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
                       className={`flex items-center py-2 px-3 cursor-pointer ${
                         index === highlightedIndex ? 'bg-accent' : ''
                       }`}
+                      data-testid={`movie-suggestion-${movie.id}`}
                     >
                       <span className="truncate">{movie.title}</span>
                       {movie.releaseYear ? (
