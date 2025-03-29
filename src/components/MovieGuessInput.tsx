@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { ArrowUp } from 'lucide-react';
 import { Movie } from '@/utils/types/movieTypes';
 import { Input } from './ui/input';
 import MovieSuggestions from './MovieSuggestions';
@@ -199,9 +200,7 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
             disabled={disabled || !guess.trim()}
             className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-none bg-primary text-white border border-white/20 shadow-[1px_1px_0px_0px_rgba(0,0,0,0.5)] hover:translate-y-[1px] hover:shadow-none active:translate-y-[2px] disabled:opacity-30 transition-all"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-3 w-3">
-              <path d="m5 12 7-7 7 7" /><path d="M12 19V5" />
-            </svg>
+            <ArrowUp className="h-3 w-3" />
           </button>
         </div>
       </div>
