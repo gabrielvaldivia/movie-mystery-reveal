@@ -42,11 +42,9 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
         <CommandList>
           {isLoading ? (
             <div className="flex items-center justify-center py-6 font-arcade text-xs">
-              <img 
-                src="https://raster.saran13raj.com/icon/loading" 
-                alt="Loading" 
-                className="h-4 w-4 animate-spin text-primary mr-2" 
-              />
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 animate-spin text-primary mr-2">
+                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+              </svg>
               <span>Loading...</span>
             </div>
           ) : (
