@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { ArrowUp } from 'lucide-react';
 import { Movie } from '@/utils/types/movieTypes';
@@ -190,7 +189,7 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
             onBlur={handleBlur}
             placeholder="Guess the movie..."
             disabled={disabled}
-            className={`w-full py-2 px-3 pr-10 bg-white/90 focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-60 disabled:cursor-not-allowed transition-all ${
+            className={`w-full py-2 px-3 pr-10 text-xs tracking-tight ${
               hasIncorrectGuess 
                 ? 'border-destructive ring-2 ring-destructive/50 shake-animation' 
                 : ''
@@ -199,7 +198,7 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
           <button
             type="submit"
             disabled={disabled || !guess.trim()}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-full bg-primary text-white opacity-90 hover:opacity-100 disabled:opacity-30 transition-opacity"
+            className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-none bg-primary text-white border border-white/20 shadow-[1px_1px_0px_0px_rgba(0,0,0,0.5)] hover:translate-y-[1px] hover:shadow-none active:translate-y-[2px] disabled:opacity-30 transition-all"
           >
             <ArrowUp className="h-3 w-3" />
           </button>
