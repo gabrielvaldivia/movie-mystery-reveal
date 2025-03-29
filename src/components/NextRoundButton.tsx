@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { RefreshCw } from 'lucide-react';
+import { Joystick } from 'lucide-react';
 
 interface NextRoundButtonProps {
   onNextRound: () => void;
@@ -14,7 +14,7 @@ const NextRoundButton: React.FC<NextRoundButtonProps> = ({ onNextRound }) => {
         onClick={onNextRound}
         className="w-full bg-primary text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all hover:bg-primary/90 active:scale-[0.98] font-arcade text-sm"
       >
-        <RefreshCw className="h-5 w-5" />
+        <Joystick className="h-5 w-5" />
         <span>Next Round</span>
       </button>
     </div>
