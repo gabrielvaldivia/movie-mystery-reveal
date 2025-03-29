@@ -21,7 +21,7 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({
   return (
     <div className="fixed inset-0 bg-background z-50 flex items-center justify-center">
       <div className="max-w-md w-full px-4 py-8 flex flex-col items-center space-y-6 animate-in fade-in-0 slide-in-from-bottom-5 duration-300">
-        <h1 className="text-3xl font-bold text-center">
+        <h1 className="text-2xl font-arcade text-center tracking-wide">
           {timeExpired ? "Time's Up!" : "Correct! 🎉"}
         </h1>
         
@@ -34,13 +34,13 @@ const SuccessDialog: React.FC<SuccessDialogProps> = ({
         </div>
         
         <div className="flex flex-col items-center space-y-3 w-full">
-          <h2 className="text-2xl font-bold text-center">{movie.title}</h2>
-          <p className="text-muted-foreground text-center">{movie.releaseYear}</p>
+          <h2 className="text-xl font-arcade text-center tracking-wide">{movie.title}</h2>
+          <p className="text-muted-foreground text-center font-arcade text-xs">{movie.releaseYear}</p>
         </div>
         
         <Button 
           onClick={onNextRound} 
-          className="w-full mt-6"
+          className="w-full mt-6 font-arcade text-sm tracking-wide"
           size="lg"
         >
           Next Movie

@@ -13,15 +13,15 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStartGame }) => {
       <div className="mb-8 text-primary">
         <FilmIcon size={64} />
       </div>
-      <h1 className="text-4xl font-bold mb-4">Movie Mystery</h1>
-      <p className="text-muted-foreground mb-8 max-w-md">
+      <h1 className="text-3xl font-arcade mb-6 tracking-wider">Movie Mystery</h1>
+      <p className="text-muted-foreground mb-10 max-w-md font-arcade text-xs leading-relaxed tracking-wide">
         Test your movie knowledge! Guess the movie as it gradually reveals itself. 
         The faster you guess, the higher your score.
       </p>
       <Button 
         size="lg" 
         onClick={onStartGame}
-        className="px-8 py-6 text-lg font-semibold"
+        className="px-8 py-6 text-lg font-arcade tracking-wide"
       >
         Start Game
       </Button>
