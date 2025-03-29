@@ -31,16 +31,16 @@ const GameHeader: React.FC<GameHeaderProps> = ({
         isRunning={isRunning && !isPaused} 
       />
       
-      <div className="bg-gradient-to-b from-black to-transparent h-16 flex justify-between items-center px-4 py-4 pt-6 border-b-2 border-[#33ff00]">
+      <div className="bg-gradient-to-b from-black/40 to-transparent h-12 flex justify-between items-center px-4 py-4 pt-6">
         <Button 
           variant="ghost" 
           size="icon" 
           onClick={onClose}
-          className="text-[#33ff00] rounded-full p-0 flex items-center justify-center hover:bg-black/50 hover:text-[#ff00ff] border border-[#33ff00] hover:border-[#ff00ff] hover:shadow-[0_0_8px_#ff00ff]"
+          className="text-white rounded-full p-0 flex items-center justify-center hover:bg-transparent hover:text-white"
           aria-label="Close game"
           style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
         >
-          <X className="h-5 w-5" strokeWidth={1.5} />
+          <X className="h-5 w-5" />
         </Button>
         
         <div className="flex gap-2">
@@ -49,11 +49,11 @@ const GameHeader: React.FC<GameHeaderProps> = ({
               variant="ghost" 
               size="icon" 
               onClick={onTogglePause}
-              className="text-[#33ff00] rounded-full p-0 flex items-center justify-center hover:bg-black/50 hover:text-[#00ffff] border border-[#33ff00] hover:border-[#00ffff] hover:shadow-[0_0_8px_#00ffff]"
+              className="text-white rounded-full p-0 flex items-center justify-center hover:bg-transparent hover:text-white"
               aria-label={isPaused ? "Resume pixelation" : "Pause pixelation"}
               style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
             >
-              {isPaused ? <Play className="h-5 w-5" strokeWidth={1.5} /> : <Pause className="h-5 w-5" strokeWidth={1.5} />}
+              {isPaused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
             </Button>
           )}
           
@@ -61,11 +61,11 @@ const GameHeader: React.FC<GameHeaderProps> = ({
             variant="ghost" 
             size="icon" 
             onClick={onSkip}
-            className="text-[#33ff00] rounded-full p-0 flex items-center justify-center hover:bg-black/50 hover:text-[#ffff00] border border-[#33ff00] hover:border-[#ffff00] hover:shadow-[0_0_8px_#ffff00]"
+            className="text-white rounded-full p-0 flex items-center justify-center hover:bg-transparent hover:text-white"
             aria-label="Skip this movie"
             style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
           >
-            <SkipForward className="h-5 w-5" strokeWidth={1.5} />
+            <SkipForward className="h-5 w-5" />
           </Button>
         </div>
       </div>

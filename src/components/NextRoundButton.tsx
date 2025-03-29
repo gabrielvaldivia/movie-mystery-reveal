@@ -12,9 +12,9 @@ const NextRoundButton: React.FC<NextRoundButtonProps> = ({ onNextRound }) => {
       <button
         id="next-round-button"
         onClick={onNextRound}
-        className="w-full bg-black text-[#33ff00] py-3 px-4 rounded-md flex items-center justify-center gap-2 border-2 border-[#33ff00] font-pixel text-sm uppercase tracking-wider shadow-[0_0_8px_#33ff00] hover:shadow-[0_0_12px_#33ff00] hover:bg-[#111] transition-all duration-300"
+        className="w-full bg-primary text-white py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-all hover:bg-primary/90 active:scale-[0.98]"
       >
-        <RefreshCw className="h-5 w-5" strokeWidth={1.5} />
+        <RefreshCw className="h-5 w-5" />
         <span>Next Round</span>
       </button>
     </div>
