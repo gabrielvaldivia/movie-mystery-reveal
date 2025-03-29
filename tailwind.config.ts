@@ -52,7 +52,18 @@ export default {
 				card: {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
+				},
+				arcade: {
+					background: '#000000',
+					text: '#33ff00',
+					accent: '#ff00ff',
+					highlight: '#00ffff',
+					dimmed: '#006600'
 				}
+			},
+			fontFamily: {
+				inter: ['Inter', 'sans-serif'],
+				pixel: ['"Press Start 2P"', 'cursive']
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
