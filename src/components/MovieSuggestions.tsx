@@ -2,7 +2,7 @@
 import React from 'react';
 import { Movie } from '@/utils/types/movieTypes';
 import { Command, CommandEmpty, CommandGroup, CommandItem, CommandList } from './ui/command';
-import { Gamepad } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 
 interface MovieSuggestionsProps {
   suggestions: Movie[];
@@ -43,7 +43,7 @@ const MovieSuggestions: React.FC<MovieSuggestionsProps> = ({
         <CommandList>
           {isLoading ? (
             <div className="flex items-center justify-center py-6 font-arcade text-xs">
-              <Gamepad className="h-4 w-4 animate-spin text-primary mr-2" />
+              <Loader2 className="h-4 w-4 animate-spin text-primary mr-2" />
               <span>Loading...</span>
             </div>
           ) : (

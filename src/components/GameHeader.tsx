@@ -2,7 +2,7 @@
 import React from 'react';
 import Timer from './Timer';
 import { Button } from './ui/button';
-import { Square, Zap, Gamepad, CircleX } from 'lucide-react';
+import { SkipForward, X, Pause, Play } from 'lucide-react';
 
 interface GameHeaderProps {
   duration: number;
@@ -40,7 +40,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
           aria-label="Close game"
           style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
         >
-          <CircleX className="h-5 w-5" />
+          <X className="h-5 w-5" />
         </Button>
         
         <div className="flex gap-2">
@@ -53,7 +53,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
               aria-label={isPaused ? "Resume pixelation" : "Pause pixelation"}
               style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
             >
-              {isPaused ? <Gamepad className="h-5 w-5" /> : <Square className="h-5 w-5" />}
+              {isPaused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
             </Button>
           )}
           
@@ -65,7 +65,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
             aria-label="Skip this movie"
             style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
           >
-            <Zap className="h-5 w-5" />
+            <SkipForward className="h-5 w-5" />
           </Button>
         </div>
       </div>
