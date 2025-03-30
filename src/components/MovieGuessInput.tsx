@@ -1,9 +1,9 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { ArrowUp } from 'lucide-react';
-import { Movie } from '@/utils/types/movieTypes';
-import { Input } from './ui/input';
-import MovieSuggestions from './MovieSuggestions';
-import { searchMovies } from '@/utils/services/tmdbService';
+import React, { useState, useRef, useEffect } from "react";
+import { ArrowUp } from "lucide-react";
+import { Movie } from "@/utils/types/movieTypes";
+import { Input } from "./ui/input";
+import MovieSuggestions from "./MovieSuggestions";
+import { searchMovies } from "@/utils/services/tmdbService";
 
 interface MovieGuessInputProps {
   onGuess: (guess: string) => void;
@@ -13,29 +13,30 @@ interface MovieGuessInputProps {
   onInputBlur?: () => void;
 }
 
-const MovieGuessInput: React.FC<MovieGuessInputProps> = ({ 
-  onGuess, 
-  disabled, 
-  hasIncorrectGuess
+const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
+  onGuess,
+  disabled,
+  hasIncorrectGuess,
 }) => {
   const [guess, setGuess] = useState("");
   const [suggestions, setSuggestions] = useState<Movie[]>([]);
   const [isSuggestionsOpen, setIsSuggestionsOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const [isLoading, setIsLoading] = useState(false);
-  const [isInteractingWithSuggestions, setIsInteractingWithSuggestions] = useState(false);
+  const [isInteractingWithSuggestions, setIsInteractingWithSuggestions] =
+    useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const suggestionsRef = useRef<HTMLDivElement>(null);
-  
+
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) {
       e.preventDefault();
     }
-    
+
     if (guess.trim() && !disabled) {
       console.log("Submitting guess from form:", guess.trim());
       onGuess(guess.trim());
-      setGuess(""); 
+      setGuess("");
       setSuggestions([]);
       setIsSuggestionsOpen(false);
     }
@@ -44,7 +45,7 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
   const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setGuess(value);
-    
+
     if (value.trim().length >= 2) {
       setIsLoading(true);
       try {
@@ -52,7 +53,7 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
         setSuggestions(Array.isArray(movieSuggestions) ? movieSuggestions : []);
         setIsSuggestionsOpen(movieSuggestions && movieSuggestions.length > 0);
       } catch (error) {
-        console.error('Error getting movie suggestions:', error);
+        console.error("Error getting movie suggestions:", error);
         setSuggestions([]);
         setIsSuggestionsOpen(false);
       } finally {
@@ -70,7 +71,7 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
     setGuess(movie.title);
     setSuggestions([]);
     setIsSuggestionsOpen(false);
-    
+
     // Immediately submit the guess
     if (!disabled) {
       onGuess(movie.title);
@@ -79,26 +80,21 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!isSuggestionsOpen) return;
-    
-    if (e.key === 'ArrowDown') {
+
+    if (e.key === "ArrowDown") {
       e.preventDefault();
-      setHighlightedIndex(prev => 
+      setHighlightedIndex((prev) =>
         prev < suggestions.length - 1 ? prev + 1 : prev
       );
-    }
-    else if (e.key === 'ArrowUp') {
+    } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setHighlightedIndex(prev => 
-        prev > 0 ? prev - 1 : 0
-      );
-    }
-    else if (e.key === 'Enter' && highlightedIndex >= 0) {
+      setHighlightedIndex((prev) => (prev > 0 ? prev - 1 : 0));
+    } else if (e.key === "Enter" && highlightedIndex >= 0) {
       e.preventDefault();
       if (suggestions[highlightedIndex]) {
         handleSuggestionSelect(suggestions[highlightedIndex]);
       }
-    }
-    else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       setIsSuggestionsOpen(false);
       if (inputRef.current) {
         inputRef.current.blur();
@@ -126,9 +122,15 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
   useEffect(() => {
     const handleMouseDown = (e: MouseEvent) => {
       // Check if the click is inside the suggestions dropdown
-      if (suggestionsRef.current && suggestionsRef.current.contains(e.target as Node)) {
+      if (
+        suggestionsRef.current &&
+        suggestionsRef.current.contains(e.target as Node)
+      ) {
         setIsInteractingWithSuggestions(true);
-      } else if (inputRef.current && !inputRef.current.contains(e.target as Node)) {
+      } else if (
+        inputRef.current &&
+        !inputRef.current.contains(e.target as Node)
+      ) {
         setIsInteractingWithSuggestions(false);
         setGuess("");
         setIsSuggestionsOpen(false);
@@ -142,12 +144,12 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
       }, 100);
     };
 
-    document.addEventListener('mousedown', handleMouseDown);
-    document.addEventListener('mouseup', handleMouseUp);
-    
+    document.addEventListener("mousedown", handleMouseDown);
+    document.addEventListener("mouseup", handleMouseUp);
+
     return () => {
-      document.removeEventListener('mousedown', handleMouseDown);
-      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener("mousedown", handleMouseDown);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
   }, []);
 
@@ -156,11 +158,11 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
       <div className="relative flex items-center gap-2">
         <div className="relative flex-grow">
           {isSuggestionsOpen && (
-            <div 
+            <div
               ref={suggestionsRef}
               className="absolute bottom-full left-0 right-0 mb-1 z-50"
             >
-              <MovieSuggestions 
+              <MovieSuggestions
                 suggestions={suggestions}
                 isOpen={isSuggestionsOpen}
                 onSelect={handleSuggestionSelect}
@@ -169,7 +171,7 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
               />
             </div>
           )}
-          
+
           <Input
             ref={inputRef}
             type="text"
@@ -181,15 +183,15 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
             placeholder="Guess the movie..."
             disabled={disabled}
             className={`w-full py-2 px-3 pr-10 text-xs tracking-tight ${
-              hasIncorrectGuess 
-                ? 'border-destructive ring-2 ring-destructive/50 shake-animation' 
-                : ''
+              hasIncorrectGuess
+                ? "border-destructive ring-2 ring-destructive/50 shake-animation"
+                : ""
             }`}
           />
           <button
             type="submit"
             disabled={disabled || !guess.trim()}
-            className="absolute right-2 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-none bg-primary text-white border border-white/20 shadow-[1px_1px_0px_0px_rgba(0,0,0,0.5)] hover:translate-y-[1px] hover:shadow-none active:translate-y-[2px] disabled:opacity-30 transition-all"
+            className="absolute right-3 top-1/2 -translate-y-1/2 w-7 h-7 flex items-center justify-center rounded-full bg-primary text-white border border-white/20 hover:translate-y-[1px] active:translate-y-[2px] disabled:opacity-30 transition-all"
           >
             <ArrowUp className="h-3 w-3" />
           </button>

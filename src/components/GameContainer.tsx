@@ -48,12 +48,15 @@ const GameContainer: React.FC = () => {
   } = useGameState();
 
   useEffect(() => {
+    console.log("GameContainer mounted, loading scores...");
     loadScores();
   }, []);
 
   const loadScores = async () => {
     try {
+      console.log("Loading scores from Supabase...");
       const topScores = await leaderboardService.getTopScores();
+      console.log("Scores loaded:", topScores);
       setScores(topScores);
     } catch (error) {
       console.error("Error loading scores:", error);
@@ -92,7 +95,9 @@ const GameContainer: React.FC = () => {
 
   const handleSaveScore = async (playerName: string) => {
     try {
+      console.log("Saving score for player:", playerName, "score:", score);
       await leaderboardService.saveScore(playerName, score);
+      console.log("Score saved, reloading scores...");
       await loadScores(); // Reload scores after saving
       handleSubmitScore(playerName);
     } catch (error) {
@@ -110,9 +115,9 @@ const GameContainer: React.FC = () => {
         } flex items-center justify-center m-0 p-0`}
       >
         <div
-          className={`flex flex-col items-center w-full max-w-2xl ${
+          className={`flex flex-col items-center w-full ${
             isMobile ? "h-full max-h-none" : "aspect-[3/5] h-full max-h-screen"
-          } m-0 p-0`}
+          } m-0 p-0 bg-[#1A2336]`}
         >
           <StartScreen onStartGame={handleStartGame} />
         </div>
@@ -126,7 +131,7 @@ const GameContainer: React.FC = () => {
         isMobile
           ? "h-full absolute inset-0 overflow-hidden"
           : "h-full overflow-hidden"
-      } flex items-center justify-center m-0 p-0`}
+      } flex items-center justify-center m-0 p-0 bg-[#1A2336]`}
     >
       <div
         className={`flex flex-col items-center w-full max-w-2xl ${
