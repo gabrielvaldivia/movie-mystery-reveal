@@ -42,14 +42,18 @@ export function useGameRound(
   const [timeExpired, setTimeExpired] = useState(false);
   
   const startNewRound = useCallback(async (livesOverride?: number) => {
+    console.log("Starting new round with lives:", livesOverride !== undefined ? livesOverride : lives);
+    
     const currentLivesValue = livesOverride !== undefined ? livesOverride : lives;
     
     if (currentLivesValue <= 0) {
+      console.log("No lives left, game over");
       setIsGameOver(true);
       return;
     }
     
     if (livesOverride !== undefined) {
+      console.log("Setting lives explicitly to:", livesOverride);
       setLives(livesOverride);
     }
     
@@ -72,9 +76,14 @@ export function useGameRound(
       setCurrentMovie(nextMovie);
       setIsCorrectGuess(false);
       setHasIncorrectGuess(false);
+      
+      // Give UI time to update before finishing loading
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 300);
+      
     } catch (error) {
       console.error("Error starting new round:", error);
-    } finally {
       setIsLoading(false);
     }
   }, [currentMovie, lives, setIsGameOver, setLives]);

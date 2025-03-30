@@ -35,7 +35,13 @@ export function useGameInit(): UseGameInitResult {
       
       clearInterval(progressInterval);
       setLoadingProgress(100);
-      setGameInitialized(true);
+      
+      // Add a slight delay before setting gameInitialized and isLoading
+      setTimeout(() => {
+        setGameInitialized(true);
+        setIsLoading(false);
+      }, 500);
+      
     } catch (error) {
       console.error("Error initializing game:", error);
       setLoadingProgress(100);

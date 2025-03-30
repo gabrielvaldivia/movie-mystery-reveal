@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import MovieImage from './MovieImage';
 import GuessInput from './GuessInput';
 import SuccessDialog from './SuccessDialog';
@@ -14,6 +15,7 @@ const GAME_DURATION = 30000; // 30 seconds
 const GameContainer: React.FC = () => {
   const [showStartScreen, setShowStartScreen] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
+  const [retryAttempt, setRetryAttempt] = useState(0); // Add a retry counter
   const isMobile = useIsMobile();
   const {
     currentMovie,
@@ -44,7 +46,18 @@ const GameContainer: React.FC = () => {
     updateRemainingTime
   } = useGameState();
   
+  // Log key state changes
+  useEffect(() => {
+    console.log("Game container state:", { 
+      isLoading, 
+      currentMovie: currentMovie?.title || 'none',
+      loadingProgress,
+      isImageLoaded
+    });
+  }, [isLoading, currentMovie, loadingProgress, isImageLoaded]);
+  
   const handleStartGame = () => {
+    console.log("Starting game from start screen");
     resetGame(); // Ensure game state is reset before starting a new game
     setShowStartScreen(false);
     setIsPaused(false); // Ensure game starts unpaused
@@ -82,6 +95,12 @@ const GameContainer: React.FC = () => {
   };
   
   const handlePlayAgain = () => {
+    resetGame();
+  };
+  
+  const handleRetry = () => {
+    console.log("Retrying loading...");
+    setRetryAttempt(prev => prev + 1);
     resetGame();
   };
   
@@ -135,7 +154,7 @@ const GameContainer: React.FC = () => {
                   />
                   
                   <MovieImage 
-                    key={imageKey}
+                    key={`${imageKey}-${retryAttempt}`} // Add retry attempt to key to force remount
                     imageUrl={currentMovie.imageUrl}
                     duration={GAME_DURATION}
                     onRevealComplete={handleRevealComplete}
@@ -144,6 +163,7 @@ const GameContainer: React.FC = () => {
                     onImageError={handleImageError}
                     isPaused={isPaused}
                     onTogglePause={handleTogglePause}
+                    onRetry={handleRetry} // Add retry handler
                   >
                     <GuessInput 
                       onGuess={handleGuess}
@@ -172,7 +192,7 @@ const GameContainer: React.FC = () => {
               }
             </p>
             <button 
-              onClick={handleNextRoundWithReset}
+              onClick={handleRetry}
               className="px-6 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors"
             >
               Try Again

@@ -1,3 +1,4 @@
+
 import { Movie } from '../types/movieTypes';
 import { getMoviesCollection } from '../data/movieCollection';
 import { TMDB_IMAGE_BASE_URL } from '../services/tmdbService';
@@ -55,14 +56,19 @@ const validMovies: Movie[] = [];
 
 // Load a movie with image, on-demand, randomizing selection from the entire collection
 export const getMovieWithImage = async (): Promise<Movie> => {
+  console.log("Getting movie with valid image...");
+  
   // If we have previously validated movies, return a random one
   if (validMovies.length > 10) {
-    return validMovies[Math.floor(Math.random() * validMovies.length)];
+    const randomMovie = validMovies[Math.floor(Math.random() * validMovies.length)];
+    console.log(`Using cached movie: "${randomMovie.title}" (${randomMovie.releaseYear})`);
+    return randomMovie;
   }
   
   // Otherwise, we need to fetch movies from TMDB and find ones with valid images
   try {
     const moviesCollection = await getMoviesCollection();
+    console.log(`Searching through ${moviesCollection.length} movies for valid images...`);
     
     // Shuffle the entire movie collection to ensure true randomness
     const shuffledMovies = [...moviesCollection].sort(() => Math.random() - 0.5);
@@ -70,6 +76,7 @@ export const getMovieWithImage = async (): Promise<Movie> => {
     // Try to find a movie with a valid image
     for (const movie of shuffledMovies) {
       try {
+        console.log(`Checking image for: "${movie.title}" (${movie.releaseYear})`);
         const imageUrl = await fetchMovieImages(movie);
         const movieWithImage = { ...movie, imageUrl };
         
@@ -78,6 +85,7 @@ export const getMovieWithImage = async (): Promise<Movie> => {
           validMovies.push(movieWithImage);
         }
         
+        console.log(`Found valid image for: "${movie.title}"`);
         return movieWithImage;
       } catch (error) {
         // Just skip this movie and try another

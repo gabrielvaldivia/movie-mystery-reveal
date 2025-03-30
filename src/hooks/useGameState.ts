@@ -43,6 +43,7 @@ export function useGameState() {
   // Initialize game on startup
   useEffect(() => {
     if (!gameInitialized) {
+      console.log("Starting game initialization...");
       const initGame = async () => {
         setLives(MAX_LIVES);
         await initializeGame(startNewRound);
@@ -52,8 +53,21 @@ export function useGameState() {
     }
   }, [gameInitialized, initializeGame, startNewRound, setLives]);
   
+  // Log state changes to help with debugging
+  useEffect(() => {
+    console.log("Game state updated:", { 
+      isLoading,
+      roundIsLoading,
+      initIsLoading,
+      gameInitialized,
+      loadingProgress,
+      lives
+    });
+  }, [isLoading, roundIsLoading, initIsLoading, gameInitialized, loadingProgress, lives]);
+  
   // Combine all hooks for the final API
   const resetGame = () => {
+    console.log("Resetting game...");
     setIsLoading(true);
     setGameInitialized(false);
     setImageLoadError(false);
