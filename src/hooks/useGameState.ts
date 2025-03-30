@@ -144,19 +144,24 @@ export function useGameState() {
 
   const handleTimeUp = () => {
     if (isGameActive && !isRoundComplete) {
+      // Important: Capture current lives before state update
       const currentLives = lives;
       
+      // Only decrement by 1
       setLives(prev => Math.max(0, prev - 1));
       
       setIsGameActive(false);
       setIsRoundComplete(true);
       setTimeExpired(true);
       
+      // Use the captured currentLives value for the check
       if (currentLives <= 1) {
+        // If we had only 1 life left, set game over after a delay
         setTimeout(() => {
           setIsGameOver(true);
         }, 1000);
       } else {
+        // Otherwise, continue to next round after a delay
         setTimeout(() => {
           setTimeExpired(false);
           startNewRound();
@@ -189,8 +194,10 @@ export function useGameState() {
   
   const handleSkip = async () => {
     if (isGameActive) {
+      // Important: Capture current lives before state update
       const currentLives = lives;
       
+      // Only decrement by 1
       setLives(prev => Math.max(0, prev - 1));
       
       setIsGameActive(false);
@@ -199,13 +206,16 @@ export function useGameState() {
       setShowSuccessDialog(false);
       setIsCorrectGuess(false);
       
-      if (currentLives > 1) {
-        await new Promise(resolve => setTimeout(resolve, 10));
-        await startNewRound();
-      } else {
+      // Use the captured currentLives value for the check
+      if (currentLives <= 1) {
+        // If we had only 1 life left, set game over after a delay
         setTimeout(() => {
           setIsGameOver(true);
         }, 1000);
+      } else {
+        // Otherwise, continue to next round after a small delay
+        await new Promise(resolve => setTimeout(resolve, 10));
+        await startNewRound();
       }
     }
   };
