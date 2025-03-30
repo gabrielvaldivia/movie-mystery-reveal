@@ -34,17 +34,8 @@ const GameHeader: React.FC<GameHeaderProps> = ({
         onTimeUpdate={onTimeUpdate}
       />
       
-      <div className="bg-gradient-to-b from-black/40 to-transparent h-12 flex justify-between items-center px-4 py-4 pt-6">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          onClick={onClose}
-          className="text-white rounded-full p-0 flex items-center justify-center hover:bg-transparent hover:text-white"
-          aria-label="Close game"
-          style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
-        >
-          <X className="h-5 w-5" />
-        </Button>
+      <div className="bg-gradient-to-b from-black/40 to-transparent h-16 flex justify-between items-center px-4 py-4 pt-6">
+        <div className="flex-1"></div> {/* Empty space for GameStats */}
         
         <div className="flex gap-2">
           {onTogglePause && (
@@ -69,6 +60,17 @@ const GameHeader: React.FC<GameHeaderProps> = ({
             style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
           >
             <SkipForward className="h-5 w-5" />
+          </Button>
+          
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onClose}
+            className="text-white rounded-full p-0 flex items-center justify-center hover:bg-transparent hover:text-white"
+            aria-label="Close game"
+            style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
+          >
+            <X className="h-5 w-5" />
           </Button>
         </div>
       </div>

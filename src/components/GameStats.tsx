@@ -14,11 +14,11 @@ const GameStats: React.FC<GameStatsProps> = ({
   maxLives = 10 
 }) => {
   return (
-    <div className="absolute top-0 left-0 right-0 z-20 bg-black/60 px-4 py-2 flex justify-between items-center">
-      <div className="font-arcade text-white text-sm">
+    <div className="absolute top-0 left-0 z-20 px-4 py-2 flex justify-start items-center h-16">
+      <div className="font-arcade text-white text-sm bg-black/60 px-4 py-2 rounded-lg shadow-md">
         Score: {score}
       </div>
-      <div className="flex items-center gap-0.5">
+      <div className="flex items-center gap-0.5 ml-4 bg-black/60 px-4 py-2 rounded-lg shadow-md">
         {Array.from({ length: maxLives }).map((_, i) => (
           <Heart 
             key={i} 
