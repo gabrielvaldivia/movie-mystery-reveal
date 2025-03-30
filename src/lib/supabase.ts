@@ -9,9 +9,14 @@ if (!supabaseUrl || !supabaseAnonKey) {
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
+export type Difficulty = 'easy' | 'hard';
+
 export interface LeaderboardEntry {
   id: number;
-  name: string;
-  score: number;
   created_at: string;
-} 
+  player_name: string;
+  score: number;
+  difficulty: Difficulty;
+}
+
+export type { GameMode } from '../components/GameContainer'; 

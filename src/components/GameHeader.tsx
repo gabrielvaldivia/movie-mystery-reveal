@@ -47,7 +47,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
           {score}
         </div>
 
-        <div className="flex items-center gap-0.5 pointer-events-auto z-10">
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-2 pointer-events-auto z-10">
           {Array.from({ length: maxLives }).map((_, i) => (
             <Heart
               key={i}

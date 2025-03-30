@@ -1,105 +1,90 @@
-
-import React, { useState, useEffect, useRef } from 'react';
-import { Progress } from './ui/progress';
+import React, { useEffect, useRef, useState } from "react";
+import { Progress } from "./ui/progress";
 
 interface TimerProps {
   duration: number;
   onTimeUp: () => void;
   isRunning: boolean;
-  onTimeUpdate?: (remainingMs: number) => void;
+  onTimeUpdate?: (timeMs: number) => void;
 }
 
-const Timer: React.FC<TimerProps> = ({ 
-  duration, 
-  onTimeUp, 
+const Timer: React.FC<TimerProps> = ({
+  duration,
+  onTimeUp,
   isRunning,
-  onTimeUpdate
+  onTimeUpdate,
 }) => {
-  const [timeRemaining, setTimeRemaining] = useState(duration);
-  const timerRef = useRef<number | null>(null);
-  const hasStartedRef = useRef<boolean>(false);
-  const lastTickTimeRef = useRef<number | null>(null);
-  
-  // Reset timer when duration changes
+  const [progress, setProgress] = useState(100);
+  const startTimeRef = useRef<number | null>(null);
+  const animationFrameRef = useRef<number>();
+  const lastUpdateTimeRef = useRef<number>(Date.now());
+  const hasCalledTimeUpRef = useRef(false);
+  const isRunningRef = useRef(isRunning);
+
+  // Keep isRunningRef in sync with isRunning prop
   useEffect(() => {
-    setTimeRemaining(duration);
-    hasStartedRef.current = false;
-    lastTickTimeRef.current = null;
-  }, [duration]);
-  
-  // Clear interval on unmount
-  useEffect(() => {
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
+    isRunningRef.current = isRunning;
+
+    // Reset state when isRunning changes to true
+    if (isRunning) {
+      hasCalledTimeUpRef.current = false;
+      setProgress(100);
+      startTimeRef.current = Date.now();
+      lastUpdateTimeRef.current = Date.now();
+    } else {
+      // Reset progress when timer stops
+      setProgress(100);
+      startTimeRef.current = null;
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = undefined;
       }
-    };
-  }, []);
-  
-  // Handle running state changes
-  useEffect(() => {
-    // Clear any existing interval first
-    if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
     }
-    
-    // Start timer if running and we have time left
-    if (isRunning && timeRemaining > 0) {
-      hasStartedRef.current = true;
-      lastTickTimeRef.current = Date.now();
-      
-      timerRef.current = window.setInterval(() => {
-        const now = Date.now();
-        const elapsed = lastTickTimeRef.current ? now - lastTickTimeRef.current : 100;
-        lastTickTimeRef.current = now;
-        
-        setTimeRemaining((prev) => {
-          const newTime = Math.max(0, prev - elapsed);
-          
-          // Report remaining time to parent
+  }, [isRunning]);
+
+  useEffect(() => {
+    if (isRunning) {
+      const animate = () => {
+        const currentTime = Date.now();
+        const elapsedTime = currentTime - (startTimeRef.current || currentTime);
+        const remainingTime = Math.max(0, duration - elapsedTime);
+        const newProgress = (remainingTime / duration) * 100;
+
+        // Only update if enough time has passed (e.g., every 16ms for ~60fps)
+        if (currentTime - lastUpdateTimeRef.current >= 16) {
+          setProgress(newProgress);
           if (onTimeUpdate) {
-            onTimeUpdate(newTime);
+            onTimeUpdate(remainingTime);
           }
-          
-          if (newTime <= 0) {
-            if (timerRef.current) {
-              clearInterval(timerRef.current);
-              timerRef.current = null;
-            }
-            // Only trigger time up if the timer has actually been running
-            if (hasStartedRef.current) {
-              setTimeout(() => onTimeUp(), 0);
-            }
-            return 0;
+          lastUpdateTimeRef.current = currentTime;
+        }
+
+        // Use isRunningRef.current to get the latest running state
+        if (isRunningRef.current) {
+          if (remainingTime > 0) {
+            animationFrameRef.current = requestAnimationFrame(animate);
+          } else if (!hasCalledTimeUpRef.current) {
+            hasCalledTimeUpRef.current = true;
+            onTimeUp();
           }
-          return newTime;
-        });
-      }, 100);
-    } else if (!isRunning) {
-      // If we're paused, update the last tick time to now so we don't count
-      // the paused time when we resume
-      lastTickTimeRef.current = null;
+        }
+      };
+
+      animationFrameRef.current = requestAnimationFrame(animate);
+
+      return () => {
+        if (animationFrameRef.current) {
+          cancelAnimationFrame(animationFrameRef.current);
+        }
+      };
     }
-    
-    // Return cleanup function
-    return () => {
-      if (timerRef.current) {
-        clearInterval(timerRef.current);
-        timerRef.current = null;
-      }
-    };
-  }, [isRunning, onTimeUp, timeRemaining, onTimeUpdate]);
-  
-  // Calculate progress as a percentage from 0 to 100
-  // Inverting the calculation so it fills from left to right as time decreases
-  const progress = 100 - Math.max(0, (timeRemaining / duration) * 100);
-  
+  }, [isRunning, duration, onTimeUp, onTimeUpdate]);
+
   return (
     <div className="w-full">
-      <Progress 
-        value={progress} 
-        className="h-1 w-full rounded-none bg-gray-700" 
+      <Progress
+        value={progress}
+        className="h-1 w-full rounded-none bg-gray-700"
         indicatorClassName="bg-white"
       />
     </div>

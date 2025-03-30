@@ -1,6 +1,6 @@
-
 import { useImageLoader } from './useImageLoader';
 import { usePixelationAnimation } from './usePixelationAnimation';
+import { Difficulty } from '../lib/supabase';
 
 interface UsePixelRevealProps {
   imageUrl: string;
@@ -10,6 +10,7 @@ interface UsePixelRevealProps {
   onImageError?: () => void;
   isActive: boolean;
   isPaused?: boolean;
+  difficulty: Difficulty;
 }
 
 export function usePixelReveal({
@@ -19,7 +20,8 @@ export function usePixelReveal({
   onImageLoaded,
   onImageError,
   isActive,
-  isPaused = false
+  isPaused = false,
+  difficulty
 }: UsePixelRevealProps) {
   // Use the image loader hook
   const {
@@ -47,7 +49,8 @@ export function usePixelReveal({
     onRevealComplete,
     isActive,
     isLoaded,
-    isPaused // Pass the external isPaused state
+    isPaused,
+    difficulty
   });
 
   return {

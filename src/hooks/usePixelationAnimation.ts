@@ -1,6 +1,7 @@
-
 import { useRef, useEffect, useState } from 'react';
 import { createPixelationAnimation } from '../utils/pixelation';
+import { createEasyModeAnimation } from '../utils/pixelation/easyModeAnimation';
+import { Difficulty } from '../lib/supabase';
 
 interface UsePixelationAnimationProps {
   imageRef: React.MutableRefObject<HTMLImageElement | null>;
@@ -9,6 +10,7 @@ interface UsePixelationAnimationProps {
   isActive: boolean;
   isLoaded: boolean;
   isPaused?: boolean;
+  difficulty: Difficulty;
 }
 
 export function usePixelationAnimation({
@@ -17,7 +19,8 @@ export function usePixelationAnimation({
   onRevealComplete,
   isActive,
   isLoaded,
-  isPaused = false
+  isPaused = false,
+  difficulty
 }: UsePixelationAnimationProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [internalIsPaused, setInternalIsPaused] = useState(false);
@@ -63,12 +66,19 @@ export function usePixelationAnimation({
         canvasRef.current.width = container.clientWidth;
         canvasRef.current.height = container.clientHeight;
         
-        const animation = createPixelationAnimation(
-          imageRef.current,
-          canvasRef.current,
-          duration,
-          onRevealComplete
-        );
+        const animation = difficulty === 'easy' 
+          ? createEasyModeAnimation(
+              imageRef.current,
+              canvasRef.current,
+              duration,
+              onRevealComplete
+            )
+          : createPixelationAnimation(
+              imageRef.current,
+              canvasRef.current,
+              duration,
+              onRevealComplete
+            );
         
         animationRef.current = animation;
       } catch (error) {
@@ -94,7 +104,7 @@ export function usePixelationAnimation({
       animationRef.current.forceComplete();
       animationStartedRef.current = false;
     }
-  }, [isActive, isLoaded, isPaused, duration, onRevealComplete]);
+  }, [isActive, isLoaded, isPaused, duration, onRevealComplete, difficulty]);
   
   // Handle window resize - recreate animation at new canvas size
   useEffect(() => {
@@ -116,12 +126,19 @@ export function usePixelationAnimation({
           animationRef.current.stop();
           
           try {
-            const animation = createPixelationAnimation(
-              imageRef.current,
-              canvasRef.current,
-              duration,
-              onRevealComplete
-            );
+            const animation = difficulty === 'easy' 
+              ? createEasyModeAnimation(
+                  imageRef.current,
+                  canvasRef.current,
+                  duration,
+                  onRevealComplete
+                )
+              : createPixelationAnimation(
+                  imageRef.current,
+                  canvasRef.current,
+                  duration,
+                  onRevealComplete
+                );
             
             animationRef.current = animation;
             
@@ -145,7 +162,7 @@ export function usePixelationAnimation({
     
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
-  }, [duration, isActive, isLoaded, onRevealComplete, isPaused]);
+  }, [duration, isActive, isLoaded, onRevealComplete, isPaused, difficulty]);
   
   // Cleanup on unmount
   useEffect(() => {

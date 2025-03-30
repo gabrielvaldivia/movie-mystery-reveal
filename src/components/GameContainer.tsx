@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import MovieImage from "./MovieImage";
 import GuessInput from "./GuessInput";
+import MultipleChoiceInput from "./MultipleChoiceInput";
 import SuccessDialog from "./SuccessDialog";
 import GameLoading from "./GameLoading";
 import GameHeader from "./GameHeader";
@@ -9,15 +10,23 @@ import StartScreen from "./StartScreen";
 import { useGameState } from "../hooks/useGameState";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { leaderboardService } from "../services/leaderboardService";
-import { LeaderboardEntry } from "../lib/supabase";
+import { LeaderboardEntry, Difficulty } from "../lib/supabase";
+import {
+  getRandomMovieTitles,
+  initializeMovieOptions,
+} from "../utils/services/movieOptionsService";
 
-const GAME_DURATION = 30000; // 30 seconds
+const HARD_MODE_DURATION = 30000; // 30 seconds
+const EASY_MODE_DURATION = 15000; // 15 seconds
 
 const GameContainer: React.FC = () => {
   const [showStartScreen, setShowStartScreen] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [scores, setScores] = useState<LeaderboardEntry[]>([]);
+  const [difficulty, setDifficulty] = useState<Difficulty>("hard");
+  const [movieOptions, setMovieOptions] = useState<string[]>([]);
   const isMobile = useIsMobile();
+
   const {
     currentMovie,
     isGameActive,
@@ -45,17 +54,38 @@ const GameContainer: React.FC = () => {
     resetGame,
     handleSubmitScore,
     updateRemainingTime,
-  } = useGameState();
+  } = useGameState(difficulty);
+
+  // Get the game duration based on difficulty
+  const gameDuration =
+    difficulty === "easy" ? EASY_MODE_DURATION : HARD_MODE_DURATION;
 
   useEffect(() => {
-    console.log("GameContainer mounted, loading scores...");
-    loadScores();
+    const init = async () => {
+      console.log(
+        "GameContainer mounted, loading scores and initializing movies..."
+      );
+      await loadScores();
+      await initializeMovieOptions();
+    };
+    init();
   }, []);
+
+  useEffect(() => {
+    if (currentMovie && difficulty === "easy") {
+      const options = getRandomMovieTitles(currentMovie);
+      if (!options.includes(currentMovie.title)) {
+        // If somehow the correct answer isn't included, add it
+        options.splice(Math.floor(Math.random() * 4), 0, currentMovie.title);
+      }
+      setMovieOptions(options);
+    }
+  }, [currentMovie, difficulty]);
 
   const loadScores = async () => {
     try {
       console.log("Loading scores from Supabase...");
-      const topScores = await leaderboardService.getTopScores();
+      const topScores = await leaderboardService.getTopScores(difficulty);
       console.log("Scores loaded:", topScores);
       setScores(topScores);
     } catch (error) {
@@ -63,7 +93,8 @@ const GameContainer: React.FC = () => {
     }
   };
 
-  const handleStartGame = () => {
+  const handleStartGame = (selectedDifficulty: Difficulty) => {
+    setDifficulty(selectedDifficulty);
     resetGame();
     setShowStartScreen(false);
     setIsPaused(false);
@@ -96,9 +127,9 @@ const GameContainer: React.FC = () => {
   const handleSaveScore = async (playerName: string) => {
     try {
       console.log("Saving score for player:", playerName, "score:", score);
-      await leaderboardService.saveScore(playerName, score);
+      await leaderboardService.saveScore(playerName, score, difficulty);
       console.log("Score saved, reloading scores...");
-      await loadScores(); // Reload scores after saving
+      await loadScores();
       handleSubmitScore(playerName);
     } catch (error) {
       console.error("Error saving score:", error);
@@ -150,9 +181,9 @@ const GameContainer: React.FC = () => {
         ) : (
           <>
             <GameHeader
-              duration={GAME_DURATION}
+              duration={gameDuration}
               onTimeUp={handleTimeUp}
-              isRunning={isGameActive}
+              isRunning={isGameActive && !showSuccessDialog && !isCorrectGuess}
               onSkip={handleSkipWithReset}
               onClose={handleCloseGame}
               isPaused={isPaused}
@@ -166,25 +197,40 @@ const GameContainer: React.FC = () => {
             <div className="relative flex-1 w-full">
               <MovieImage
                 key={imageKey}
-                imageUrl={currentMovie.imageUrl}
-                duration={GAME_DURATION}
+                imageUrl={currentMovie?.imageUrl}
+                duration={gameDuration}
                 onRevealComplete={handleRevealComplete}
-                isActive={isGameActive && !showSuccessDialog}
+                isActive={isGameActive && !showSuccessDialog && !isCorrectGuess}
                 onImageLoaded={handleImageLoaded}
                 onImageError={handleImageError}
                 isPaused={isPaused}
                 onTogglePause={handleTogglePause}
+                difficulty={difficulty}
+                isCorrectGuess={isCorrectGuess}
               >
-                <GuessInput
-                  onGuess={handleGuess}
-                  disabled={!isGameActive || isLoading || !isImageLoaded}
-                  correctAnswer={
-                    isRoundComplete ? currentMovie?.title : undefined
-                  }
-                  isCorrect={isCorrectGuess}
-                  hasIncorrectGuess={hasIncorrectGuess}
-                  onNextRound={handleNextRoundWithReset}
-                />
+                {difficulty === "hard" ? (
+                  <GuessInput
+                    onGuess={handleGuess}
+                    disabled={!isGameActive || isLoading || !isImageLoaded}
+                    correctAnswer={
+                      isRoundComplete ? currentMovie?.title : undefined
+                    }
+                    isCorrect={isCorrectGuess}
+                    hasIncorrectGuess={hasIncorrectGuess}
+                    onNextRound={handleNextRoundWithReset}
+                  />
+                ) : (
+                  <MultipleChoiceInput
+                    options={movieOptions}
+                    onGuess={handleGuess}
+                    disabled={!isGameActive || isLoading || !isImageLoaded}
+                    correctAnswer={
+                      isRoundComplete ? currentMovie?.title : undefined
+                    }
+                    hasIncorrectGuess={hasIncorrectGuess}
+                    onNextRound={handleNextRoundWithReset}
+                  />
+                )}
               </MovieImage>
             </div>
           </>

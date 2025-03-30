@@ -1,10 +1,10 @@
-
-import React from 'react';
-import ImageLoadingIndicator from './ImageLoadingIndicator';
-import PixelRevealCanvas from './PixelRevealCanvas';
-import MovieContentWrapper from './MovieContentWrapper';
-import { usePixelReveal } from '../hooks/usePixelReveal';
-import { useIsMobile } from '@/hooks/use-mobile';
+import React from "react";
+import ImageLoadingIndicator from "./ImageLoadingIndicator";
+import PixelRevealCanvas from "./PixelRevealCanvas";
+import MovieContentWrapper from "./MovieContentWrapper";
+import { usePixelReveal } from "../hooks/usePixelReveal";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Difficulty } from "@/lib/supabase";
 
 interface MovieImageProps {
   imageUrl: string;
@@ -17,11 +17,13 @@ interface MovieImageProps {
   onRetry?: () => void;
   isPaused?: boolean;
   onTogglePause?: () => void;
+  difficulty: Difficulty;
+  isCorrectGuess?: boolean;
 }
 
-const MovieImage: React.FC<MovieImageProps> = ({ 
-  imageUrl, 
-  duration, 
+const MovieImage: React.FC<MovieImageProps> = ({
+  imageUrl,
+  duration,
   onRevealComplete,
   isActive,
   children,
@@ -29,7 +31,9 @@ const MovieImage: React.FC<MovieImageProps> = ({
   onImageError,
   onRetry,
   isPaused,
-  onTogglePause
+  onTogglePause,
+  difficulty,
+  isCorrectGuess = false,
 }) => {
   const isMobile = useIsMobile();
   const {
@@ -40,15 +44,16 @@ const MovieImage: React.FC<MovieImageProps> = ({
     loadingProgress,
     handleRetry,
     isPaused: internalIsPaused,
-    togglePause: internalTogglePause
+    togglePause: internalTogglePause,
   } = usePixelReveal({
     imageUrl,
     duration,
-    onRevealComplete,
+    onRevealComplete: isCorrectGuess ? undefined : onRevealComplete,
     onImageLoaded,
     onImageError,
     isActive,
-    isPaused // Pass down the isPaused prop
+    isPaused,
+    difficulty,
   });
 
   const handleRetryClick = () => {
@@ -66,15 +71,15 @@ const MovieImage: React.FC<MovieImageProps> = ({
   return (
     <div className="pixel-reveal-container relative w-full h-full p-0 m-0 overflow-hidden">
       <PixelRevealCanvas ref={canvasRef} />
-      
-      <ImageLoadingIndicator 
+
+      <ImageLoadingIndicator
         isLoading={isLoading}
         progress={loadingProgress}
         error={loadError}
         timeout={timeoutError}
         onRetry={handleRetryClick}
       />
-      
+
       {children && <MovieContentWrapper>{children}</MovieContentWrapper>}
     </div>
   );
