@@ -31,6 +31,10 @@ export function useGameState() {
       return;
     }
     
+    if (livesOverride !== undefined) {
+      setLives(livesOverride);
+    }
+    
     setIsLoading(true);
     setIsImageLoaded(false);
     setShowSuccessDialog(false);
@@ -146,21 +150,23 @@ export function useGameState() {
 
   const handleTimeUp = () => {
     if (isGameActive && !isRoundComplete) {
-      const currentLives = lives;
+      const newLives = Math.max(0, lives - 1);
+      console.log(`Time up: Reducing lives from ${lives} to ${newLives}`);
       
-      setLives(prev => Math.max(0, prev - 1));
-      
+      setLives(newLives);
       setIsGameActive(false);
       setIsRoundComplete(true);
       setTimeExpired(true);
       
-      if (currentLives <= 1) {
+      if (newLives <= 0) {
+        console.log("No lives left, ending game");
         setTimeout(() => {
           setIsGameOver(true);
         }, 1000);
       } else {
+        console.log(`${newLives} lives left, continuing to next round`);
         setTimeout(() => {
-          startNewRound(currentLives - 1);
+          startNewRound(newLives);
         }, 1000);
       }
     }
@@ -190,24 +196,26 @@ export function useGameState() {
   
   const handleSkip = async () => {
     if (isGameActive) {
-      const currentLives = lives;
+      const newLives = Math.max(0, lives - 1);
+      console.log(`Skip: Reducing lives from ${lives} to ${newLives}`);
       
+      setLives(newLives);
       setIsGameActive(false);
       setIsRoundComplete(false);
       setTimeExpired(false);
       setShowSuccessDialog(false);
       setIsCorrectGuess(false);
       
-      setLives(prev => Math.max(0, prev - 1));
-      
-      if (currentLives <= 1) {
+      if (newLives <= 0) {
+        console.log("No lives left, ending game");
         setTimeout(() => {
           setIsGameOver(true);
         }, 1000);
       } else {
+        console.log(`${newLives} lives left, continuing to next round`);
         setTimeout(() => {
-          startNewRound(currentLives - 1);
-        }, 100);
+          startNewRound(newLives);
+        }, 200);
       }
     }
   };
