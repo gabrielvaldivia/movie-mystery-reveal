@@ -34,9 +34,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
         onTimeUpdate={onTimeUpdate}
       />
       
-      <div className="bg-gradient-to-b from-black/40 to-transparent h-16 flex justify-between items-center px-4 py-4 pt-6">
-        <div className="flex-1"></div> {/* Empty space for GameStats */}
-        
+      <div className="bg-gradient-to-b from-black/40 to-transparent h-16 flex justify-end items-center px-4 py-4 pt-6">
         <div className="flex gap-2">
           {onTogglePause && (
             <Button 
