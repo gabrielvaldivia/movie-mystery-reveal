@@ -41,9 +41,8 @@ const GameHeader: React.FC<GameHeaderProps> = ({
               variant="ghost" 
               size="icon" 
               onClick={onTogglePause}
-              className="text-white rounded-full p-0 flex items-center justify-center hover:bg-transparent hover:text-white"
+              className="text-white rounded-full p-2 flex items-center justify-center hover:bg-white/20"
               aria-label={isPaused ? "Resume pixelation" : "Pause pixelation"}
-              style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
             >
               {isPaused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
             </Button>
@@ -53,9 +52,8 @@ const GameHeader: React.FC<GameHeaderProps> = ({
             variant="ghost" 
             size="icon" 
             onClick={onSkip}
-            className="text-white rounded-full p-0 flex items-center justify-center hover:bg-transparent hover:text-white"
+            className="text-white rounded-full p-2 flex items-center justify-center hover:bg-white/20"
             aria-label="Skip this movie"
-            style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
           >
             <SkipForward className="h-5 w-5" />
           </Button>
@@ -64,9 +62,8 @@ const GameHeader: React.FC<GameHeaderProps> = ({
             variant="ghost" 
             size="icon" 
             onClick={onClose}
-            className="text-white rounded-full p-0 flex items-center justify-center hover:bg-transparent hover:text-white"
+            className="text-white rounded-full p-2 flex items-center justify-center hover:bg-white/20"
             aria-label="Close game"
-            style={{ width: '40px', height: '40px', minWidth: '40px', minHeight: '40px' }}
           >
             <X className="h-5 w-5" />
           </Button>
