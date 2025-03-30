@@ -2,7 +2,7 @@
 import React from 'react';
 import Timer from './Timer';
 import { Button } from './ui/button';
-import { SkipForward, X, Pause, Play } from 'lucide-react';
+import { SkipForward, X, Pause, Play, Heart } from 'lucide-react';
 
 interface GameHeaderProps {
   duration: number;
@@ -13,6 +13,9 @@ interface GameHeaderProps {
   isPaused?: boolean;
   onTogglePause?: () => void;
   onTimeUpdate?: (remainingMs: number) => void;
+  lives: number;
+  score: number;
+  maxLives?: number;
 }
 
 const GameHeader: React.FC<GameHeaderProps> = ({ 
@@ -23,7 +26,10 @@ const GameHeader: React.FC<GameHeaderProps> = ({
   onClose,
   isPaused = false,
   onTogglePause,
-  onTimeUpdate
+  onTimeUpdate,
+  lives,
+  score,
+  maxLives = 10
 }) => {
   return (
     <div className="absolute top-0 left-0 right-0 z-50 flex flex-col">
@@ -34,9 +40,22 @@ const GameHeader: React.FC<GameHeaderProps> = ({
         onTimeUpdate={onTimeUpdate}
       />
       
-      <div className="relative h-16 flex justify-end items-center px-4">
+      <div className="relative h-16 flex justify-between items-center px-4">
         {/* Background gradient as a separate non-interactive element */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent pointer-events-none"></div>
+        
+        <div className="font-arcade text-white text-sm pointer-events-auto z-10">
+          Score: {score}
+        </div>
+        
+        <div className="flex items-center gap-0.5 pointer-events-auto z-10">
+          {Array.from({ length: maxLives }).map((_, i) => (
+            <Heart 
+              key={i} 
+              className={`h-4 w-4 ${i < lives ? 'text-red-500 fill-red-500' : 'text-muted-foreground'}`} 
+            />
+          ))}
+        </div>
         
         <div className="flex gap-2 relative z-10 items-center">
           {onTogglePause && (

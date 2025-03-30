@@ -4,7 +4,6 @@ import GuessInput from './GuessInput';
 import SuccessDialog from './SuccessDialog';
 import GameLoading from './GameLoading';
 import GameHeader from './GameHeader';
-import GameStats from './GameStats';
 import GameOverScreen from './GameOverScreen';
 import StartScreen from './StartScreen';
 import { useGameState } from '../hooks/useGameState';
@@ -121,24 +120,19 @@ const GameContainer: React.FC = () => {
                 )}
                 
                 <div className="relative w-full h-full m-0 p-0 overflow-hidden">
-                  <div className="absolute top-0 left-0 right-0 z-40 flex justify-between items-center">
-                    <GameStats 
-                      lives={lives}
-                      score={score}
-                      maxLives={maxLives}
-                    />
-                    
-                    <GameHeader 
-                      duration={GAME_DURATION}
-                      onTimeUp={handleTimeUp}
-                      isRunning={isGameActive && isImageLoaded && !showSuccessDialog}
-                      onSkip={handleSkipWithReset}
-                      onClose={handleCloseGame}
-                      isPaused={isPaused}
-                      onTogglePause={handleTogglePause}
-                      onTimeUpdate={updateRemainingTime}
-                    />
-                  </div>
+                  <GameHeader 
+                    duration={GAME_DURATION}
+                    onTimeUp={handleTimeUp}
+                    isRunning={isGameActive && isImageLoaded && !showSuccessDialog}
+                    onSkip={handleSkipWithReset}
+                    onClose={handleCloseGame}
+                    isPaused={isPaused}
+                    onTogglePause={handleTogglePause}
+                    onTimeUpdate={updateRemainingTime}
+                    lives={lives}
+                    score={score}
+                    maxLives={maxLives}
+                  />
                   
                   <MovieImage 
                     key={imageKey}
