@@ -23,7 +23,7 @@ const GameStats: React.FC<GameStatsProps> = ({
         {Array.from({ length: maxLives }).map((_, i) => (
           <Heart 
             key={i} 
-            className={`h-4 w-4 ${i < lives ? 'text-red-500 fill-red-500' : 'text-muted-foreground'}`} 
+            className={`h-4 w-4 ${i < lives ? 'text-white fill-white' : 'text-muted-foreground'}`} 
           />
         ))}
       </div>
