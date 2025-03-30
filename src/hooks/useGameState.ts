@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react';
 import { Movie } from '../utils/types/movieTypes';
 import { getRandomMovie, getNextMovie } from '../utils/gameData';
@@ -159,6 +158,7 @@ export function useGameState() {
       
       if (lives > 1) {
         setTimeout(() => {
+          setTimeExpired(false);
           startNewRound();
         }, 1000);
       }
@@ -189,10 +189,8 @@ export function useGameState() {
   
   const handleSkip = async () => {
     if (isGameActive) {
-      // Get current lives value
       const currentLives = lives;
       
-      // Deduct a life for skipping
       setLives(prev => {
         const newLives = Math.max(0, prev - 1);
         if (newLives <= 0) {
@@ -208,7 +206,6 @@ export function useGameState() {
       setShowSuccessDialog(false);
       setIsCorrectGuess(false);
       
-      // Only start new round if we still have lives after deduction
       if (currentLives > 1) {
         await new Promise(resolve => setTimeout(resolve, 10));
         await startNewRound();
