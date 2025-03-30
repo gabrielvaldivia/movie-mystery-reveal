@@ -16,9 +16,7 @@ interface MovieGuessInputProps {
 const MovieGuessInput: React.FC<MovieGuessInputProps> = ({ 
   onGuess, 
   disabled, 
-  hasIncorrectGuess,
-  onInputFocus,
-  onInputBlur
+  hasIncorrectGuess
 }) => {
   const [guess, setGuess] = useState("");
   const [suggestions, setSuggestions] = useState<Movie[]>([]);
@@ -109,10 +107,6 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
   };
 
   const handleFocus = () => {
-    if (onInputFocus) {
-      onInputFocus();
-    }
-    
     if (guess.trim().length >= 2 && suggestions.length > 0) {
       setIsSuggestionsOpen(true);
     }
@@ -122,9 +116,6 @@ const MovieGuessInput: React.FC<MovieGuessInputProps> = ({
     // Don't clear input if user is interacting with suggestions
     if (!isInteractingWithSuggestions) {
       setTimeout(() => {
-        if (onInputBlur) {
-          onInputBlur();
-        }
         setIsSuggestionsOpen(false);
         setGuess("");
       }, 200);

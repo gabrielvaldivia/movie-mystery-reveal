@@ -20,9 +20,7 @@ const GuessInput: React.FC<GuessInputProps> = ({
   isCorrect,
   correctAnswer,
   hasIncorrectGuess,
-  onNextRound,
-  onInputFocus,
-  onInputBlur
+  onNextRound
 }) => {
   // Focus the next round button when correct answer is shown
   useEffect(() => {
@@ -54,8 +52,6 @@ const GuessInput: React.FC<GuessInputProps> = ({
               onGuess={handleGuess} 
               disabled={disabled && !correctAnswer} 
               hasIncorrectGuess={hasIncorrectGuess}
-              onInputFocus={onInputFocus}
-              onInputBlur={onInputBlur}
             />
           </div>
         </div>
