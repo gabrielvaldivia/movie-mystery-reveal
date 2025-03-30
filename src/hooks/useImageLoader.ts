@@ -39,8 +39,6 @@ export function useImageLoader({
   });
   
   const loadImage = () => {
-    console.log("Loading image:", imageUrl);
-    
     setIsLoading(true);
     setIsLoaded(false);
     setLoadError(false);
@@ -52,10 +50,8 @@ export function useImageLoader({
       timerRef.current = null;
     }
     
-    // Set a timeout to catch images that take too long to load
     timerRef.current = setTimeout(() => {
       if (!isLoaded) {
-        console.error("Image load timed out:", imageUrl);
         setTimeoutError(true);
         setIsLoading(false);
         if (onImageError) onImageError();
@@ -66,8 +62,6 @@ export function useImageLoader({
     image.crossOrigin = "anonymous";
     
     image.onload = () => {
-      console.log("Image loaded successfully:", imageUrl);
-      
       if (timerRef.current) {
         clearTimeout(timerRef.current);
         timerRef.current = null;
@@ -82,53 +76,34 @@ export function useImageLoader({
       }
     };
     
-    image.onerror = (e) => {
-      console.error("Error loading image:", imageUrl, e);
-      
+    image.onerror = () => {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
         timerRef.current = null;
       }
       
+      console.error("Error loading image:", imageUrl);
       setLoadError(true);
       setIsLoading(false);
-      
-      if (onImageError) {
-        onImageError();
-      }
+      if (onImageError) onImageError();
     };
     
-    // Actually set the src to start loading
     image.src = imageUrl;
-    
-    // For some browsers, if the image is cached, the onload event may not fire
-    // This additional check helps in those cases
-    if (image.complete) {
-      console.log("Image was already cached:", imageUrl);
-      image.onload?.call(image);
-    }
   };
 
   useEffect(() => {
-    if (!imageUrl) {
-      console.log("No image URL provided, can't load image");
-      setLoadError(true);
-      setIsLoading(false);
-      return;
-    }
+    if (!imageUrl) return;
     
     loadImage();
     
     return () => {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
-        timerRef.current = null;
       }
     };
   }, [imageUrl]);
 
   const handleRetry = () => {
-    console.log("Retrying image load for:", imageUrl);
     loadImage();
   };
 
