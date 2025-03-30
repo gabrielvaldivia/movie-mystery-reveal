@@ -1,5 +1,4 @@
-
-import { Movie } from '../types/movieTypes';
+import { Movie, TMDbMovie, TMDbResponse } from '../types/movieTypes';
 
 // The Movie Database API configuration
 export const TMDB_API_BASE_URL = "https://api.themoviedb.org/3";
@@ -15,34 +14,43 @@ export const fetchPopularMovies = async (page: number = 1): Promise<Movie[]> => 
     console.log(`Fetching popular American movies - page ${page}`);
     
     // Use region=US parameter to only get American movies
-    // Also add 'with_original_language=en' to further filter for English language films
+    // Add vote_count to ensure movies are well-known
+    // Add vote_average for quality threshold
+    // Add primary_release_date.gte for movies from 1970 onwards
+    // Add with_original_language=en for English language films
     const response = await fetch(
-      `${TMDB_API_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&language=en-US&page=${page}&region=US&with_original_language=en`
+      `${TMDB_API_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&language=en-US&page=${page}&region=US&with_original_language=en&vote_count.gte=1000&vote_average.gte=6.5&primary_release_date.gte=1970-01-01&sort_by=popularity.desc`
     );
     
     if (!response.ok) {
       throw new Error(`TMDB API error: ${response.status}`);
     }
 
-    const data = await response.json();
+    const data: TMDbResponse = await response.json();
     console.log(`Received ${data.results.length} movies from page ${page}`);
     
-    // Additional filter to make sure we're only getting US movies (some might slip through)
-    const usMovies = data.results.filter((movie: any) => {
+    // Additional filter to make sure we're only getting US movies and they have all required data
+    const usMovies = data.results.filter((movie: TMDbMovie) => {
       return movie.original_language === 'en' && 
-             (!movie.origin_country || movie.origin_country.includes('US'));
+             (!movie.origin_country || movie.origin_country.includes('US')) &&
+             movie.poster_path &&  // Must have a poster
+             movie.vote_count >= 1000 &&  // Additional check for vote count
+             movie.vote_average >= 6.5 &&  // Additional check for rating
+             movie.release_date;  // Must have a release date
     });
     
     console.log(`Filtered to ${usMovies.length} American movies from page ${page}`);
     
     // Map TMDB movie format to our app's Movie format
-    return usMovies.map((movie: any) => ({
+    return usMovies.map((movie: TMDbMovie) => ({
       id: movie.id.toString(),
       title: movie.title,
       imageUrl: movie.poster_path ? `${TMDB_IMAGE_BASE_URL}${movie.poster_path}` : "",
       releaseYear: new Date(movie.release_date).getFullYear() || 0,
       tmdbId: movie.id,
-      poster_path: movie.poster_path
+      poster_path: movie.poster_path,
+      vote_average: movie.vote_average,
+      vote_count: movie.vote_count
     }));
   } catch (error) {
     console.error(`Error fetching popular movies (page ${page}):`, error);

@@ -1,4 +1,3 @@
-
 import { Movie } from '../types/movieTypes';
 import { fetchPopularMovies } from '../services/tmdbService';
 
@@ -18,9 +17,9 @@ export const getMoviesCollection = async (): Promise<Movie[]> => {
   try {
     console.log("Fetching American movies collection from TMDB...");
     
-    // Fetch 25 pages to get approximately 500 popular American movies (20 per page)
+    // Fetch 50 pages to get approximately 1000 popular American movies (20 per page)
     const allMovies: Movie[] = [];
-    const pagesToFetch = 25; // 25 pages * 20 movies = 500 movies
+    const pagesToFetch = 50; // 50 pages * 20 movies = 1000 movies
     
     for (let page = 1; page <= pagesToFetch; page++) {
       const pageMovies = await fetchPopularMovies(page);
@@ -33,7 +32,7 @@ export const getMoviesCollection = async (): Promise<Movie[]> => {
       console.log(`Fetched page ${page}/${pagesToFetch}, got ${moviesWithPosters.length} valid American movies, total: ${allMovies.length}`);
       
       // If we already have enough movies, we can stop fetching
-      if (allMovies.length >= 200) {
+      if (allMovies.length >= 500) {  // Increased minimum number of movies
         console.log("Reached sufficient number of American movies, stopping fetch");
         break;
       }

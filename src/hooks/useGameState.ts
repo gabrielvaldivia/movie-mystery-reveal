@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Movie } from '../utils/types/movieTypes';
-import { getRandomMovie, getNextMovie } from '../utils/gameData';
+import { resetMoviePools, getNextGameMovie } from '../utils/services/gameMovieService';
 
 export function useGameState() {
   const [currentMovie, setCurrentMovie] = useState<Movie | null>(null);
@@ -46,10 +46,7 @@ export function useGameState() {
     try {
       setImageKey(Date.now());
       
-      const nextMovie = currentMovie 
-        ? await getNextMovie(currentMovie.id) 
-        : await getRandomMovie();
-      
+      const nextMovie = await getNextGameMovie();
       console.log(`Loaded movie: "${nextMovie.title}" (${nextMovie.releaseYear})`);
       
       setCurrentMovie(nextMovie);
@@ -61,7 +58,7 @@ export function useGameState() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentMovie, lives]);
+  }, [lives]);
 
   useEffect(() => {
     if (!gameInitialized) {
@@ -80,6 +77,7 @@ export function useGameState() {
             });
           }, 200);
           
+          await resetMoviePools();
           await startNewRound();
           
           clearInterval(progressInterval);
@@ -114,6 +112,10 @@ export function useGameState() {
     setGameInitialized(false);
     setLives(MAX_LIVES);
     setIsGameOver(false);
+    
+    resetMoviePools().catch(error => {
+      console.error("Error resetting movie pools:", error);
+    });
   }, []);
 
   const handleGuess = (guess: string) => {
@@ -157,16 +159,12 @@ export function useGameState() {
       setIsGameActive(false);
       setIsRoundComplete(true);
       setTimeExpired(true);
+      setShowSuccessDialog(true);
       
       if (newLives <= 0) {
         console.log("No lives left, ending game");
         setTimeout(() => {
           setIsGameOver(true);
-        }, 1000);
-      } else {
-        console.log(`${newLives} lives left, continuing to next round`);
-        setTimeout(() => {
-          startNewRound(newLives);
         }, 1000);
       }
     }
@@ -213,9 +211,7 @@ export function useGameState() {
         }, 1000);
       } else {
         console.log(`${newLives} lives left, continuing to next round`);
-        setTimeout(() => {
-          startNewRound(newLives);
-        }, 200);
+        await startNewRound(newLives);
       }
     }
   };
