@@ -57,7 +57,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
           ))}
         </div>
         
-        <div className="flex gap-2 relative z-10 items-center">
+        <div className="flex gap-4 relative z-10 items-center">
           {onTogglePause && (
             <Button 
               variant="ghost" 
