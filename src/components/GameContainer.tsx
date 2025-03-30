@@ -5,6 +5,8 @@ import GuessInput from './GuessInput';
 import SuccessDialog from './SuccessDialog';
 import GameLoading from './GameLoading';
 import GameHeader from './GameHeader';
+import GameStats from './GameStats';
+import GameOverScreen from './GameOverScreen';
 import StartScreen from './StartScreen';
 import { useGameState } from '../hooks/useGameState';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -28,6 +30,10 @@ const GameContainer: React.FC = () => {
     isCorrectGuess,
     isRoundComplete,
     imageLoadError,
+    lives,
+    maxLives,
+    score,
+    isGameOver,
     handleGuess,
     handleTimeUp,
     handleImageLoaded,
@@ -35,7 +41,9 @@ const GameContainer: React.FC = () => {
     handleRevealComplete,
     handleNextRound,
     handleSkip,
-    resetGame
+    resetGame,
+    handleSubmitScore,
+    updateRemainingTime
   } = useGameState();
   
   const handleStartGame = () => {
@@ -75,6 +83,10 @@ const GameContainer: React.FC = () => {
     handleSkip();
   };
   
+  const handlePlayAgain = () => {
+    resetGame();
+  };
+  
   if (showStartScreen) {
     return (
       <div className={`w-full ${isMobile ? 'h-full absolute inset-0 overflow-hidden' : 'h-full overflow-hidden'} flex items-center justify-center m-0 p-0`}>
@@ -92,49 +104,66 @@ const GameContainer: React.FC = () => {
           <GameLoading loadingProgress={loadingProgress} />
         ) : currentMovie ? (
           <>
-            {!showSuccessDialog && (
-              <div className="relative w-full h-full m-0 p-0 overflow-hidden">
-                <GameHeader 
-                  duration={GAME_DURATION}
-                  onTimeUp={handleTimeUp}
-                  isRunning={isGameActive && isImageLoaded && !showSuccessDialog}
-                  onSkip={handleSkipWithReset}
-                  onClose={handleCloseGame}
-                  isPaused={isPaused}
-                  onTogglePause={handleTogglePause}
-                />
+            {isGameOver ? (
+              <GameOverScreen 
+                finalScore={score}
+                onPlayAgain={handlePlayAgain}
+                onSubmitScore={handleSubmitScore}
+              />
+            ) : (
+              <>
+                {!showSuccessDialog && (
+                  <div className="relative w-full h-full m-0 p-0 overflow-hidden">
+                    <GameHeader 
+                      duration={GAME_DURATION}
+                      onTimeUp={handleTimeUp}
+                      isRunning={isGameActive && isImageLoaded && !showSuccessDialog}
+                      onSkip={handleSkipWithReset}
+                      onClose={handleCloseGame}
+                      isPaused={isPaused}
+                      onTogglePause={handleTogglePause}
+                      onTimeUpdate={updateRemainingTime}
+                    />
+                    
+                    <GameStats 
+                      lives={lives}
+                      score={score}
+                      maxLives={maxLives}
+                    />
+                    
+                    <MovieImage 
+                      key={imageKey}
+                      imageUrl={currentMovie.imageUrl}
+                      duration={GAME_DURATION}
+                      onRevealComplete={handleRevealComplete}
+                      isActive={isGameActive && !showSuccessDialog}
+                      onImageLoaded={handleImageLoaded}
+                      onImageError={handleImageError}
+                      isPaused={isPaused}
+                      onTogglePause={handleTogglePause}
+                    >
+                      <GuessInput 
+                        onGuess={handleGuess}
+                        disabled={!isGameActive || isLoading || !isImageLoaded}
+                        correctAnswer={isRoundComplete ? currentMovie?.title : undefined}
+                        isCorrect={isCorrectGuess}
+                        hasIncorrectGuess={hasIncorrectGuess}
+                        onNextRound={handleNextRoundWithReset}
+                        onInputFocus={handleInputFocus}
+                        onInputBlur={handleInputBlur}
+                      />
+                    </MovieImage>
+                  </div>
+                )}
                 
-                <MovieImage 
-                  key={imageKey}
-                  imageUrl={currentMovie.imageUrl}
-                  duration={GAME_DURATION}
-                  onRevealComplete={handleRevealComplete}
-                  isActive={isGameActive && !showSuccessDialog}
-                  onImageLoaded={handleImageLoaded}
-                  onImageError={handleImageError}
-                  isPaused={isPaused}
-                  onTogglePause={handleTogglePause}
-                >
-                  <GuessInput 
-                    onGuess={handleGuess}
-                    disabled={!isGameActive || isLoading || !isImageLoaded}
-                    correctAnswer={isRoundComplete ? currentMovie?.title : undefined}
-                    isCorrect={isCorrectGuess}
-                    hasIncorrectGuess={hasIncorrectGuess}
-                    onNextRound={handleNextRoundWithReset}
-                    onInputFocus={handleInputFocus}
-                    onInputBlur={handleInputBlur}
-                  />
-                </MovieImage>
-              </div>
+                <SuccessDialog 
+                  isOpen={showSuccessDialog}
+                  movie={currentMovie}
+                  onNextRound={handleNextRoundWithReset}
+                  timeExpired={timeExpired}
+                />
+              </>
             )}
-            
-            <SuccessDialog 
-              isOpen={showSuccessDialog}
-              movie={currentMovie}
-              onNextRound={handleNextRoundWithReset}
-              timeExpired={timeExpired}
-            />
           </>
         ) : (
           <div className="flex flex-col items-center justify-center h-full w-full bg-card text-card-foreground rounded-lg">

@@ -6,9 +6,15 @@ interface TimerProps {
   duration: number;
   onTimeUp: () => void;
   isRunning: boolean;
+  onTimeUpdate?: (remainingMs: number) => void;
 }
 
-const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
+const Timer: React.FC<TimerProps> = ({ 
+  duration, 
+  onTimeUp, 
+  isRunning,
+  onTimeUpdate
+}) => {
   const [timeRemaining, setTimeRemaining] = useState(duration);
   const timerRef = useRef<number | null>(null);
   const hasStartedRef = useRef<boolean>(false);
@@ -51,6 +57,11 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
         setTimeRemaining((prev) => {
           const newTime = Math.max(0, prev - elapsed);
           
+          // Report remaining time to parent
+          if (onTimeUpdate) {
+            onTimeUpdate(newTime);
+          }
+          
           if (newTime <= 0) {
             if (timerRef.current) {
               clearInterval(timerRef.current);
@@ -78,7 +89,7 @@ const Timer: React.FC<TimerProps> = ({ duration, onTimeUp, isRunning }) => {
         timerRef.current = null;
       }
     };
-  }, [isRunning, onTimeUp, timeRemaining]);
+  }, [isRunning, onTimeUp, timeRemaining, onTimeUpdate]);
   
   // Calculate progress as a percentage from 0 to 100
   // Inverting the calculation so it fills from left to right as time decreases

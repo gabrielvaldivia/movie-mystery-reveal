@@ -12,6 +12,7 @@ interface GameHeaderProps {
   onClose: () => void;
   isPaused?: boolean;
   onTogglePause?: () => void;
+  onTimeUpdate?: (remainingMs: number) => void;
 }
 
 const GameHeader: React.FC<GameHeaderProps> = ({ 
@@ -21,14 +22,16 @@ const GameHeader: React.FC<GameHeaderProps> = ({
   onSkip,
   onClose,
   isPaused = false,
-  onTogglePause
+  onTogglePause,
+  onTimeUpdate
 }) => {
   return (
     <div className="absolute top-0 left-0 right-0 z-10 flex flex-col">
       <Timer 
         duration={duration} 
         onTimeUp={onTimeUp} 
-        isRunning={isRunning && !isPaused} 
+        isRunning={isRunning && !isPaused}
+        onTimeUpdate={onTimeUpdate}
       />
       
       <div className="bg-gradient-to-b from-black/40 to-transparent h-12 flex justify-between items-center px-4 py-4 pt-6">
