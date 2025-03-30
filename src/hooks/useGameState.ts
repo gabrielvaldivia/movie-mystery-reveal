@@ -23,8 +23,10 @@ export function useGameState() {
   const [isGameOver, setIsGameOver] = useState(false);
   const [remainingTimeMs, setRemainingTimeMs] = useState(0);
 
-  const startNewRound = useCallback(async () => {
-    if (lives <= 0) {
+  const startNewRound = useCallback(async (livesOverride?: number) => {
+    const currentLivesValue = livesOverride !== undefined ? livesOverride : lives;
+    
+    if (currentLivesValue <= 0) {
       setIsGameOver(true);
       return;
     }
@@ -144,27 +146,21 @@ export function useGameState() {
 
   const handleTimeUp = () => {
     if (isGameActive && !isRoundComplete) {
-      // Important: Capture current lives before state update
       const currentLives = lives;
       
-      // Only decrement by 1
       setLives(prev => Math.max(0, prev - 1));
       
       setIsGameActive(false);
       setIsRoundComplete(true);
       setTimeExpired(true);
       
-      // Use the captured currentLives value for the check
       if (currentLives <= 1) {
-        // If we had only 1 life left, set game over after a delay
         setTimeout(() => {
           setIsGameOver(true);
         }, 1000);
       } else {
-        // Otherwise, continue to next round after a delay
         setTimeout(() => {
-          setTimeExpired(false);
-          startNewRound();
+          startNewRound(currentLives - 1);
         }, 1000);
       }
     }
@@ -194,34 +190,24 @@ export function useGameState() {
   
   const handleSkip = async () => {
     if (isGameActive) {
-      // Important: First capture current lives
       const currentLives = lives;
       
-      // Then decrement by 1 and wait for state to update
-      setLives(prev => {
-        const newLives = Math.max(0, prev - 1);
-        return newLives;
-      });
-      
-      // Disable game interactions
       setIsGameActive(false);
       setIsRoundComplete(false);
       setTimeExpired(false);
       setShowSuccessDialog(false);
       setIsCorrectGuess(false);
       
-      // Check if this was our last life
+      setLives(prev => Math.max(0, prev - 1));
+      
       if (currentLives <= 1) {
-        // If it was, set game over after a delay
         setTimeout(() => {
           setIsGameOver(true);
         }, 1000);
       } else {
-        // Otherwise we need to ensure the state updates have time to complete
-        // before starting the next round
-        setTimeout(async () => {
-          await startNewRound();
-        }, 100); // Slightly longer delay to ensure state is updated
+        setTimeout(() => {
+          startNewRound(currentLives - 1);
+        }, 100);
       }
     }
   };
