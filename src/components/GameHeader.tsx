@@ -44,10 +44,10 @@ const GameHeader: React.FC<GameHeaderProps> = ({
               variant="ghost" 
               size="icon" 
               onClick={onTogglePause}
-              className="text-white rounded-full p-1 flex items-center justify-center hover:bg-white/20 h-9 w-9"
+              className="text-white rounded-full p-0 flex items-center justify-center h-4 w-4"
               aria-label={isPaused ? "Resume pixelation" : "Pause pixelation"}
             >
-              {isPaused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
+              {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
             </Button>
           )}
           
@@ -55,20 +55,20 @@ const GameHeader: React.FC<GameHeaderProps> = ({
             variant="ghost" 
             size="icon" 
             onClick={onSkip}
-            className="text-white rounded-full p-1 flex items-center justify-center hover:bg-white/20 h-9 w-9"
+            className="text-white rounded-full p-0 flex items-center justify-center h-4 w-4"
             aria-label="Skip this movie"
           >
-            <SkipForward className="h-5 w-5" />
+            <SkipForward className="h-4 w-4" />
           </Button>
           
           <Button 
             variant="ghost" 
             size="icon" 
             onClick={onClose}
-            className="text-white rounded-full p-1 flex items-center justify-center hover:bg-white/20 h-9 w-9"
+            className="text-white rounded-full p-0 flex items-center justify-center h-4 w-4"
             aria-label="Close game"
           >
-            <X className="h-5 w-5" />
+            <X className="h-4 w-4" />
           </Button>
         </div>
       </div>
