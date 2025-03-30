@@ -26,7 +26,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
   onTimeUpdate
 }) => {
   return (
-    <div className="absolute top-0 left-0 right-0 z-20 flex flex-col">
+    <div className="absolute top-0 left-0 right-0 z-10 flex flex-col">
       <Timer 
         duration={duration} 
         onTimeUp={onTimeUp} 
@@ -34,9 +34,8 @@ const GameHeader: React.FC<GameHeaderProps> = ({
         onTimeUpdate={onTimeUpdate}
       />
       
-      <div className="relative h-16 flex justify-end items-center px-4 py-4 pt-6">
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent pointer-events-none" />
-        <div className="relative z-10 flex gap-2">
+      <div className="bg-gradient-to-b from-black/40 to-transparent h-16 flex justify-end items-center px-4 py-4 pt-6">
+        <div className="flex gap-2">
           {onTogglePause && (
             <Button 
               variant="ghost" 
