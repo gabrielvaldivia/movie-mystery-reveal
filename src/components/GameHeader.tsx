@@ -38,13 +38,13 @@ const GameHeader: React.FC<GameHeaderProps> = ({
         {/* Background gradient as a separate non-interactive element */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent pointer-events-none"></div>
         
-        <div className="flex gap-2 relative z-10">
+        <div className="flex gap-2 relative z-10 items-center">
           {onTogglePause && (
             <Button 
               variant="ghost" 
               size="icon" 
               onClick={onTogglePause}
-              className="text-white rounded-full p-0 flex items-center justify-center h-4 w-4 hover:bg-transparent hover:text-white hover:opacity-100 hover:shadow-none"
+              className="text-white rounded-full p-0 flex items-center justify-center h-4 w-4 hover:bg-transparent hover:text-white hover:opacity-100 hover:shadow-none hover:no-underline"
               aria-label={isPaused ? "Resume pixelation" : "Pause pixelation"}
             >
               {isPaused ? <Play className="h-4 w-4" /> : <Pause className="h-4 w-4" />}
@@ -55,7 +55,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
             variant="ghost" 
             size="icon" 
             onClick={onSkip}
-            className="text-white rounded-full p-0 flex items-center justify-center h-4 w-4 hover:bg-transparent hover:text-white hover:opacity-100 hover:shadow-none"
+            className="text-white rounded-full p-0 flex items-center justify-center h-4 w-4 hover:bg-transparent hover:text-white hover:opacity-100 hover:shadow-none hover:no-underline"
             aria-label="Skip this movie"
           >
             <SkipForward className="h-4 w-4" />
@@ -65,7 +65,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
             variant="ghost" 
             size="icon" 
             onClick={onClose}
-            className="text-white rounded-full p-0 flex items-center justify-center h-4 w-4 hover:bg-transparent hover:text-white hover:opacity-100 hover:shadow-none"
+            className="text-white rounded-full p-0 flex items-center justify-center h-4 w-4 hover:bg-transparent hover:text-white hover:opacity-100 hover:shadow-none hover:no-underline"
             aria-label="Close game"
           >
             <X className="h-4 w-4" />
