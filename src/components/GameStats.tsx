@@ -14,20 +14,18 @@ const GameStats: React.FC<GameStatsProps> = ({
   maxLives = 10 
 }) => {
   return (
-    <div className="absolute top-0 left-0 right-0 z-20 px-4 py-2 flex justify-between items-center h-16">
-      <div className="font-arcade text-white text-sm bg-black/60 px-4 py-2 rounded-lg shadow-md">
+    <div className="absolute top-0 left-0 right-0 z-20 flex justify-between items-center h-16 px-4 py-2 bg-gradient-to-b from-black/60 to-transparent">
+      <div className="font-arcade text-white text-sm">
         Score: {score}
       </div>
       
-      <div className="flex-1 flex justify-center">
-        <div className="flex items-center gap-0.5 bg-black/60 px-4 py-2 rounded-lg shadow-md">
-          {Array.from({ length: maxLives }).map((_, i) => (
-            <Heart 
-              key={i} 
-              className={`h-4 w-4 ${i < lives ? 'text-white fill-white' : 'text-muted-foreground'}`} 
-            />
-          ))}
-        </div>
+      <div className="flex items-center gap-0.5">
+        {Array.from({ length: maxLives }).map((_, i) => (
+          <Heart 
+            key={i} 
+            className={`h-4 w-4 ${i < lives ? 'text-white fill-white' : 'text-muted-foreground'}`} 
+          />
+        ))}
       </div>
       
       <div className="w-[80px]"></div> {/* Empty space to balance the layout */}
