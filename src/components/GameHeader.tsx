@@ -34,7 +34,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
         onTimeUpdate={onTimeUpdate}
       />
       
-      <div className="relative h-16 flex justify-end items-center px-4 py-4 pt-6">
+      <div className="relative h-16 flex justify-end items-center px-4">
         {/* Background gradient as a separate non-interactive element */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent pointer-events-none"></div>
         
@@ -44,7 +44,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
               variant="ghost" 
               size="icon" 
               onClick={onTogglePause}
-              className="text-white rounded-full p-2 flex items-center justify-center hover:bg-white/20"
+              className="text-white rounded-full p-1 flex items-center justify-center hover:bg-white/20 h-9 w-9"
               aria-label={isPaused ? "Resume pixelation" : "Pause pixelation"}
             >
               {isPaused ? <Play className="h-5 w-5" /> : <Pause className="h-5 w-5" />}
@@ -55,7 +55,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
             variant="ghost" 
             size="icon" 
             onClick={onSkip}
-            className="text-white rounded-full p-2 flex items-center justify-center hover:bg-white/20"
+            className="text-white rounded-full p-1 flex items-center justify-center hover:bg-white/20 h-9 w-9"
             aria-label="Skip this movie"
           >
             <SkipForward className="h-5 w-5" />
@@ -65,7 +65,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
             variant="ghost" 
             size="icon" 
             onClick={onClose}
-            className="text-white rounded-full p-2 flex items-center justify-center hover:bg-white/20"
+            className="text-white rounded-full p-1 flex items-center justify-center hover:bg-white/20 h-9 w-9"
             aria-label="Close game"
           >
             <X className="h-5 w-5" />
