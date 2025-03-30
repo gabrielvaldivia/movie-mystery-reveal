@@ -28,7 +28,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
   onTimeUpdate,
   lives,
   score,
-  maxLives = 8,
+  maxLives = 10,
 }) => {
   return (
     <div className="absolute top-0 left-0 right-0 z-50 flex flex-col">
@@ -44,7 +44,7 @@ const GameHeader: React.FC<GameHeaderProps> = ({
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 to-transparent pointer-events-none"></div>
 
         <div className="font-arcade text-white text-sm pointer-events-auto z-10">
-          Score: {score}
+          {score}
         </div>
 
         <div className="flex items-center gap-0.5 pointer-events-auto z-10">
