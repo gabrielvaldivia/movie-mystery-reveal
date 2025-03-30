@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useCallback } from 'react';
 import { Movie } from '../utils/types/movieTypes';
 import { getRandomMovie, getNextMovie } from '../utils/gameData';
@@ -144,13 +145,16 @@ export function useGameState() {
 
   const handleTimeUp = () => {
     if (isGameActive && !isRoundComplete) {
+      // Store the current lives value before modifying it
+      const currentLives = lives;
+      
       setLives(prev => Math.max(0, prev - 1));
       
       setIsGameActive(false);
       setIsRoundComplete(true);
       setTimeExpired(true);
       
-      if (lives <= 1) {
+      if (currentLives <= 1) {
         setTimeout(() => {
           setIsGameOver(true);
         }, 1000);
