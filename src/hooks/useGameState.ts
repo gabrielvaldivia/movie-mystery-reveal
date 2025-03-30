@@ -18,7 +18,7 @@ export function useGameState() {
   const [imageLoadError, setImageLoadError] = useState(false);
   const [gameInitialized, setGameInitialized] = useState(false);
   
-  const MAX_LIVES = 10;
+  const MAX_LIVES = 8;
   const [lives, setLives] = useState(MAX_LIVES);
   const [isGameOver, setIsGameOver] = useState(false);
   const [remainingTimeMs, setRemainingTimeMs] = useState(0);
