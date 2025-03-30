@@ -194,28 +194,34 @@ export function useGameState() {
   
   const handleSkip = async () => {
     if (isGameActive) {
-      // Important: Capture current lives before state update
+      // Important: First capture current lives
       const currentLives = lives;
       
-      // Only decrement by 1
-      setLives(prev => Math.max(0, prev - 1));
+      // Then decrement by 1 and wait for state to update
+      setLives(prev => {
+        const newLives = Math.max(0, prev - 1);
+        return newLives;
+      });
       
+      // Disable game interactions
       setIsGameActive(false);
       setIsRoundComplete(false);
       setTimeExpired(false);
       setShowSuccessDialog(false);
       setIsCorrectGuess(false);
       
-      // Use the captured currentLives value for the check
+      // Check if this was our last life
       if (currentLives <= 1) {
-        // If we had only 1 life left, set game over after a delay
+        // If it was, set game over after a delay
         setTimeout(() => {
           setIsGameOver(true);
         }, 1000);
       } else {
-        // Otherwise, continue to next round after a small delay
-        await new Promise(resolve => setTimeout(resolve, 10));
-        await startNewRound();
+        // Otherwise we need to ensure the state updates have time to complete
+        // before starting the next round
+        setTimeout(async () => {
+          await startNewRound();
+        }, 100); // Slightly longer delay to ensure state is updated
       }
     }
   };
