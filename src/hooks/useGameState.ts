@@ -144,19 +144,17 @@ export function useGameState() {
 
   const handleTimeUp = () => {
     if (isGameActive && !isRoundComplete) {
-      setLives(prev => {
-        const newLives = Math.max(0, prev - 1);
-        if (newLives <= 0) {
-          setIsGameOver(true);
-        }
-        return newLives;
-      });
+      setLives(prev => Math.max(0, prev - 1));
       
       setIsGameActive(false);
       setIsRoundComplete(true);
       setTimeExpired(true);
       
-      if (lives > 1) {
+      if (lives <= 1) {
+        setTimeout(() => {
+          setIsGameOver(true);
+        }, 1000);
+      } else {
         setTimeout(() => {
           setTimeExpired(false);
           startNewRound();
