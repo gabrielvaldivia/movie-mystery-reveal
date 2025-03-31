@@ -96,7 +96,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStartGame }) => {
           <img
             src="/flicktionary-logo.png"
             alt="Flicktionary Logo"
-            className="w-48 h-48 md:w-96 md:h-96 object-contain animate-in fade-in-0 slide-in-from-bottom-5 duration-500"
+            className="w-56 h-56 md:w-64 md:h-64 object-contain animate-in fade-in-0 slide-in-from-bottom-5 duration-500"
           />
         </div>
         <h1 className="text-xl md:text-3xl font-arcade mb-4 md:mb-6 tracking-wider text-[#ECAF31]">

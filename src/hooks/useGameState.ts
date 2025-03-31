@@ -164,35 +164,31 @@ export function useGameState(difficulty: Difficulty) {
     console.log('Guess made:', { guess, normalizedGuess, normalizedTitle, isCorrect });
     
     if (isCorrect) {
-      // First, immediately set isCorrectGuess to true to stop the timer
-      setIsCorrectGuess(true);
-      
-      // Calculate points before any other state changes
+      // Calculate points before any state changes
       const pointsToAdd = Math.round(remainingTimeMs / 1000);
       
-      // Use a small delay to ensure isCorrectGuess is processed first
-      setTimeout(() => {
-        setIsTransitioning(true);
-        setIsGameActive(false);
-        setIsRoundComplete(true);
-        setScore(prev => prev + pointsToAdd);
-        
-        console.log('Correct guess! Adding points and proceeding...');
-        
-        if (difficulty === 'easy') {
-          // In easy mode, automatically proceed to next round after a short delay
-          console.log('Correct guess in easy mode, waiting 2 seconds before next round');
-          transitionTimeoutRef.current = setTimeout(() => {
-            setIsTransitioning(false);
-            startNewRound();
-          }, 2000);
-        } else {
-          // In hard mode, show the success dialog
-          console.log('Correct guess in hard mode, showing success dialog');
-          setShowSuccessDialog(true);
+      // Set all state updates immediately
+      setIsCorrectGuess(true);
+      setIsTransitioning(true);
+      setIsGameActive(false);
+      setIsRoundComplete(true);
+      setScore(prev => prev + pointsToAdd);
+      
+      console.log('Correct guess! Adding points and proceeding...');
+      
+      if (difficulty === 'easy') {
+        // In easy mode, automatically proceed to next round after a short delay
+        console.log('Correct guess in easy mode, waiting 2 seconds before next round');
+        transitionTimeoutRef.current = setTimeout(() => {
           setIsTransitioning(false);
-        }
-      }, 0);
+          startNewRound();
+        }, 2000);
+      } else {
+        // In hard mode, show the success dialog
+        console.log('Correct guess in hard mode, showing success dialog');
+        setShowSuccessDialog(true);
+        setIsTransitioning(false);
+      }
       return;
     }
     
@@ -344,7 +340,8 @@ export function useGameState(difficulty: Difficulty) {
   };
   
   const handleSubmitScore = (playerName: string) => {
-    console.log(`Saving score for ${playerName}: ${score}`);
+    console.log(`Score submission completed for ${playerName}: ${score}`);
+    // Reset the game state after score submission
     resetGame();
   };
   

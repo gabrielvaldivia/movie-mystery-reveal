@@ -131,6 +131,7 @@ const GameContainer: React.FC = () => {
       console.log("Score saved, reloading scores...");
       await loadScores();
       handleSubmitScore(playerName);
+      setShowStartScreen(true);
     } catch (error) {
       console.error("Error saving score:", error);
     }

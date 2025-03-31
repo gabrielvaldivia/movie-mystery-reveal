@@ -34,9 +34,7 @@ const Leaderboard: React.FC<LeaderboardProps> = ({
     <div className="w-full max-w-md min-h-[600px] bg-[#1A2336] rounded-lg p-6">
       <div className="flex flex-col items-center gap-6 h-full">
         <div className="flex justify-between items-center w-full">
-          <h2 className="text-xl font-arcade text-[#ECAF31]">
-            {difficulty === "easy" ? "Easy Mode" : "Hard Mode"}
-          </h2>
+          <h2 className="text-xl font-arcade text-[#ECAF31]">Leaderboard</h2>
           <button
             onClick={onClose}
             className="p-2 hover:bg-white/10 rounded-lg transition-colors"
