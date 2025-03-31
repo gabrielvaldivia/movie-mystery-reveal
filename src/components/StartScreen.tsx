@@ -100,7 +100,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStartGame }) => {
           />
         </div>
         <h1 className="text-xl md:text-3xl font-arcade mb-4 md:mb-6 tracking-wider text-[#ECAF31]">
-          Flicktionary
+          FLICKTIONARY
         </h1>
         <p className="text-[#ECAF31] mb-8 md:mb-10 max-w-md font-arcade text-xs leading-relaxed tracking-wide">
           Guess the movie as it gradually reveals itself. The faster you guess,
@@ -110,7 +110,7 @@ const StartScreen: React.FC<StartScreenProps> = ({ onStartGame }) => {
 
       <div className="flex-1" />
 
-      <div className="flex-none relative space-y-6 w-full max-w-[500px]">
+      <div className="flex-none relative space-y-3 w-full max-w-[500px]">
         <div className="relative">
           <div className="absolute left-4 w-6 pt-2">
             <div className="hand-float">
